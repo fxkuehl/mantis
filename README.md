@@ -21,7 +21,7 @@ In addition to the PCB you need these components to build a working keyboard:
 
 ## Firmware
 
-The firmware will be available on a branch of my QMK fork.
+Firmware is available in my [QMK fork](https://github.com/fxkuehl/qmk_firmware/tree/mantis-v0.1/keyboards/mantis).
 
 ## Concept
 
