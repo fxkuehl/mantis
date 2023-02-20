@@ -1,0 +1,487 @@
+units:
+  hx: 21.5
+  hy: 18.62
+  my: 2
+  mx: 0.87my
+points:
+  zones:
+    # Only one zone. Using shifts to arrange keys in a hex grid. The
+    # arrangement into rows and columns reflects the keyboard matrix.
+    # The lowest row is nominally the thumb row. But the pinky and ring
+    # finger keys are not really part of the thumb cluster. The inner
+    # index finger column has actually two thumb keys.
+    hex:
+      anchor:
+        shift: [hx*3/2,-5hy]
+      columns:
+        pinky:
+          rows:
+            thumb:
+              shift: [hx/2, hy]
+            r1:
+              shift: [hx, hy]
+            r2:
+              shift: [0, 0]
+            r3:
+              shift: [hx/2, 0]
+          key:
+            column_net: P19
+            mirror.column_net: P4
+        ring:
+          spread: hx
+          rows:
+            thumb:
+              shift: [hx, 0]
+          key:
+            column_net: P18
+            mirror.column_net: P5
+        middle:
+          spread: hx
+          rows:
+            thumb:
+              shift: [hx/2, -hy-my]
+          key:
+            column_net: P15
+            mirror.column_net: P6
+        index:
+          spread: hx/2
+          stagger: -hy
+          rows:
+            thumb:
+              shift: [hx, -my]
+          key:
+            column_net: P14
+            mirror.column_net: P7
+        inner:
+          spread: hx/2
+          stagger: -hy
+          rows:
+            thumb:
+              shift: [hx, -my]
+            r1:
+              shift: [hx*3/2, -my]
+            r2:
+            r3:
+          key:
+            column_net: P16
+            mirror.column_net: P8
+      rows:
+        thumb:
+          row_net: P3
+        r1:
+          shift: [hx/2]
+          row_net: P2
+        r2:
+          shift: [hx]
+          row_net: P0
+        r3:
+          shift: [hx*3/2]
+          row_net: P1
+  key:
+    padding: hy
+    bind: 7
+    footprints:
+      choc_hotswap:
+        type: choc
+        anchor:
+          rotate: 180
+        nets:
+          from: =colrow
+          to: =column_net
+        params:
+          keycaps: false
+          hotswap: true
+      diode:
+        type: diode
+        anchor:
+          rotate: -90
+          shift: [9, 0]
+        nets:
+          from: =colrow
+          to: =row_net
+        params:
+          through_hole: true
+    mirror.footprints:
+      choc_hotswap:
+        type: choc
+        anchor:
+          rotate: 180
+        nets:
+          from: =colrow
+          to: =column_net
+        params:
+          keycaps: false
+          hotswap: true
+      diode:
+        type: diode
+        anchor:
+          rotate: 90
+          shift: [-9, 0]
+        nets:
+          from: =colrow
+          to: =row_net
+        params:
+          through_hole: true
+  mirror:
+    ref: hex_inner_r3
+    distance: hx+2
+outlines:
+  exports:
+    _poly:
+      - type: polygon
+        points:
+          - ref: hex_inner_thumb
+            shift: [0, -2hy/3-my]
+          - ref: hex_middle_thumb
+            shift: [-hx/2-mx, -hy/3-my/2]
+          - ref: hex_middle_thumb
+            shift: [-hx/2-mx, hy/3+my/2]
+
+#          - ref: hex_ring_thumb
+#            shift: [-hx/2-mx, -hy/3-my/2]
+#          - ref: hex_ring_thumb
+#            shift: [-hx/2-mx, -hy/3+my/2]
+
+#            shift: [-hx/2-mx, hy/3+my/2]
+#          - ref: hex_pinky_thumb
+#            shift: [hx/2, -hy/3-my]
+#          - ref: hex_pinky_thumb
+#            shift: [0, -2hy/3-my]
+
+          - ref: hex_pinky_thumb
+            shift: [-hx-mx, -my/2]
+          - ref: hex_pinky_r3
+            shift: [-hx-mx, my/2]
+          - ref: hex_pinky_r3
+            shift: [0, 2hy/3+my]
+          - ref: hex_pinky_r3
+            shift: [hx, my]
+          - ref: hex_ring_r3
+            shift: [hx/2, hy+my]
+
+          - ref: hex_middle_r3
+            shift: [1.5hx+1, my-hy/3-0.87]
+
+          - ref: mirror_hex_ring_r3
+            shift: [hx/2, hy+my]
+          - ref: mirror_hex_pinky_r3
+            shift: [hx, my]
+          - ref: mirror_hex_pinky_r3
+            shift: [0, 2hy/3+my]
+          - ref: mirror_hex_pinky_r3
+            shift: [-hx-mx, my/2]
+          - ref: mirror_hex_pinky_thumb
+            shift: [-hx-mx, -my/2]
+          - ref: mirror_hex_middle_thumb
+            shift: [-hx/2-mx, hy/3+my/2]
+          - ref: mirror_hex_middle_thumb
+            shift: [-hx/2-mx, -hy/3-my/2]
+          - ref: mirror_hex_inner_thumb
+            shift: [0, -2hy/3-my]
+
+          - ref: hex_inner_thumb
+            shift: [hx+1, 0.87-my]
+    _raw_outline:
+      - type: outline
+        name: _poly
+      - type: rectangle
+        anchor:
+          ref: hex_index_r3
+          shift: [hx+1-25, hy/2-17.5]
+        size: [50, 35]
+        operation: add
+    outline:
+      - type: outline
+        name: _raw_outline
+        fillet: my
+    _k01:
+      - type: polygon
+        points:
+          - ref: hex_pinky_thumb
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k02:
+      - type: polygon
+        points:
+          - ref: hex_ring_thumb
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k03:
+      - type: polygon
+        points:
+          - ref: hex_middle_thumb
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k04:
+      - type: polygon
+        points:
+          - ref: hex_index_thumb
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k05:
+      - type: polygon
+        points:
+          - ref: hex_inner_thumb
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k11:
+      - type: polygon
+        points:
+          - ref: hex_pinky_r1
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k12:
+      - type: polygon
+        points:
+          - ref: hex_ring_r1
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k13:
+      - type: polygon
+        points:
+          - ref: hex_middle_r1
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k14:
+      - type: polygon
+        points:
+          - ref: hex_index_r1
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k15:
+      - type: polygon
+        points:
+          - ref: hex_inner_r1
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k21:
+      - type: polygon
+        points:
+          - ref: hex_pinky_r2
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k22:
+      - type: polygon
+        points:
+          - ref: hex_ring_r2
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k23:
+      - type: polygon
+        points:
+          - ref: hex_middle_r2
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k24:
+      - type: polygon
+        points:
+          - ref: hex_index_r2
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k25:
+      - type: polygon
+        points:
+          - ref: hex_inner_r2
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k31:
+      - type: polygon
+        points:
+          - ref: hex_pinky_r3
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k32:
+      - type: polygon
+        points:
+          - ref: hex_ring_r3
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k33:
+      - type: polygon
+        points:
+          - ref: hex_middle_r3
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k34:
+      - type: polygon
+        points:
+          - ref: hex_index_r3
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    _k35:
+      - type: polygon
+        points:
+          - ref: hex_inner_r3
+            shift: [-hx/2+0.5, -hy/3+0.43]
+          - shift: [0, 2hy/3-0.86]
+          - shift: [hx/2-0.5, hy/3+0.43-0.58]
+          - shift: [hx/2-0.5, -hy/3+0.58-0.43]
+          - shift: [0, -2hy/3+0.86]
+          - shift: [-hx/2+0.5, -hy/3-0.43+0.58]
+    switch_plate:
+      - type: outline
+        name: outline
+      - type: keys
+        side: left
+        operation: subtract
+      - type: keys
+        side: right
+        operation: subtract
+pcbs:
+  board:
+    outlines:
+      main:
+        outline: outline
+      k01:
+        outline: _k01
+        layer: Eco1.User
+      k02:
+        outline: _k02
+        layer: Eco1.User
+      k03:
+        outline: _k03
+        layer: Eco1.User
+      k04:
+        outline: _k04
+        layer: Eco1.User
+      k05:
+        outline: _k05
+        layer: Eco1.User
+      k11:
+        outline: _k11
+        layer: Eco1.User
+      k12:
+        outline: _k12
+        layer: Eco1.User
+      k13:
+        outline: _k13
+        layer: Eco1.User
+      k14:
+        outline: _k14
+        layer: Eco1.User
+      k15:
+        outline: _k15
+        layer: Eco1.User
+      k21:
+        outline: _k21
+        layer: Eco1.User
+      k22:
+        outline: _k22
+        layer: Eco1.User
+      k23:
+        outline: _k23
+        layer: Eco1.User
+      k24:
+        outline: _k24
+        layer: Eco1.User
+      k25:
+        outline: _k25
+        layer: Eco1.User
+      k31:
+        outline: _k31
+        layer: Eco1.User
+      k32:
+        outline: _k32
+        layer: Eco1.User
+      k33:
+        outline: _k33
+        layer: Eco1.User
+      k34:
+        outline: _k34
+        layer: Eco1.User
+      k35:
+        outline: _k35
+        layer: Eco1.User
+    footprints:
+      promicro:
+        type: promicro
+        anchor:
+          ref: hex_index_r3
+          shift: [hx+1, hy/2-0.5]
+          rotate: -90
+      reset:
+        type: button
+        anchor:
+          ref: hex_index_r3
+          shift: [hx/3, hy]
+        params:
+          side: F
+        nets:
+          from: GND
+          to: RST
