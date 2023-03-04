@@ -33,9 +33,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 2.2,
-          "height": 4.4,
-          "width": 4.4
+          "drill": 0.762,
+          "height": 1.524,
+          "width": 1.524
         },
         "silk_line_width": 0.12,
         "silk_text_italic": false,
@@ -140,7 +140,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "mantis.kicad_pro",
+    "filename": "mantis_raised.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -172,7 +172,7 @@
     "last_paths": {
       "gencad": "",
       "idf": "",
-      "netlist": "",
+      "netlist": "./",
       "specctra_dsn": "",
       "step": "",
       "vrml": ""
