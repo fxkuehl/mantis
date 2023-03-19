@@ -170,6 +170,7 @@ points:
           row_net: P3
   key:
     spread: hx
+    padding: hy
 # Can't get rotated diode footprints right
 # in the mirror image. So need to mirror
 # manually for now.
