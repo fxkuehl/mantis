@@ -3,7 +3,7 @@ units:
   hx: 21.5
   hy: 18.62
   # Margin around the PCB
-  mx: 1
+  mx: 2
   my: 1.1547mx
   # Distance between key clusters
   dx: 3
@@ -13,275 +13,348 @@ units:
   ky: 1.1547kx
   fk: 3
   # Space around raised PCB and fillet radius
-  rx: 0.5
+  rx: kx
   ry: 1.1547rx
-  fr: 1.7
+  # Width of the sound channel and exit radius
+  wc: 15.2
+  # MCU vertical offset
+  mcu_top: hy/3+2my
 
 points:
   zones:
-    fingers:
+    # Just key positions for reference, without any rotation
+    # Origin aligns the center/split line with both inch and mm rasters
+    f:
       anchor:
-        shift: [hx*3/2,-4hy]
+        shift: [254-9hx/2-dx/2, -127+3hy]
+      columns:
+        c0:
+          rows:
+            r0: $unset
+            r1: $unset
+            r2: $unset
+            r3:
+              shift: [0]
+        c1:
+          rows:
+            r0: $unset
+          key:
+            stagger: -2hy
+            spread: 0
+        c2:
+          rows:
+            r0: $unset
+        c3:
+          rows:
+            r1:
+              shift: [hx/2]
+          key:
+            stagger: -hy
+            spread: hx/2
+        c4:
+          rows:
+            r0: $unset
+        c5:
+          rows:
+            r0: $unset
+            r1: $unset
+            r2:
+              shift: [0]
+      rows:
+        r0:
+        r1:
+        r2:
+          shift: [hx/2]
+        r3:
+          shift: [hx/2]
+    t:
+      anchor:
+        shift: [254-5hx/2-dx/2, -127-hy-dy]
+      columns:
+        c1:
+        c2:
+        c3:
+          rows:
+            r1:
+            r2:
+              shift: [hx/2]
+          key:
+            stagger: -hy
+            spread: hx/2
+      rows:
+        r1:
+
+    # Positions for standoffs, mounting holes and headers
+    mount:
+      anchor:
+        ref: f_c0_r3
+      columns:
+        base1:
+          rows.r.shift: [-hx/2+hx/8, -hy+hy/4]
+        base2:
+          rows.r.shift: [3hx/4, -3hy]
+          #rows.r.shift: [hx, -4hy/3]
+        base3:
+          rows.r.shift: [3hx/2-1, hy/3-1]
+        raise1:
+          #rows.r.shift: [5hx/2-3, -27hy/6-dy]
+          rows.r.shift: [5hx/2-hx/8, -5hy-dy+hy/4+my+ky]
+        raise2:
+          rows.r.shift: [9hx/2+dx/2-4, -11hy/3]
+        raise3:
+          #rows.r.shift: [23hx/6, -hy/3]
+          rows.r.shift: [4hx-hx/8, -hy/4]
+        header:
+          rows.r.shift: [9hx/2+dx/2, -3hy-dy/4]
+      key:
+        spread: 0
+
+    # Keys are rotated in 60° increments to make a simulated key well
+    # with sculpted key caps. Define each row in its own zone to make
+    # the key rotation easier. Otherwise the spread and stagger get very
+    # confusing. The matrix is a little unintuitive to minimize the
+    # number of column pins between top and bottom PCBs.
+    top:
+      anchor:
+        ref: f_c1_r3
       columns:
         c1:
           key:
-            column_net: P19
-            mirror.column_net: P4
+            column_net: C1
+            mirror.column_net: M_C1
         c2:
           key:
-            column_net: P18
-            mirror.column_net: P5
+            column_net: C2
+            mirror.column_net: M_C2
         c3:
           key:
-            column_net: P15
-            mirror.column_net: P6
+            column_net: C3
+            mirror.column_net: M_C3
         c4:
-          rows:
-            r3:
-              shift: [0, hy]
           key:
             spread: hx/2
             stagger: -hy
-            column_net: P14
-            mirror.column_net: P7
+            column_net: C4
+            mirror.column_net: M_C4
         c5:
           key:
-            column_net: P16
-            mirror.column_net: P8
+            spread: hx/2
+            stagger: -hy
+            column_net: C5
+            mirror.column_net: M_C5
+      rows:
+        r3:
+          row_net: R3
+          rotate: -60
+    home:
+      anchor:
+        ref: f_c1_r2
+      columns:
+        c1:
+          key:
+            column_net: C1
+            mirror.column_net: M_C1
+        c2:
+          key:
+            column_net: C2
+            mirror.column_net: M_C2
+        c3:
+          key:
+            column_net: C3
+            mirror.column_net: M_C3
+        c4:
+          key:
+            spread: hx/2
+            stagger: -hy
+            column_net: C4
+            mirror.column_net: M_C4
+        c5:
+          key:
+            spread: hx/2
+            stagger: -hy
+            column_net: C5
+            mirror.column_net: M_C5
+      rows:
+        r2:
+          row_net: R2
+          rotate: -120
+    bottom:
+      anchor:
+        ref: f_c1_r1
+      columns:
+        c1:
+          key:
+            column_net: C1
+            mirror.column_net: M_C1
+        c2:
+          key:
+            column_net: C2
+            mirror.column_net: M_C2
+        c3:
+          key:
+            column_net: C3
+            mirror.column_net: M_C3
+        c4:
+          key:
+            spread: hx/2
+            stagger: -hy
+            column_net: C4
+            mirror.column_net: M_C4
+        c5:
+          rows.r1:
+            rotate: -60
+          key:
+            spread: 1.5hx
+            stagger: -hy-dy
+            column_net: C5
+            mirror.column_net: M_C5
       rows:
         r1:
-          row_net: P2
-        r2:
-          shift: [hx/2, 0]
-          row_net: P0
-        r3:
-          shift: [-hx/2, 0]
-          row_net: P1
+          row_net: R1
+          rotate: 180
     thumb:
       anchor:
-        ref: fingers_c4_r1
-        shift: [-hx/2,-hy-dy]
+        ref: f_c0_r3
       columns:
         c1:
-#          $skip: true
-          rows:
-            rt:
-              shift: [-hx/2, hy+dy]
           key:
-            column_net: P19
-            mirror.column_net: P4
+            column_net: C1
+            mirror.column_net: M_C1
         c2:
+          rows.rt:
+            rotate: 180
           key:
-            spread: 0
-            column_net: P18
-            mirror.column_net: P5
+            spread: 1.5hx
+            stagger: -3hy
+            column_net: C2
+            mirror.column_net: M_C2
         c3:
           key:
-            column_net: P15
-            mirror.column_net: P6
+            spread: 2hx
+            stagger: -2hy-dy
+            column_net: C3
+            mirror.column_net: M_C3
         c4:
+          rows.rt:
+            rotate: 60
           key:
-            spread: hx/2
-            stagger: -hy
-            column_net: P14
-            mirror.column_net: P7
+            spread: -1.5hx
+            stagger: hy
+            column_net: C4
+            mirror.column_net: M_C4
         c5:
-#          $skip: true
           key:
-            spread: hx/2
-            stagger: hy
-            column_net: P16
-            mirror.column_net: P8
+            column_net: C5
+            mirror.column_net: M_C5
       rows:
         rt:
-          row_net: P3
-# Can't get rotated diode footprints right
-# in the mirror image. So need to mirror
-# manually for now.
-    mirror_fingers:
-      anchor:
-        shift: [hx*3/2+9hx+dx,-4hy]
-      columns:
-        c1m:
-          key:
-            column_net: P4
-        c2m:
-          key:
-            column_net: P5
-        c3m:
-          key:
-            column_net: P6
-        c4m:
-          rows:
-            r3:
-              shift: [0, hy]
-          key:
-            spread: -hx/2
-            stagger: -hy
-            column_net: P7
-        c5m:
-          key:
-            column_net: P8
-      rows:
-        r1:
-          row_net: P2
-        r2:
-          shift: [-hx/2, 0]
-          row_net: P0
-        r3:
-          shift: [hx/2, 0]
-          row_net: P1
-      key:
-        spread: -hx
-    mirror_thumb:
-      anchor:
-        ref: mirror_fingers_c4m_r1
-        shift: [hx/2,-hy-dy]
-      columns:
-        c1m:
-#          $skip: true
-          rows:
-            rt:
-              shift: [hx/2, hy+dy]
-          key:
-            column_net: P4
-        c2m:
-          key:
-            spread: 0
-            column_net: P5
-        c3m:
-          key:
-            column_net: P6
-        c4m:
-          key:
-            spread: -hx/2
-            stagger: -hy
-            column_net: P7
-        c5m:
-#          $skip: true
-          key:
-            spread: -hx/2
-            stagger: hy
-            column_net: P8
-      key:
-        spread: -hx
-      rows:
-        rt:
-          row_net: P3
+          row_net: RT
+          rotate: 0
   key:
     spread: hx
     padding: hy
-# Can't get rotated diode footprints right
-# in the mirror image. So need to mirror
-# manually for now.
-#  mirror:
-#    ref: fingers_c5_r2
-#    distance: hx+mx
+  mirror:
+    ref: top_c5_r3
+    distance: hx+dx
 
 outlines:
   _main:
+    # All points of the main outline are relative to non-rotated
+    # keys to keep it sane.
     - what: polygon
       points:
-        - ref: thumb_c4_rt
-          shift: [0, -2.0hy/3-my]
-        - ref: thumb_c2_rt
-          shift: [-hx/2-mx, -hy/3-my/2]
-        - ref: thumb_c2_rt
-          shift: [-hx/2-mx, hy/3+dy-my/2]
-        - ref: fingers_c1_r1
-          shift: [-hx/2-mx, -hy/3-my/2]
-        - ref: fingers_c1_r3
+        - ref: thumb_c3_rt
+          shift: [0, -2hy/3-my]
+        - ref: thumb_c3_rt
+          shift: [-2hx-mx, 2hy/3-my/2]
+        - ref: thumb_c3_rt
+          shift: [-2hx-mx, 4hy/3+dy-my/2]
+        - ref: thumb_c1_rt
+          shift: [-hx/2-mx, -7hy/3-my/2]
+        - ref: thumb_c1_rt
           shift: [-hx/2-mx, hy/3+my/2]
-        - ref: fingers_c1_r3
+        - ref: thumb_c1_rt
           shift: [hx/2, hy+my]
-        - ref: fingers_c2_r3
-          shift: [hx/2, hy/3+my]
-        - ref: fingers_c3_r3
+        - ref: thumb_c1_rt
+          shift: [3hx/2, hy/3+my]
+        - ref: thumb_c1_rt
+          shift: [5hx/2, hy+my]
+
+        - ref: thumb_c1_rt
+          shift: [9hx/2+dx/2, my-dy/4-hy/3]
+
+        - ref: mirror_thumb_c1_rt
+          shift: [5hx/2, hy+my]
+        - ref: mirror_thumb_c1_rt
+          shift: [3hx/2, hy/3+my]
+        - ref: mirror_thumb_c1_rt
           shift: [hx/2, hy+my]
+        - ref: mirror_thumb_c1_rt
+          shift: [-hx/2-mx, hy/3+my/2]
+        - ref: mirror_thumb_c1_rt
+          shift: [-hx/2-mx, -7hy/3-my/2]
+        - ref: mirror_thumb_c3_rt
+          shift: [-2hx-mx, 4hy/3+dy-my/2]
+        - ref: mirror_thumb_c3_rt
+          shift: [-2hx-mx, 2hy/3-my/2]
+        - ref: mirror_thumb_c3_rt
+          shift: [0, -2hy/3-my]
 
-        - ref: fingers_c4_r3
-          shift: [1.5hx+dx/2, my-dy/4-hy/3]
-
-        - ref: mirror_fingers_c3m_r3
-          shift: [-hx/2, hy+my]
-        - ref: mirror_fingers_c2m_r3
-          shift: [-hx/2, hy/3+my]
-        - ref: mirror_fingers_c1m_r3
-          shift: [-hx/2, hy+my]
-        - ref: mirror_fingers_c1m_r3
-          shift: [hx/2+mx, hy/3+my/2]
-        - ref: mirror_fingers_c1m_r1
-          shift: [hx/2+mx, -hy/3-my/2]
-        - ref: mirror_thumb_c2m_rt
-          shift: [hx/2+mx, hy/3+dy-my/2]
-        - ref: mirror_thumb_c2m_rt
-          shift: [hx/2+mx, -hy/3-my/2]
-        - ref: mirror_thumb_c4m_rt
-          shift: [0, -2.0hy/3-my]
-
-        - ref: thumb_c4_rt
-          shift: [hx+dx/2, my-dy/4]
+        - ref: thumb_c3_rt
+          shift: [hx+dx/2, -my+dy/4]
     - what: rectangle
       where:
-        ref: fingers_c5_r3
-        shift: [hx+dx/2, hy/2]
-      size: [55, 35]
+        ref: thumb_c1_rt
+        shift: [9hx/2+dx/2, mcu_top-4hy/3]
+      size: [4hx+dx, 8hy/3]
       operation: add
+      fillet: mx+kx+fk
   _raised:
     - what: polygon
       points:
-        - ref: thumb_c4_rt
+        - ref: thumb_c3_rt
           shift: [hx+dx/2, -dy/4+ry]
-        - ref: thumb_c4_rt
-          shift: [0, 2.0hy/3+ry]
-        - shift: [-hx, -2.0hy/3]
-        - ref: thumb_c2_rt
-          shift: [-hx/2+rx, -hy/3+ry/2]
-        # Uncomment this line and comment out the following two
-        # if the optional c1_rt key is skipped
-        #- shift: [0, 4.0hy/3+dy-ry]
-        - shift: [0, 2.0hy/3-ry]
+        - shift: [-hx-dx/2, 2hy/3+dy/4]
+        - shift: [-hx, -2hy/3]
+        - shift: [-hx+rx, 2hy/3-ry/2]
+        - shift: [0, 2hy/3-ry]
         - shift: [hx/2, hy/3]
-        - ref: fingers_c4_r1
-          shift: [-hx/2+rx, hy/3-ry/2]
+        - shift: [0, 2hy/3+dy]
         - shift: [hx/2, hy/3]
-        - ref: fingers_c4_r2
-          shift: [-hx/2+rx, hy/3-ry/2]
+        - shift: [0, 2hy/3]
         - shift: [hx/2, hy/3]
-        - ref: fingers_c5_r3
-          shift: [-hx/2+rx, hy/3-ry/2]
-        - shift: [hx/2-rx, hy/3-ry/2]
-        - shift: [hx/2-rx, -hy/3+ry/2]
-        - ref: fingers_c5_r2
-          shift: [-rx, 2.0hy/3-ry/2]
-        - shift: [hx/2+dx/2+rx, -hy/3-dy/4-ry/2]
+        - shift: [0, 2hy/3]
 
-        - ref: mirror_fingers_c5m_r2
-          shift: [rx, 2.0hy/3-ry/2]
-        - ref: mirror_fingers_c5m_r3
-          shift: [-hx/2+rx, hy/3-ry/2]
-        - shift: [hx/2-rx, hy/3-ry/2]
-        - shift: [hx/2-rx, -hy/3+ry/2]
-        - ref: mirror_fingers_c4m_r2
-          shift: [-rx, 2.0hy/3-ry/2]
+        # Extended center to mount controller
+        - shift: [hx/2, hy/3]
+        - shift: [0, hy/3+ry/2+mcu_top]
+        - shift: [2hx+dx-2rx, 0]
+        - shift: [0, -hy/3-ry/2-mcu_top]
         - shift: [hx/2, -hy/3]
-        - ref: mirror_fingers_c4m_r1
-          shift: [-rx, 2.0hy/3-ry/2]
-        # Uncomment these three lines and comment out the following five
-        # if the optional c1_rt key is skipped
-        #- shift: [hx, -2.0hy/3]
-        #- ref: mirror_thumb_c2m_rt
-        #  shift: [hx/2-rx, -hy/3+ry/2]
+
+        # Fitted center for controller on the main PCB
+        #- shift: [hx/2-rx, hy/3-ry/2]
+        #- shift: [hx/2-rx, -hy/3+ry/2]
+        #- shift: [0, -2hy/3]
+        #- shift: [hx/2+dx/2+rx, -hy/3-dy/4-ry/2]
+
+        #- shift: [hx/2+dx/2+rx, hy/3+dy/4+ry/2]
+        #- shift: [0, 2hy/3]
+        #- shift: [hx/2-rx, hy/3-ry/2]
+        #- shift: [hx/2-rx, -hy/3+ry/2]
+
+        - shift: [0, -2hy/3]
         - shift: [hx/2, -hy/3]
-        - ref: mirror_thumb_c2m_rt
-          shift: [-rx, 2.0hy/3-ry/2]
+        - shift: [0, -2hy/3]
         - shift: [hx/2, -hy/3]
-        - shift: [0, -2.0hy/3+ry]
-        - ref: mirror_thumb_c2m_rt
-          shift: [-hx/2, -hy+ry]
-        - ref: mirror_thumb_c4m_rt
-          shift: [0, 2.0hy/3+ry]
-  _hexkey:
+        - shift: [0, -2hy/3-dy]
+        - shift: [hx/2, -hy/3]
+        - shift: [0, -2hy/3+ry]
+        - shift: [-hx+rx, -2hy/3+ry/2]
+        - shift: [-hx, 2hy/3]
+      fillet: fk+kx-rx
+
+  _hexagon:
     - what: polygon
       points:
         - shift: [-hx/2+kx, -hy/3+ky/2]
@@ -290,113 +363,704 @@ outlines:
         - shift: [hx/2-kx, -hy/3+ky/2]
         - shift: [0, -2.0hy/3+ky]
         - shift: [-hx/2+kx, -hy/3+ky/2]
+      fillet: fk
+  _hexkey:
+    - what: outline
+      name: _hexagon
+    - what: circle
+      radius: 7
+      where:
+        shift: [0, -1.5]
+      operation: stack
+  _m2_nut:
+    - what: polygon
+      points:
+        - shift: [-2.1, -1.215]
+        - shift: [0, 2.43]
+        - shift: [2.1, 1.215]
+        - shift: [2.1, -1.215]
+        - shift: [0, -2.43]
+        - shift: [-2.1, -1.215]
+      fillet: 1
+  _rgb_cutout:
+    - what: rectangle
+      where:
+        shift: [0, 4.7]
+      size: [3.2, 3.2]
+      fillet: 0.4
+  _switch_cutout1:
+    - what: rectangle
+      size: [13.8, 13.6]
+      fillet: 1
+  _mcu_cutout:
+    - what: rectangle
+      size: [17.78 + 1, 33.02 + 1]
+      where:
+        ref: thumb_c1_rt
+        shift: [9hx/2+dx/2, mcu_top-16.51]
+      fillet: 0.5
+  _header_cutout:
+    - what: polygon
+      points:
+        - ref: thumb_c3_rt
+          shift: [hx/2+kx, 5hy/3+ky/2+dy/2]
+        - shift: [0, 2hy/3+dy/2-ky]
+        #- shift: [hx/2-kx+dx/2, hy/3-ky/2+dx/4]
+        #- shift: [hx/2-kx+dx/2, -hy/3+ky/2-dx/4]
+        - shift: [hx-2kx+dx, 0]
+        - shift: [0, -2hy/3-dy/2+ky]
+        #- shift: [-hx/2+kx-dx/2, -hy/3+ky/2-dx/4]
+    - what: rectangle
+      size: [hx, wc]
+      where: [thumb_c3_rt]
+      asym: both
+      adjust:
+        shift: [hx/4+3*1.1547, 3hy/2]
+        rotate: -60
+      operation: subtract
+      fillet: 1
+  _sound_holes:
+    - what: circle
+      radius: wc/2
+      where: [top_c4_r3, home_c4_r2,
+              bottom_c4_r1, bottom_c5_r1,
+              thumb_c4_rt, thumb_c5_rt]
+  _main_cutouts:
+    - what: outline
+      name: _mcu_cutout
+    - what: outline
+      name: _sound_holes
 
-  main:
+  _linear_channel_1u:
+    - what: rectangle
+      size: [hx+0.01, wc]
+    - what: circle
+      radius: wc/2
+      where:
+        shift: [-hx/2, 0]
+      operation: add
+    - what: circle
+      radius: wc/2
+      where:
+        shift: [hx/2, 0]
+      operation: add
+  _linear_channel_2u:
+    - what: rectangle
+      size: [2hx+0.01, wc]
+    - what: circle
+      radius: wc/2
+      where:
+        shift: [-hx, 0]
+      operation: add
+    - what: circle
+      radius: wc/2
+      where:
+        shift: [hx, 0]
+      operation: add
+  _linear_channel_3u:
+    - what: rectangle
+      size: [3hx+0.01, wc]
+    - what: circle
+      radius: wc/2
+      where:
+        shift: [-3hx/2, 0]
+      operation: add
+    - what: circle
+      radius: wc/2
+      where:
+        shift: [3hx/2, 0]
+      operation: add
+  _linear_channel_dy:
+    - what: rectangle
+      size: [wc, dy+0.01]
+      where:
+        shift: [0, dy/2]
+    - what: circle
+      radius: wc/2
+      operation: add
+  _arc_channel_1u:
+    - what: circle
+      radius: 2hy/3 + wc/2
+    - what: circle
+      radius: 2hy/3 - wc/2
+      operation: subtract
+    - what: polygon
+      points:
+        - shift: [0, 0]
+        - shift: [-2hy, hx]
+        - shift: [4hy, 0]
+      operation: intersect
+  _arc_channel_2u:
+    - what: circle
+      radius: 2hy/3 + wc/2
+    - what: circle
+      radius: 2hy/3 - wc/2
+      operation: subtract
+    - what: polygon
+      points:
+        - shift: [0, 0]
+        - shift: [-2hy, hx]
+        - shift: [4hy, 0]
+      operation: subtract
+  _sound_channel_main:
+    - what: outline
+      name: _arc_channel_1u
+      where: [f_c0_r3, f_c2_r3]
+      asym: both
+      adjust:
+        - shift: [hx/2, -hy/3]
+    - what: outline
+      name: _linear_channel_1u
+      where: [f_c0_r3, f_c3_r3]
+      asym: both
+      adjust:
+        - shift: [hx/4, -hy/2]
+        - rotate: -60
+    - what: outline
+      name: _linear_channel_2u
+      where: [f_c3_r0, f_c3_r2]
+      asym: both
+      adjust:
+        - rotate: -60
+    - what: outline
+      name: _linear_channel_3u
+      where: [f_c2_r2]
+      asym: both
+      adjust:
+        - shift: [hx/4, -hy/2]
+        - rotate: -60
+    - what: outline
+      name: _arc_channel_2u
+      where: [f_c1_r2]
+      asym: both
+      adjust:
+        - shift: [0, -2hy/3]
+        - rotate: -60
+    - what: outline
+      name: _linear_channel_dy
+      where: [t_c1_r1]
+      asym: both
+    - what: outline
+      name: _arc_channel_2u
+      where: [t_c3_r1]
+      asym: both
+      adjust:
+        - shift: [0, 2hy/3]
+    - what: circle
+      radius: wc/2
+      where: [t_c2_r1, t_c3_r2]
+      asym: both
+      fillet: 1
+  _sound_channel_raised:
+    - what: outline
+      name: _linear_channel_1u
+      where: [f_c5_r3, f_c5_r2, t_c2_r1, t_c3_r2]
+      asym: both
+      adjust:
+        shift: [-hx/4, hy/2]
+        rotate: -60
+    - what: outline
+      name: _linear_channel_dy
+      where: [f_c4_r1, f_c5_r2]
+      asym: both
+      adjust:
+        rotate: 180
+      fillet: 1
+    - what: circle
+      radius: wc/2
+      where: [t_c1_r1]
+      asym: both
+    - what: rectangle
+      size: [wc, wc/3]
+      where: [t_c1_r1]
+      asym: both
+      adjust:
+        shift: [-wc/2, 0]
+    - what: rectangle
+      size: [wc, wc]
+      where: [t_c1_r1]
+      asym: both
+      adjust:
+        shift: [-hx/2-wc/2+kx, 0]
+      fillet: (hx-wc)/4
+
+  main_split:
     - what: outline
       name: _main
-      fillet: mx+kx+fk
+    - what: outline
+      name: _rgb_cutout
+      where: [top_c1_r3, top_c2_r3, top_c3_r3,
+              home_c1_r2, home_c2_r2, home_c3_r2,
+              bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
+              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+      operation: subtract
+    - what: outline
+      name: _main_cutouts
+      operation: subtract
+    - what: rectangle
+      size: [9hx+dx, 9hy]
+      where:
+        ref: thumb_c1_rt
+        shift: [0, -3hy]
+      operation: intersect
   raised:
     - what: outline
       name: _raised
-      fillet: fr
-  keys:
+    - what: outline
+      name: _rgb_cutout
+      where: [top_c4_r3, top_c5_r3,
+              home_c4_r2, home_c5_r2,
+              bottom_c4_r1, bottom_c5_r1,
+              thumb_c4_rt, thumb_c5_rt]
+      asym: both
+      operation: subtract
+  plate_main_split:
+    - what: outline
+      name: _main
+    - what: rectangle
+      size: [9hx+dx, 9hy]
+      where:
+        ref: thumb_c1_rt
+        shift: [0, -3hy]
+      operation: intersect
+    - what: outline
+      name: _switch_cutout1
+      where: [top_c1_r3, top_c2_r3, top_c3_r3,
+              home_c1_r2, home_c2_r2, home_c3_r2,
+              bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
+              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+      operation: subtract
+    - what: outline
+      name: _main_cutouts
+      operation: subtract
+    - what: outline
+      name: _header_cutout
+      operation: subtract
+    - what: outline
+      name: _m2_nut
+      where: [mount_base1_r, mount_base2_r, mount_base3_r]
+      operation: subtract
+    - what: circle
+      radius: 1.6
+      where: [mount_raise1_r, mount_raise2_r, mount_raise3_r]
+      operation: subtract
+  plate_raised:
+    - what: outline
+      name: _raised
+    - what: outline
+      name: _switch_cutout1
+      where: [top_c4_r3, top_c5_r3,
+              home_c4_r2, home_c5_r2,
+              bottom_c4_r1, bottom_c5_r1,
+              thumb_c4_rt, thumb_c5_rt]
+      asym: both
+      operation: subtract
+    - what: outline
+      name: _mcu_cutout
+      operation: subtract
+    - what: outline
+      name: _header_cutout
+      operation: subtract
+    - what: outline
+      name: _m2_nut
+      where: [mount_raise1_r, mount_raise2_r, mount_raise3_r]
+      asym: both
+      operation: subtract
+  sound_plate_main_split:
+    - what: outline
+      name: _main
+    - what: rectangle
+      size: [9hx+dx, 9hy]
+      where:
+        ref: thumb_c1_rt
+        shift: [0, -3hy]
+      operation: intersect
+    - what: outline
+      name: _mcu_cutout
+      operation: subtract
+    - what: outline
+      name: _header_cutout
+      operation: subtract
+    - what: outline
+      name: _sound_channel_main
+      operation: subtract
+    - what: circle
+      radius: 1.6
+      where: [mount_base1_r, mount_base2_r, mount_base3_r, mount_raise1_r, mount_raise2_r, mount_raise3_r]
+      operation: subtract
+  sound_plate_raised:
+    - what: outline
+      name: _raised
+    - what: outline
+      name: _mcu_cutout
+      operation: subtract
+    - what: outline
+      name: _header_cutout
+      operation: subtract
+    - what: outline
+      name: _sound_channel_raised
+      operation: subtract
+    - what: circle
+      radius: 1.6
+      where: [mount_raise1_r, mount_raise2_r, mount_raise3_r]
+      asym: both
+      operation: subtract
+  composite_keys:
+    - what: outline
+      name: _main
+    - what: outline
+      name: _mcu_cutout
+      operation: subtract
+    - what: outline
+      name: _raised
+      where:
+        shift: [0, 0.01]
+      operation: stack
     - what: outline
       name: _hexkey
-      where: true
-      fillet: fk
-  keys_raised:
-    - what: outline
-      name: _hexkey
-      where: [fingers_c5_r3, fingers_c4_r2, fingers_c5_r2, fingers_c4_r1, fingers_c5_r1, thumb_c2_rt, thumb_c3_rt, thumb_c5_rt, mirror_fingers_c5m_r3, mirror_fingers_c4m_r2, mirror_fingers_c5m_r2, mirror_fingers_c4m_r1, mirror_fingers_c5m_r1, mirror_thumb_c2m_rt, mirror_thumb_c3m_rt, mirror_thumb_c5m_rt]
-      fillet: fk
-  composite:
-    - what: outline
-      name: main
-    - what: outline
-      name: keys
+      where: [top_c1_r3, top_c2_r3, top_c3_r3, top_c4_r3, top_c5_r3,
+              home_c1_r2, home_c2_r2, home_c3_r2, home_c4_r2, home_c5_r2,
+              bottom_c1_r1, bottom_c2_r1, bottom_c3_r1, bottom_c4_r1, bottom_c5_r1,
+              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt, thumb_c4_rt, thumb_c5_rt]
+      asym: both
       operation: stack
     - what: outline
-      name: raised
+      name: _header_cutout
       operation: stack
-
-  composite_raised:
     - what: outline
-      name: raised
-    - what: outline
-      name: keys_raised
+      name: _m2_nut
+      where: [mount_base1_r, mount_base2_r, mount_base3_r, mount_raise1_r, mount_raise2_r, mount_raise3_r]
+      asym: both
       operation: stack
+    # Room for a 35mm cirque track pad by sacrificing 2 thumb keys
+    #- what: circle
+    #  radius: 35/2
+    #  where:
+    #    shift: [254, -127-hy-dy/2]
+    #  operation: stack
+  composite_sound:
+    - what: outline
+      name: _main
+      operation: stack
+    - what: outline
+      name: _sound_channel_main
+      operation: subtract
+    - what: outline
+      name: sound_plate_raised
+      where:
+        shift: [0, 0.01]
+      operation: stack
+    - what: circle
+      radius: 1.6
+      where: [mount_base1_r, mount_base2_r, mount_base3_r, mount_raise1_r, mount_raise2_r, mount_raise3_r]
+      asym: both
+      operation: stack
+  composites:
+    - what: outline
+      name: composite_keys
+    - what: outline
+      name: composite_sound
+      where:
+        shift: [0, -6hy-2dy-2my]
 
 pcbs:
-  mantis:
+  plate_main_split:
     outlines:
       main:
-        outline: main
-      keys:
-        outline: keys
-        layer: Dwgs.User
+        outline: plate_main_split
+
+  plate_raised:
+    outlines:
+      main:
+        outline: plate_raised
+
+  sound_plate_main_split:
+    outlines:
+      main:
+        outline: sound_plate_main_split
+
+  sound_plate_raised:
+    outlines:
+      main:
+        outline: sound_plate_raised
+
+  mantis_reversible_split:
+    outlines:
+      main:
+        outline: main_split
       raised:
-        outline: raised
-        layer: F.SilkS
+        outline: _raised
+        layer: Dwgs.User
+      headers:
+        outline: _header_cutout
+        layer: Dwgs.User
+      sound_main:
+        outline: _sound_channel_main
+        layer: Eco1.User
+      sound_raised:
+        outline: _sound_channel_raised
+        layer: Eco2.User
     footprints:
       keys:
         what: choc
-        where: true
+        where: [top_c1_r3, top_c2_r3, top_c3_r3,
+                home_c1_r2, home_c2_r2, home_c3_r2,
+                bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
         adjust:
           rotate: 180
         params:
-          from: "{{colrow}}"
-          to: "{{column_net}}"
+          from: "{{column_net}}"
+          to: "{{colrow}}"
           keycaps: false
-          hotswap: true
+          hotswap: false
+          reverse: true
       diodes:
         what: diode
-        where: true
+        where: [top_c1_r3, top_c2_r3, top_c3_r3,
+                home_c1_r2, home_c2_r2, home_c3_r2,
+                bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
         adjust:
-          rotate: -90
-          shift: [8.5, -1]
+          shift: [0, -3.5]
         params:
           from: "{{colrow}}"
           to: "{{row_net}}"
-      promicro:
+      row_vias:
+        what: via
+        where: [top_c1_r3, top_c2_r3, top_c3_r3,
+                home_c1_r2, home_c2_r2, home_c3_r2,
+                bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+        adjust:
+          shift: [0, -3.5]
+        params:
+          net: "{{row_net}}"
+      rgb:
+        what: rgb
+        where: [top_c1_r3, top_c2_r3, top_c3_r3,
+                home_c1_r2, home_c2_r2, home_c3_r2,
+                bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+        adjust.shift: [0, 4.7]
+        params:
+          side: B
+          din: "di_{{colrow}}"
+          dout: "do_{{colrow}}"
+      din_vias:
+        what: via
+        where: [top_c1_r3, top_c2_r3, top_c3_r3,
+                home_c1_r2, home_c2_r2, home_c3_r2,
+                bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+        adjust.shift: [4.2, 4.7]
+        params:
+          net: "di_{{colrow}}"
+      dout_vias:
+        what: via
+        where: [top_c1_r3, top_c2_r3, top_c3_r3,
+                home_c1_r2, home_c2_r2, home_c3_r2,
+                bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+        adjust.shift: [-4.2, 4.7]
+        params:
+          net: "do_{{colrow}}"
+      vcc_vias:
+        what: via
+        where: [top_c1_r3, top_c2_r3, top_c3_r3,
+                home_c1_r2, home_c2_r2, home_c3_r2,
+                bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+        adjust.shift: [-5.2, 4.7]
+        params:
+          net: VCC
+      # Pads as place holders for mounting points
+      mount:
+        what: pad
+        where: [mount_base1_r, mount_base2_r, mount_base3_r, mount_raise1_r, mount_raise2_r, mount_raise3_r]
+        params:
+          net: GND
+      # Pad as place holder for headers
+      header:
+        what: pad
+        where: [mount_header_r]
+        params:
+          net: VCC
+
+  mantis_raised:
+    outlines:
+      raised:
+        outline: raised
+      mcu:
+        outline: _mcu_cutout
+        layer: Dwgs.User
+      headers:
+        outline: _header_cutout
+        layer: Dwgs.User
+      sound_raised:
+        outline: _sound_channel_raised
+        layer: Eco2.User
+    footprints:
+      keys:
+        what: choc
+        where: [top_c4_r3, top_c5_r3,
+                home_c4_r2, home_c5_r2,
+                bottom_c4_r1, bottom_c5_r1,
+                thumb_c4_rt, thumb_c5_rt]
+        asym: both
+        adjust:
+          rotate: 180
+        params:
+          from: "{{column_net}}"
+          to: "{{colrow}}"
+          keycaps: false
+          hotswap: false
+      diodes:
+        what: diode
+        where: [top_c4_r3, top_c5_r3,
+                home_c4_r2, home_c5_r2,
+                bottom_c4_r1, bottom_c5_r1,
+                thumb_c4_rt, thumb_c5_rt]
+        asym: both
+        adjust:
+          shift: [0, -3.5]
+        params:
+          from: "{{colrow}}"
+          to: "{{row_net}}"
+      mcu:
         what: promicro
         where:
-          ref: fingers_c5_r3
-          shift: [hx+dx/2, hy/2-0.5]
+          ref: thumb_c1_rt
+          shift: [9hx/2+dx/2, mcu_top - 17.78]
           rotate: -90
+        params:
+          orientation: up
+          P0: R2
+          P1: R3
+          P2: R1
+          P3: RT
+          P4: C1
+          P5: C2
+          P6: C3
+          P7: C4
+          P8: C5
+          P14: M_C4
+          P15: M_C3
+          P16: M_C5
+          P18: M_C2
+          P19: M_C1
       reset:
         what: button
         where:
-          ref: fingers_c5_r3
-          shift: [hx/3, hy]
+          ref: thumb_c1_rt
+          shift: [9hx/2+dx/2, mcu_top-7]
         params:
           side: F
           from: GND
           to: RST
+      rgb:
+        what: rgb
+        where: [top_c4_r3, top_c5_r3,
+                home_c4_r2, home_c5_r2,
+                bottom_c4_r1, bottom_c5_r1,
+                thumb_c4_rt, thumb_c5_rt]
+        adjust.shift: [0, 4.7]
+        asym: both
+        params:
+          side: B
+          din: "di_{{colrow}}"
+          dout: "do_{{colrow}}"
+      din_vias_l:
+        what: via
+        where: [top_c4_r3, top_c5_r3,
+                home_c4_r2, home_c5_r2,
+                bottom_c4_r1, bottom_c5_r1,
+                thumb_c4_rt, thumb_c5_rt]
+        adjust.shift: [4.2, 4.7]
+        asym: left
+        params:
+          net: "di_{{colrow}}"
+      din_vias_r:
+        what: via
+        where: [top_c4_r3, top_c5_r3,
+                home_c4_r2, home_c5_r2,
+                bottom_c4_r1, bottom_c5_r1,
+                thumb_c4_rt, thumb_c5_rt]
+        adjust.shift: [-4.2, 4.7]
+        asym: right
+        params:
+          net: "di_{{colrow}}"
+      dout_vias_l:
+        what: via
+        where: [top_c4_r3, top_c5_r3,
+                home_c4_r2, home_c5_r2,
+                bottom_c4_r1, bottom_c5_r1,
+                thumb_c4_rt, thumb_c5_rt]
+        adjust.shift: [-4.2, 4.7]
+        asym: left
+        params:
+          net: "do_{{colrow}}"
+      dout_vias_r:
+        what: via
+        where: [top_c4_r3, top_c5_r3,
+                home_c4_r2, home_c5_r2,
+                bottom_c4_r1, bottom_c5_r1,
+                thumb_c4_rt, thumb_c5_rt]
+        adjust.shift: [4.2, 4.7]
+        asym: right
+        params:
+          net: "do_{{colrow}}"
+      vcc_vias_l:
+        what: via
+        where: [top_c4_r3, top_c5_r3,
+                home_c4_r2, home_c5_r2,
+                bottom_c4_r1, bottom_c5_r1,
+                thumb_c4_rt, thumb_c5_rt]
+        adjust.shift: [-5.2, 4.7]
+        asym: left
+        params:
+          net: VCC
+      vcc_vias_r:
+        what: via
+        where: [top_c4_r3, top_c5_r3,
+                home_c4_r2, home_c5_r2,
+                bottom_c4_r1, bottom_c5_r1,
+                thumb_c4_rt, thumb_c5_rt]
+        adjust.shift: [5.2, 4.7]
+        asym: right
+        params:
+          net: VCC
+      gnd_vias_l:
+        what: via
+        where: [top_c4_r3, top_c5_r3,
+                home_c4_r2, home_c5_r2,
+                bottom_c4_r1, bottom_c5_r1,
+                thumb_c4_rt, thumb_c5_rt]
+        adjust.shift: [5.2, 4.7]
+        asym: left
+        params:
+          net: GND
+      gnd_vias_r:
+        what: via
+        where: [top_c4_r3, top_c5_r3,
+                home_c4_r2, home_c5_r2,
+                bottom_c4_r1, bottom_c5_r1,
+                thumb_c4_rt, thumb_c5_rt]
+        adjust.shift: [-5.2, 4.7]
+        asym: right
+        params:
+          net: GND
+      # Pads as place holders for mounting points
+      mount:
+        what: pad
+        where: [mount_raise1_r, mount_raise2_r, mount_raise3_r]
+        asym: both
+        params:
+          net: GND
+      # Pad as place holder for headers
+      header:
+        what: pad
+        where: [mount_header_r]
+        params:
+          net: VCC
 
-  mantis_raised:
-    outlines:
-      main:
-        outline: raised
-      keys:
-        outline: keys_raised
-        layer: Dwgs.User
-    footprints:
-      keys:
-        what: choc
-        where: [fingers_c5_r3, fingers_c4_r2, fingers_c5_r2, fingers_c4_r1, fingers_c5_r1, thumb_c2_rt, thumb_c3_rt, thumb_c5_rt, mirror_fingers_c5m_r3, mirror_fingers_c4m_r2, mirror_fingers_c5m_r2, mirror_fingers_c4m_r1, mirror_fingers_c5m_r1, mirror_thumb_c2m_rt, mirror_thumb_c3m_rt, mirror_thumb_c5m_rt]
-        adjust:
-          rotate: 180
-        params:
-          from: "{{colrow}}"
-          to: "{{column_net}}"
-          keycaps: false
-          hotswap: true
-      diodes:
-        what: diode
-        where: [fingers_c5_r3, fingers_c4_r2, fingers_c5_r2, fingers_c4_r1, fingers_c5_r1, thumb_c2_rt, thumb_c3_rt, thumb_c5_rt, mirror_fingers_c5m_r3, mirror_fingers_c4m_r2, mirror_fingers_c5m_r2, mirror_fingers_c4m_r1, mirror_fingers_c5m_r1, mirror_thumb_c2m_rt, mirror_thumb_c3m_rt, mirror_thumb_c5m_rt]
-        adjust:
-          rotate: -90
-          shift: [8.5, -1]
-        params:
-          from: "{{colrow}}"
-          to: "{{row_net}}"
