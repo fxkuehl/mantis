@@ -1,12 +1,36 @@
+// Angular resulution
 $fa = 1;
 $fs = 0.4;
-$tilt = 15;
-$tilt2 = 15;
+// Whether to render RGB LED cutouts in the keycaps
 $rgb = 1;
 
-$preview_mantis = 1;
-$preview_key = 0;
+// Key parameters:
+// Tilt angle of the keycap surface
+$tilt = 15;
+// Tilt angle for outside keys
+$tilt2 = 15;
+// Slope angle of the dish at the rim
+$slope = 15;
+// Height from the bottom of the keycap to the rim at the front of the key
+$height = 2.8;
+// Approximate thickness of the wall (may be thicker in some places)
+$thickness = 1.3;
+// Width of the hexagonal key
+$key_width = 21;
+// Diameter of the spherical dish
+$dish_diam = 14;
+// Fillet radius
+$fillet = 3;
+// Maximum dish excentricity (tilt / 7.5)
+$max_exc = 2.5;
+
+// How for the keys are pressed down (0-3mm)
+$travel = 3;
+$preview_mantis = 0;
+$preview_key = 1;
+$preview_half_key = 0;
 $preview_exploded_key = 0;
+$preview_switch = 0;
 
 function rotate_x(point, angle) = [
     point.x,
@@ -164,15 +188,26 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
     }
 }
 
-module key(tilt=15) {
-    R1 = 21 / 2;
-    R2 = 14 / 2;
-    r1 = 3;
+// How far the the switch can be inserted into the bottom of the key
+function key_offset(tilt=$tilt) = let (
+    exc = min($max_exc, tilt/7.5),
+    exc_i = exc - $thickness * sin(tilt),
+    dish_radius = $dish_diam/2 * sqrt(1 + 1/tan($slope)^2),
+    front_offset = $height - $thickness + 0.5,
+    mid_offset = rotate_x_around(
+        [0, -3, $height - $thickness - (1.0-cos($slope))*dish_radius], tilt,
+        [0, -exc_i - $dish_diam/2, $height - $thickness]).z)
+    min(front_offset, mid_offset);
+
+module key(tilt=$tilt) {
+    R1 = $key_width / 2;
+    R2 = $dish_diam / 2;
+    r1 = $fillet;
     r2 = R2;
-    exc = min(2.5, tilt/7.5);
-    slope = 15;
-    height = 2.6;
-    thickness = 1.5;
+    exc = min($max_exc, tilt/7.5);
+    slope = $slope;
+    height = $height;
+    thickness = $thickness;
     Ri = R1 - thickness;
     ri = max(0, r1 - thickness);
     exc_i = exc - thickness * sin(tilt);
@@ -196,7 +231,7 @@ module key(tilt=15) {
 }
 
 // A key cut into slices to make the wall thickness visible
-module sliced_key(tilt=15, slice=[30, 30, 1], dir=[0, 0, 1],
+module sliced_key(tilt=$tilt, slice=[30, 30, 1], dir=[0, 0, 1],
                   slice_list=[0,1,2,3,4,5,6,7], factor=2) {
     for(i = slice_list) {
         translate(dir*i*factor) intersection() {
@@ -204,6 +239,71 @@ module sliced_key(tilt=15, slice=[30, 30, 1], dir=[0, 0, 1],
             translate(dir*i) cube(slice, center=true);
         }
     }
+}
+
+module choc_switch() {
+    color("gray") difference() {
+        union() {
+            linear_extrude(height = 2.21) {
+                offset(r = 0.4) square(13, center = true);
+            }
+            translate([0, 0, 2.2]) linear_extrude(height = 0.8) {
+                offset(r = 1.0) square(13, center = true);
+            }
+            translate([0, 0, -2]) cylinder(h = 2.01, d = 3.2);
+            translate([0, 0, -2.65]) cylinder(h = 0.66, d1 = 2.8, d2 = 3.2);
+            translate([-5.22, 0, -2   ]) cylinder(h = 2.01, d = 1.8);
+            translate([-5.22, 0, -2.65]) cylinder(h = 0.66, d1 = 1.4, d2 = 1.8);
+            translate([ 5.22, 0, -2   ]) cylinder(h = 2.01, d = 1.8);
+            translate([ 5.22, 0, -2.65]) cylinder(h = 0.66, d1 = 1.4, d2 = 1.8);
+        }
+        translate([0, 0, 6.9]) cube(13, center = true);
+        translate([0, 4.7, 0]) cube([5.3, 3.25, 2], center = true);
+    }
+    color("gold") translate([0, -5.9, -1]) rotate([90, 0, 0])
+    linear_extrude(height = 0.2, center = true) {
+        offset(r = 0.5) square([0.01, 3], center = true);
+    }
+    color("silver") translate([-5, -3.8, -1]) rotate([90, 0, 0])
+    linear_extrude(height = 0.2, center = true) {
+        offset(r = 0.5) square([0.01, 3], center = true);
+    }
+    color("rosybrown") translate([0, 0, 5+1.01-$travel]) difference() {
+        union() {
+            cube([11, 4.5, 4], center = true);
+            translate([0, -2.74, 0]) cube([3, 1.02, 4], center = true);
+        }
+        translate([-2.85, 0, 0.51]) cube([1.2, 3, 3], center = true);
+        translate([ 2.85, 0, 0.51]) cube([1.2, 3, 3], center = true);
+        translate([0, -2.76, -0.5]) cube([2, 1.02, 4], center = true);
+    }
+    color("white", 0.4) difference() {
+        union() {
+            translate([0, 0, 2.99])
+            linear_extrude(height = 2.01, scale = 0.9) {
+                offset(r = 0.4) square(13, center = true);
+            }
+            translate([0, 0, 4.99])
+            linear_extrude(height = 0.51, convexity = 2, scale = 0.98) {
+                offset(r = 0.4) polygon([
+                [-5.8, -2.55], [-5.8,  2.55], [ 5.8,  2.55], [ 5.8, -2.55],
+                [ 2.0, -2.55], [ 2.0, -1.85], [-2.0, -1.85], [-2.0, -2.55]
+                ]);
+            }
+        }
+        translate([0, 0, 2.98])
+        linear_extrude(height = 1.62, scale = 0.9) {
+            square(13, center = true);
+        }
+        translate([0, 0, 5]) cube([11.02, 4.52, 2], center = true);
+        translate([0, -2.74, 5]) cube([3.02, 1.04, 2], center = true);
+    }
+}
+
+module switch_key(tilt = $tilt) {
+    offset = key_offset(tilt);
+    translate([0, 0, 5.5 + 3 - $travel - offset]) key(tilt);
+    choc_switch();
 }
 
 module half_mantis() {
@@ -215,31 +315,31 @@ module half_mantis() {
     tilt1 = $tilt;
     tilt2 = $tilt2;
     translate([-4.5*hx-dx/2, -3*hy, 0]) {
-        translate([0  *hx, 0*hy   ,     0]) rotate([0, 0,    0]) key(tilt2);
-        translate([1  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) key(tilt2);
-        translate([2  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) key(tilt2);
-        translate([3  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) key(tilt2);
-        translate([3.5*hx, 1*hy   , raise]) rotate([0, 0,  -60]) key(tilt2);
-        translate([4  *hx, 2*hy   , raise]) rotate([0, 0,  -60]) key(tilt2);
+        translate([0  *hx, 0*hy   ,     0]) rotate([0, 0,    0]) switch_key(tilt2);
+        translate([1  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key(tilt2);
+        translate([2  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key(tilt2);
+        translate([3  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key(tilt2);
+        translate([3.5*hx, 1*hy   , raise]) rotate([0, 0,  -60]) switch_key(tilt2);
+        translate([4  *hx, 2*hy   , raise]) rotate([0, 0,  -60]) switch_key(tilt2);
 
-        translate([0.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) key(tilt1);
-        translate([1.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) key(tilt1);
-        translate([2.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) key(tilt1);
-        translate([3  *hx, 2*hy   , raise]) rotate([0, 0, -120]) key(tilt1);
-        translate([3.5*hx, 3*hy   , raise]) rotate([0, 0, -120]) key(tilt2);
+        translate([0.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key(tilt1);
+        translate([1.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key(tilt1);
+        translate([2.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key(tilt1);
+        translate([3  *hx, 2*hy   , raise]) rotate([0, 0, -120]) switch_key(tilt1);
+        translate([3.5*hx, 3*hy   , raise]) rotate([0, 0, -120]) switch_key(tilt2);
 
-        translate([0  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) key(tilt2);
-        translate([1  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) key(tilt2);
-        translate([2  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) key(tilt2);
-        translate([2.5*hx, 3*hy   , raise]) rotate([0, 0, -180]) key(tilt2);
+        translate([0  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key(tilt2);
+        translate([1  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key(tilt2);
+        translate([2  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key(tilt2);
+        translate([2.5*hx, 3*hy   , raise]) rotate([0, 0, -180]) switch_key(tilt2);
 
-        translate([1.5*hx, 3*hy   ,     0]) rotate([0, 0, -180]) key(tilt2);
+        translate([1.5*hx, 3*hy   ,     0]) rotate([0, 0, -180]) switch_key(tilt2);
     
-        translate([2  *hx, 4*hy+dy, raise]) rotate([0, 0,   60]) key(tilt1);
-        translate([3  *hx, 4*hy+dy, raise]) rotate([0, 0,    0]) key(tilt1);
-        translate([4  *hx, 4*hy+dy, raise]) rotate([0, 0,  -60]) key(tilt1);
+        translate([2  *hx, 4*hy+dy, raise]) rotate([0, 0,   60]) switch_key(tilt1);
+        translate([3  *hx, 4*hy+dy, raise]) rotate([0, 0,    0]) switch_key(tilt1);
+        translate([4  *hx, 4*hy+dy, raise]) rotate([0, 0,  -60]) switch_key(tilt1);
     
-        translate([3.5*hx, 5*hy+dy,     0]) rotate([0, 0,    0]) key(tilt1);
+        translate([3.5*hx, 5*hy+dy,     0]) rotate([0, 0,    0]) switch_key(tilt1);
     }
 }
 
@@ -247,8 +347,12 @@ if ($preview_mantis) { // Keyboard
     half_mantis();
     mirror([1, 0, 0]) half_mantis();
 } else if ($preview_key) { // Single key
-    key($tilt);
-    //perforated_key15();
+    switch_key();
+} else if ($preview_half_key) { // Single key
+    intersection() {
+        switch_key();
+        translate([-15, 0, 0]) cube(30, center = true);
+    }
 } else if ($preview_exploded_key) { // Exploded view of key to show wall thickness
     %key($tilt);
     translate([0, 0, 12])  sliced_key($tilt, [30, 30, 1], [0, 0, 1],
@@ -261,5 +365,7 @@ if ($preview_mantis) { // Keyboard
                                       [for (i = [-10 : 0]) i-0.5], 2);
     translate([15, 0, 0])  sliced_key($tilt, [1, 30, 20], [1, 0, 0],
                                       [for (i = [0 : 10]) i+0.5], 2);
+} else if ($preview_switch) { // Choc switch
+    choc_switch();
 }
 //translate([0, 0, -2]) fillet_hexagon(21/2, 3, 2);
