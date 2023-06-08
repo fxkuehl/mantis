@@ -299,41 +299,20 @@ module key(tilt = $tilt) {
 }
 
 module rgb_key(tilt = $tilt) {
-    d = 1.6;
     y0 = 5.5;
     dx = 2.3;
     dy = dx * sqrt(3)/2;
-    module hole() {
-        rotate([0, 0, 30]) cylinder($fn=6, h=10, d=1.6);
-    }
-    function pos(x, y) = [dx * x, y0 + dy * y, 0];
+    hole_pos = [        [-1.5, 1],[-0.5, 1],[ 0.5, 1],[ 1.5,  1],
+         [-3.0, 0],[-2.0, 0],[-1.0, 0],[ 0.0, 0],[ 1.0, 0],[ 2.0, 0],[ 3.0,  0],
+    [-3.5,-1],[-2.5,-1],                                        [ 2.5,-1],[ 3.5,-1],
+         [-3.0,-2],                                                  [ 3.0,-2],
+    [-3.5,-3],                                                            [ 3.5,-3]];
+
     difference () {
         key(tilt);
-        if ($rgb) {
-            translate(pos(-1.5,  1)) hole();
-            translate(pos(-0.5,  1)) hole();
-            translate(pos( 0.5,  1)) hole();
-            translate(pos( 1.5,  1)) hole();
-
-            translate(pos(-3.0,  0)) hole();
-            translate(pos(-2.0,  0)) hole();
-            translate(pos(-1.0,  0)) hole();
-            translate(pos( 0.0,  0)) hole();
-            translate(pos( 1.0,  0)) hole();
-            translate(pos( 2.0,  0)) hole();
-            translate(pos( 3.0,  0)) hole();
-
-            translate(pos(-3.5, -1)) hole();
-            translate(pos(-2.5, -1)) hole();
-            translate(pos( 2.5, -1)) hole();
-            translate(pos( 3.5, -1)) hole();
-
-            translate(pos(-3.0, -2)) hole();
-            translate(pos( 3.0, -2)) hole();
-
-            translate(pos(-3.5, -3)) hole();
-            translate(pos( 3.5, -3)) hole();
-        }
+        if ($rgb) for (p = hole_pos)
+            translate([dx * p.x, y0 + dy * p.y, 0]) rotate([0, 0, 30])
+                cylinder($fn=6, h=10, d=1.6);
     }
 }
 
