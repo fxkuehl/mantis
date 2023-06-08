@@ -12,25 +12,30 @@ $tilt2 = 15;
 // Slope angle of the dish at the rim
 $slope = 15;
 // Height from the bottom of the keycap to the rim at the front of the key
-$height = 2.8;
+$height = 2.4;
 // Approximate thickness of the wall (may be thicker in some places)
-$thickness = 1.3;
+$thickness = 1.4;
 // Width of the hexagonal key
-$key_width = 21;
+$key_width = 20.96;
 // Diameter of the spherical dish
 $dish_diam = 14;
 // Fillet radius
-$fillet = 3;
+$fillet = 4;
 // Maximum dish excentricity (tilt / 7.5)
 $max_exc = 2.5;
 
-// How for the keys are pressed down (0-3mm)
-$travel = 3;
+// How far the keys are pressed down (0-3mm)
+$travel = 0.1;
+// Mantis keyboard with switches and keys
 $preview_mantis = 0;
-$preview_key = 1;
-$preview_half_key = 0;
-$preview_exploded_key = 0;
+// One switch and key fit check
+$preview_switch_key = 0;
+// One switch
 $preview_switch = 0;
+// One key sliced and exploded to show wall thickness
+$preview_exploded_key = 0;
+// Print some key stats
+$show_stats = 0;
 
 function rotate_x(point, angle) = [
     point.x,
@@ -177,7 +182,7 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
     polyhedron(points, faces, convexity=2);
     
     // Some stats
-    if ($preview_key) {
+    if ($show_stats) {
         thickness = 1.5; // assumed
         total_height = h + 2*R2*sin(tilt);
         mounted_height = total_height - h + thickness;
@@ -191,15 +196,14 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
 // How far the the switch can be inserted into the bottom of the key
 function key_offset(tilt=$tilt) = let (
     exc = min($max_exc, tilt/7.5),
-    exc_i = exc - $thickness * sin(tilt),
     dish_radius = $dish_diam/2 * sqrt(1 + 1/tan($slope)^2),
     front_offset = $height - $thickness + 0.5,
     mid_offset = rotate_x_around(
         [0, -3, $height - $thickness - (1.0-cos($slope))*dish_radius], tilt,
-        [0, -exc_i - $dish_diam/2, $height - $thickness]).z)
+        [0, -exc - $dish_diam/2, $height - $thickness]).z)
     min(front_offset, mid_offset);
 
-module key(tilt=$tilt) {
+module key1(tilt=$tilt) {
     R1 = $key_width / 2;
     R2 = $dish_diam / 2;
     r1 = $fillet;
@@ -228,6 +232,70 @@ module key(tilt=$tilt) {
                     cylinder($fn=6, h=6, d1=1, d2=2.5);
         }
     }
+
+    offset = key_offset(tilt);
+    dish_radius = $dish_diam/2 * sqrt(1 + 1/tan($slope)^2);
+    dish_depth = dish_radius * (1 - cos(slope));
+    module key_stem(x) {
+      translate([x, 0, offset - 3.5]) linear_extrude(height = 4, convexity = 2) {
+        polygon([
+    [ 0.65,-1.5], [ 0.65,-0.5], [ 0.4,-0.5], [ 0.4,0.5], [ 0.65,0.5], [ 0.65,1.5],
+    [-0.65,1.5], [-0.65,0.5], [-0.4,0.5], [-0.4,-0.5], [-0.65,-0.5], [-0.65,-1.5]
+        ]);
+      }
+    }
+    key_stem(-2.85);
+    key_stem( 2.85);
+    difference() {
+        union() {
+            translate([0, 0, offset+3-0.5]) cube([10, 4.5, 6], center = true);
+            translate([0, 0, offset+3    ]) cube([12, 6.5, 6], center = true);
+        }
+        translate([0, -exc-R2, height-dish_depth+3]) rotate([tilt, 0, 0])
+            translate([0, exc+R2, 0]) cube([13, 13, 6], center = true);
+    }
+}
+
+module key(tilt = $tilt) {
+    R1 = $key_width / 2;
+    R2 = $dish_diam / 2;
+    r1 = $fillet;
+    r2 = R2;
+    exc = min($max_exc, tilt/7.5);
+    slope = $slope;
+    height = $height;
+    thickness = $thickness;
+    offset = key_offset(tilt);
+
+    render(convexity=4) intersection() {
+        union() {
+            minkowski() {
+                difference() {
+                    translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
+                    fillet_hexagon_cone(R1, R2, r1, r2, exc,
+                                        tilt, slope, height, da=$fa*3);
+                }
+                intersection() {
+                    sphere(r = thickness, $fa = 30, $fs = 0.4);
+                    translate([0, 0, -2*thickness]) cube(thickness*4, center = true);
+                }
+            }
+            translate([0, 0, offset+3-0.5]) cube([10, 4.5, 6], center = true);
+            translate([0, 0, offset+3    ]) cube([12, 6.5, 6], center = true);
+        }
+        fillet_hexagon_cone(R1, R2, r1, r2, exc,
+                            tilt, slope, height);
+    }
+    module key_stem(x) {
+      translate([x, 0, offset - 3.5]) linear_extrude(height = 4, convexity = 2) {
+        polygon([
+    [ 0.65,-1.5], [ 0.65,-0.5], [ 0.4,-0.5], [ 0.4,0.5], [ 0.65,0.5], [ 0.65,1.5],
+    [-0.65,1.5], [-0.65,0.5], [-0.4,0.5], [-0.4,-0.5], [-0.65,-0.5], [-0.65,-1.5]
+        ]);
+      }
+    }
+    key_stem(-2.85);
+    key_stem( 2.85);
 }
 
 // A key cut into slices to make the wall thickness visible
@@ -270,7 +338,7 @@ module choc_switch() {
     }
     color("rosybrown") translate([0, 0, 5+1.01-$travel]) difference() {
         union() {
-            cube([11, 4.5, 4], center = true);
+            cube([10.2, 4.5, 4], center = true);
             translate([0, -2.74, 0]) cube([3, 1.02, 4], center = true);
         }
         translate([-2.85, 0, 0.51]) cube([1.2, 3, 3], center = true);
@@ -281,13 +349,13 @@ module choc_switch() {
         union() {
             translate([0, 0, 2.99])
             linear_extrude(height = 2.01, scale = 0.9) {
-                offset(r = 0.4) square(13, center = true);
+                offset(r = 0.4) square([12.8, 13], center = true);
             }
             translate([0, 0, 4.99])
             linear_extrude(height = 0.51, convexity = 2, scale = 0.98) {
                 offset(r = 0.4) polygon([
-                [-5.8, -2.55], [-5.8,  2.55], [ 5.8,  2.55], [ 5.8, -2.55],
-                [ 2.0, -2.55], [ 2.0, -1.85], [-2.0, -1.85], [-2.0, -2.55]
+                [-5.7, -2.85], [-5.7,  2.85], [ 5.7,  2.85], [ 5.7, -2.85],
+                [ 2.0, -2.85], [ 2.0, -1.85], [-2.0, -1.85], [-2.0, -2.85]
                 ]);
             }
         }
@@ -295,13 +363,15 @@ module choc_switch() {
         linear_extrude(height = 1.62, scale = 0.9) {
             square(13, center = true);
         }
-        translate([0, 0, 5]) cube([11.02, 4.52, 2], center = true);
+        translate([0, 0, 5]) cube([10.22, 4.52, 2], center = true);
         translate([0, -2.74, 5]) cube([3.02, 1.04, 2], center = true);
     }
 }
 
 module switch_key(tilt = $tilt) {
     offset = key_offset(tilt);
+    if ($show_stats)
+        echo(key_offset = offset);
     translate([0, 0, 5.5 + 3 - $travel - offset]) key(tilt);
     choc_switch();
 }
@@ -346,13 +416,13 @@ module half_mantis() {
 if ($preview_mantis) { // Keyboard
     half_mantis();
     mirror([1, 0, 0]) half_mantis();
-} else if ($preview_key) { // Single key
-    switch_key();
-} else if ($preview_half_key) { // Single key
+} else if ($preview_switch_key) { // Single key with switch
     intersection() {
         switch_key();
-        translate([-15, 0, 0]) cube(30, center = true);
+        translate([-8.8, 0, 0]) cube(30, center = true);
     }
+} else if ($preview_switch) { // Choc switch
+    choc_switch();
 } else if ($preview_exploded_key) { // Exploded view of key to show wall thickness
     %key($tilt);
     translate([0, 0, 12])  sliced_key($tilt, [30, 30, 1], [0, 0, 1],
@@ -365,7 +435,7 @@ if ($preview_mantis) { // Keyboard
                                       [for (i = [-10 : 0]) i-0.5], 2);
     translate([15, 0, 0])  sliced_key($tilt, [1, 30, 20], [1, 0, 0],
                                       [for (i = [0 : 10]) i+0.5], 2);
-} else if ($preview_switch) { // Choc switch
-    choc_switch();
+} else {
+    key();
 }
 //translate([0, 0, -2]) fillet_hexagon(21/2, 3, 2);
