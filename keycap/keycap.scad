@@ -298,6 +298,45 @@ module key(tilt = $tilt) {
     key_stem( 2.85);
 }
 
+module rgb_key(tilt = $tilt) {
+    d = 1.6;
+    y0 = 5.5;
+    dx = 2.3;
+    dy = dx * sqrt(3)/2;
+    module hole() {
+        rotate([0, 0, 30]) cylinder($fn=6, h=10, d=1.6);
+    }
+    function pos(x, y) = [dx * x, y0 + dy * y, 0];
+    difference () {
+        key(tilt);
+        if ($rgb) {
+            translate(pos(-1.5,  1)) hole();
+            translate(pos(-0.5,  1)) hole();
+            translate(pos( 0.5,  1)) hole();
+            translate(pos( 1.5,  1)) hole();
+
+            translate(pos(-3.0,  0)) hole();
+            translate(pos(-2.0,  0)) hole();
+            translate(pos(-1.0,  0)) hole();
+            translate(pos( 0.0,  0)) hole();
+            translate(pos( 1.0,  0)) hole();
+            translate(pos( 2.0,  0)) hole();
+            translate(pos( 3.0,  0)) hole();
+
+            translate(pos(-3.5, -1)) hole();
+            translate(pos(-2.5, -1)) hole();
+            translate(pos( 2.5, -1)) hole();
+            translate(pos( 3.5, -1)) hole();
+
+            translate(pos(-3.0, -2)) hole();
+            translate(pos( 3.0, -2)) hole();
+
+            translate(pos(-3.5, -3)) hole();
+            translate(pos( 3.5, -3)) hole();
+        }
+    }
+}
+
 // A key cut into slices to make the wall thickness visible
 module sliced_key(tilt=$tilt, slice=[30, 30, 1], dir=[0, 0, 1],
                   slice_list=[0,1,2,3,4,5,6,7], factor=2) {
@@ -372,7 +411,7 @@ module switch_key(tilt = $tilt) {
     offset = key_offset(tilt);
     if ($show_stats)
         echo(key_offset = offset);
-    translate([0, 0, 5.5 + 3 - $travel - offset]) key(tilt);
+    translate([0, 0, 5.5 + 3 - $travel - offset]) rgb_key(tilt);
     choc_switch();
 }
 
@@ -436,6 +475,6 @@ if ($preview_mantis) { // Keyboard
     translate([15, 0, 0])  sliced_key($tilt, [1, 30, 20], [1, 0, 0],
                                       [for (i = [0 : 10]) i+0.5], 2);
 } else {
-    key();
+    rgb_key();
 }
 //translate([0, 0, -2]) fillet_hexagon(21/2, 3, 2);
