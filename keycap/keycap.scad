@@ -20,7 +20,7 @@ $key_width = 20.96;
 // Diameter of the spherical dish
 $dish_diam = 14;
 // Fillet radius
-$fillet = 4;
+$fillet = 3;
 // Maximum dish excentricity (tilt / 7.5)
 $max_exc = 2.5;
 
@@ -50,6 +50,10 @@ function rotate_z(point, angle) = [
     point.y*cos(angle) + point.x*sin(angle),
     point.z
 ];
+
+function part_sums(seq) = [for (a = 0, i = 0; i <= len(seq);
+                                a = a + seq[min(i, len(seq)-1)],
+                                i = i + 1) a];
 
 cos30 = cos(30);
 function fillet_unit_hex_segment(r, a) = a < r*30 ?
@@ -152,42 +156,55 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
 
     steps_dish = max(2, floor(slope / da));
     da_dish = slope / steps_dish;
-    points_dish = [for (b = [slope : -da_dish : da_dish]) each
-        [for (a = [0 : da : (steps-1) * da])
+    n_points_dish = [for (b = [slope : -da_dish : 0])
+        max(1, ceil(steps * sin(b) / sin(slope)))];
+    points_dish = [for (i = [0 : 1 : steps_dish]) each
+        let (b = (steps_dish - i) * da_dish, n = n_points_dish[i], da = 360 / n)
+        [for (j = [0 : 1 : n-1]) let (a = j * da)
             rotate_x_around(dish_radius*sin(b)*[-sin(a), cos(a), 0] +
                             [0, 0, dish_radius*(1-cos(b)) - dish_depth],
                             tilt, [0, -R2, 0]) + [0, -exc, h]
         ]
     ];
-    point_center = rotate_x_around([0, 0, -dish_depth], tilt,
-                                   [0, -R2, 0]) + [0, -exc, h];
 
-    points = concat(points_cone, points_dish, [point_center]);
+    points = concat(points_cone, points_dish);
 
     face_bot = [for (i = [0 : 1 : steps-1]) i];
-    faces_cone_dish = [for (j = [0 : 1 : steps_cone + steps_dish - 2]) each
-        [for (i = [0 : 1 : steps-1]) let (o = j * steps)
+    faces_cone = [for (j = [0 : 1 : steps_cone-1]) each let (o = j * steps)
+        [for (i = [0 : 1 : steps-1])
             [(i + 1) % steps + o, i + o, 
              steps + i + o, steps + (i + 1) % steps + o]
         ]
     ];
-
-    faces_center = [for (i = [0 : 1 : steps-1])
-        let (o = (steps_cone + steps_dish - 1) * steps)
-        [(i + 1) % steps + o, i + o, steps + o]
+    o_dish = part_sums(n_points_dish);
+    faces_dish1 = [for (j = [0 : 1 : steps_dish-1]) each let (
+            o = o_dish[j] + len(points_cone),
+            n = n_points_dish[j],
+            m = n_points_dish[j + 1],
+            r = m / n
+        )
+        [for (i = [0 : 1 : n-1])
+            [(i + 1) % n + o, i + o,
+             n + round((i + 0.5)*r) % m + o]
+        ]
+    ];
+    faces_dish2 = [for (i = 1; i < len(faces_dish1); i = i + 1)
+        if (faces_dish1[i-1][2] != faces_dish1[i][2])
+            [faces_dish1[i-1][2], faces_dish1[i][2],
+             faces_dish1[i][1]]
     ];
 
-    faces = concat([face_bot], faces_cone_dish, faces_center);
+    faces = concat([face_bot], faces_cone, faces_dish1, faces_dish2);
 
     polyhedron(points, faces, convexity=2);
     
     // Some stats
     if ($show_stats) {
-        thickness = 1.5; // assumed
+        point_center = points_dish[len(points_dish)-1];
         total_height = h + 2*R2*sin(tilt);
-        mounted_height = total_height - h + thickness;
+        mounted_height = total_height - h + $thickness;
         target_depth = -point_center.y/tan(tilt) - (point_center.z - h)
-                     - thickness;
+                     - $thickness;
         echo(total_height=total_height, mounted_height=mounted_height,
              dish_depth=dish_depth, target_depth=target_depth);
     }
@@ -455,5 +472,16 @@ if ($preview_mantis) { // Keyboard
                                       [for (i = [0 : 10]) i+0.5], 2);
 } else {
     rgb_key();
+/*
+    R1 = $key_width / 2;
+    R2 = $dish_diam / 2;
+    r1 = $fillet;
+    r2 = R2;
+    exc = min($max_exc, $tilt/7.5);
+    slope = $slope;
+    height = $height;
+    fillet_hexagon_cone(R1, R2, r1, r2, exc,
+                        $tilt, slope, height);
+*/
 }
 //translate([0, 0, -2]) fillet_hexagon(21/2, 3, 2);
