@@ -300,7 +300,7 @@ module key() {
          [-3.0,-2],                                                  [ 3.0,-2],
     [-3.5,-3],                                                            [ 3.5,-3]];
 
-    difference () {
+    render(convexity = 10) difference () {
         if ($minkowski)
             minkey();
         else
