@@ -1,10 +1,10 @@
 // Angular resulution
-$fa = 1;
+$fa = 2;
 $fs = 0.4;
 // Whether to render RGB LED cutouts in the keycaps
 $rgb = true;
 // Whether to use a minkowski sum for more consistent thickness
-$minkowski = true;
+$minkowski = false;
 
 // Key parameters:
 // Tilt angle of the keycap surface
@@ -247,7 +247,7 @@ module difkey() {
             difference() {
                 translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                 fillet_hexagon_cone(Ri, R2, ri, r2, exc_i,
-                                    $tilt, $slope, $height-$thickness, da=$fa*3);
+                                    $tilt, $slope, $height-$thickness, da=7.5);
             }
             translate([0, 0, offset+3-0.5]) cube([10, 4.5, 6], center = true);
             translate([0, 0, offset+3    ]) cube([12, 6.5, 6], center = true);
@@ -273,10 +273,10 @@ module minkey() {
                 difference() {
                     translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                     fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                                        $tilt, $slope, $height, da=$fa*3);
+                                        $tilt, $slope, $height, da=7.5);
                 }
                 intersection() {
-                    sphere(r = $thickness, $fa = 30, $fs = 0.4);
+                    sphere(r = $thickness, $fa = 30, $fs = $thickness * 2*PI * 30 / 360);
                     translate([0, 0, -2*$thickness]) cube($thickness*4, center = true);
                 }
             }
@@ -300,7 +300,7 @@ module key() {
          [-3.0,-2],                                                  [ 3.0,-2],
     [-3.5,-3],                                                            [ 3.5,-3]];
 
-    render(convexity = 10) difference () {
+    difference () {
         if ($minkowski)
             minkey();
         else
@@ -385,7 +385,7 @@ module switch_key() {
     offset = key_offset();
     if ($show_stats)
         echo(key_offset = offset);
-    translate([0, 0, 5.5 + 3 - $travel - offset]) key();
+    translate([0, 0, 5.5 + 3 - $travel - offset]) render(convexity = 10) key();
     choc_switch();
 }
 
@@ -437,7 +437,7 @@ if ($preview_mantis) { // Keyboard
 } else if ($preview_exploded_key) { // Exploded view of key to show wall thickness
     %key($rgb = false);
     translate([0, 0, 15])  sliced_key([30, 30, 1], [0, 0, 1],
-                                      [for (i = [-2 : 8]) i+0.5], 2);
+                                      [for (i = [-2.01 : 7.99]) i+0.5], 2);
     translate([0, -15, 0]) sliced_key([30, 1, 20], [0, 1, 0],
                                       [for (i = [-11 : 0]) i-0.5], 2);
     translate([0, 15, 0])  sliced_key([30, 1, 20], [0, 1, 0],
