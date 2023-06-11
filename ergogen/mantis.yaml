@@ -390,8 +390,8 @@ outlines:
       fillet: 0.4
   _switch_cutout1:
     - what: rectangle
-      size: [13.8, 13.6]
-      fillet: 1
+      size: [13.8, 13.8]
+      fillet: 0.4
   _mcu_cutout:
     - what: rectangle
       size: [17.78 + 1, 33.02 + 1]
@@ -584,6 +584,14 @@ outlines:
         shift: [-hx/2-wc/2+kx, 0]
       fillet: (hx-wc)/4
 
+  base:
+    - what: outline
+      name: _main
+    - what: circle
+      radius: 1.6
+      where: [mount_base1_r, mount_base2_r, mount_base3_r, mount_raise1_r, mount_raise2_r, mount_raise3_r]
+      asym: both
+      operation: subtract
   main_split:
     - what: outline
       name: _main
