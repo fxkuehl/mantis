@@ -237,26 +237,23 @@ module difkey() {
     r1 = $fillet;
     r2 = R2;
     exc = min($max_exc, $tilt/7.5);
-    slope = $slope;
-    height = $height;
-    thickness = $thickness;
-    Ri = R1 - thickness;
-    ri = max(0, r1 - thickness);
-    exc_i = exc - thickness * sin($tilt);
+    Ri = R1 - $thickness;
+    ri = max(0, r1 - $thickness);
+    exc_i = exc - $thickness * sin($tilt);
     offset = key_offset();
 
     intersection() {
         union() {
             difference() {
                 translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
-                fillet_hexagon_cone(Ri, R2, r1, r2, exc_i,
-                                    $tilt, slope, height-thickness, da=$fa*3);
+                fillet_hexagon_cone(Ri, R2, ri, r2, exc_i,
+                                    $tilt, $slope, $height-$thickness, da=$fa*3);
             }
             translate([0, 0, offset+3-0.5]) cube([10, 4.5, 6], center = true);
             translate([0, 0, offset+3    ]) cube([12, 6.5, 6], center = true);
         }
         fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                            $tilt, slope, height);
+                            $tilt, $slope, $height);
     }
     translate([-2.85, 0, offset - 3.5]) key_stem();
     translate([ 2.85, 0, offset - 3.5]) key_stem();
@@ -268,9 +265,6 @@ module minkey() {
     r1 = $fillet;
     r2 = R2;
     exc = min($max_exc, $tilt/7.5);
-    slope = $slope;
-    height = $height;
-    thickness = $thickness;
     offset = key_offset();
 
     render(convexity=4) intersection() {
@@ -279,18 +273,18 @@ module minkey() {
                 difference() {
                     translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                     fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                                        $tilt, slope, height, da=$fa*3);
+                                        $tilt, $slope, $height, da=$fa*3);
                 }
                 intersection() {
-                    sphere(r = thickness, $fa = 30, $fs = 0.4);
-                    translate([0, 0, -2*thickness]) cube(thickness*4, center = true);
+                    sphere(r = $thickness, $fa = 30, $fs = 0.4);
+                    translate([0, 0, -2*$thickness]) cube($thickness*4, center = true);
                 }
             }
             translate([0, 0, offset+3-0.5]) cube([10, 4.5, 6], center = true);
             translate([0, 0, offset+3    ]) cube([12, 6.5, 6], center = true);
         }
         fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                            $tilt, slope, height);
+                            $tilt, $slope, $height);
     }
     translate([-2.85, 0, offset - 3.5]) key_stem();
     translate([ 2.85, 0, offset - 3.5]) key_stem();
@@ -401,8 +395,6 @@ module half_mantis() {
     dx = 3;
     dy = -dx/cos30;
     raise = 10;
-    tilt1 = $tilt;
-    tilt2 = $tilt2;
     translate([-4.5*hx-dx/2, -3*hy, 0]) {
         translate([0  *hx, 0*hy   ,     0]) rotate([0, 0,    0]) switch_key($tilt = $tilt2);
         translate([1  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = $tilt2);
