@@ -28,6 +28,8 @@ $max_exc = 2.5;
 
 // How far the keys are pressed down (0-3mm)
 $travel = 0.1;
+// Mantis plate explosion offset
+$explode = 0;
 // Mantis keyboard with switches and keys
 $preview_mantis = false;
 // One switch and key fit check
@@ -385,16 +387,72 @@ module switch_key() {
     offset = key_offset();
     if ($show_stats)
         echo(key_offset = offset);
-    translate([0, 0, 5.5 + 3 - $travel - offset]) render(convexity = 10) key();
+    translate([0, 0, 5.5 + 3 - $travel - offset + $explode/5]) render(convexity = 10) key();
     choc_switch();
 }
 
+module mantis() {
+    module base() {
+        linear_extrude(height = 1.61, convexity = 10)
+            offset(delta = -0.1) translate([-254, 127]) import("base.dxf", convexity = 10);
+    }
+    module sound_plate_main_split() {
+        linear_extrude(height = 2.99, convexity = 10)
+            offset(delta = -0.1) translate([-254, 127]) import("sound_plate_main_split.dxf", convexity = 10);
+    }
+    module main_split() {
+        linear_extrude(height = 1.59, convexity = 10)
+            offset(delta = -0.1) translate([-254, 127]) import("main_split.dxf", convexity = 10);
+    }
+    module plate_main_split() {
+        linear_extrude(height = 2.21, convexity = 10)
+            offset(delta = -0.1) translate([-254, 127]) import("plate_main_split.dxf", convexity = 10);
+    }
+    module sound_plate_raised() {
+        linear_extrude(height = 5.99, convexity = 10)
+            offset(delta = -0.1) translate([-254, 127]) import("sound_plate_raised.dxf", convexity = 10);
+    }
+    module raised() {
+        linear_extrude(height = 1.59, convexity = 10)
+            offset(delta = -0.1) translate([-254, 127]) import("raised.dxf", convexity = 10);
+    }
+    module plate_raised() {
+        linear_extrude(height = 2.21, convexity = 10)
+            offset(delta = -0.1) translate([-254, 127]) import("plate_raised.dxf", convexity = 10);
+    }
+
+    ex1 = $explode;
+    ex2 = 2 * ex1;
+    ex3 = 3 * ex1;
+    ex4 = 4 * ex1;
+    ex5 = 5 * ex1;
+    ex6 = 6 * ex1;
+
+    // Solid parts first
+    color("orange") translate([-ex1/2, 0, 4.6 + ex2]) main_split();
+    color("orange") translate([ ex1/2, 0, 4.6 + ex2]) mirror([1, 0, 0]) main_split();
+    color("red") translate([0, 0, 14.4 + ex5]) raised();
+
+    color("white", alpha = 0.4) union() {
+        translate([0, 0, 16.0 + ex6]) plate_raised();
+
+        translate([0, 0, 8.4 + ex4]) sound_plate_raised();
+        translate([-ex1/2, 0, 6.2 + ex3]) plate_main_split();
+        translate([ ex1/2, 0, 6.2 + ex3]) mirror([1, 0, 0]) plate_main_split();
+
+        translate([-ex1/2, 0, 1.6 + ex1]) sound_plate_main_split();
+        translate([ ex1/2, 0, 1.6 + ex1]) mirror([1, 0, 0]) sound_plate_main_split();
+
+        base();
+    }
+}
+
 module half_mantis() {
-    hx = 21.5;
+    hx = 21.5 + $explode/5;
     hy = -hx*cos30;
     dx = 3;
     dy = -dx/cos30;
-    raise = 10;
+    raise = 9.8 + 3*$explode;
     translate([-4.5*hx-dx/2, -3*hy, 0]) {
         translate([0  *hx, 0*hy   ,     0]) rotate([0, 0,    0]) switch_key($tilt = $tilt2);
         translate([1  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = $tilt2);
@@ -425,8 +483,11 @@ module half_mantis() {
 }
 
 if ($preview_mantis) { // Keyboard
-    half_mantis();
-    mirror([1, 0, 0]) half_mantis();
+    if ($preview_switch_key) {
+        translate([0, 0, 6.2 + 4*$explode]) half_mantis();
+        translate([0, 0, 6.2 + 4*$explode]) mirror([1, 0, 0]) half_mantis();
+    }
+    mantis($fn = 36);
 } else if ($preview_switch_key) { // Single key with switch
     intersection() {
         switch_key();
