@@ -389,7 +389,8 @@ module switch_key() {
     offset = key_offset();
     if ($show_stats)
         echo(key_offset = offset);
-    translate([0, 0, 5.5 + 3 - $travel - offset + $explode/5]) render(convexity = 10) key();
+    if ($preview_switch_key)
+        translate([0, 0, 5.5 + 3 - $travel - offset + $explode/5]) render(convexity = 10) key();
     choc_switch();
 }
 
@@ -536,7 +537,7 @@ module half_mantis() {
 }
 
 if ($preview_mantis) { // Keyboard
-    if ($preview_switch_key) {
+    if ($preview_switch_key || $preview_switch) {
         translate([0, 0, 6.2 + 4*$explode]) half_mantis();
         translate([0, 0, 6.2 + 4*$explode]) mirror([1, 0, 0]) half_mantis();
     }
