@@ -32,6 +32,8 @@ $travel = 0.1;
 $explode = 0;
 // Mantis keyboard with switches and keys
 $preview_mantis = false;
+// Model of mantis sound channels
+$preview_sound = false;
 // One switch and key fit check
 $preview_switch_key = false;
 // One switch
@@ -447,6 +449,57 @@ module mantis() {
     }
 }
 
+module sound_channels() {
+    module base() {
+        linear_extrude(height = 4.59, convexity = 10)
+            translate([-254, 127]) import("base.dxf", convexity = 10);
+    }
+    module raised_outline() {
+        linear_extrude(height = 9.8, convexity = 10)
+            translate([-254, 127]) import("raised_outline.dxf", convexity = 10);
+    }
+    module sound_plate_main_split() {
+        linear_extrude(height = 3.01, convexity = 10)
+            offset(delta = 0.01) translate([-254, 127]) import("sound_plate_main_split.dxf", convexity = 10);
+    }
+    module main_split() {
+        linear_extrude(height = 1.61, convexity = 10)
+            offset(delta = 0.01) translate([-254, 127]) import("main_split.dxf", convexity = 10);
+    }
+    module plate_main_split() {
+        linear_extrude(height = 2.21, convexity = 10)
+            offset(delta = 0.01) translate([-254, 127]) import("plate_main_split.dxf", convexity = 10);
+    }
+    module sound_plate_raised() {
+        linear_extrude(height = 6.01, convexity = 10)
+            offset(delta = 0.01) translate([-254, 127]) import("sound_plate_raised.dxf", convexity = 10);
+    }
+    module raised() {
+        linear_extrude(height = 1.61, convexity = 10)
+            offset(delta = 0.01) translate([-254, 127]) import("raised.dxf", convexity = 10);
+    }
+
+    color("white", alpha = 0.4) render(convexity = 10) difference() {
+        union() {
+            translate([0, 0, 1.605]) base();
+            translate([0, 0, 6.195]) raised_outline();
+        }
+
+        translate([0, 0, 1.6]) sound_plate_main_split();
+        translate([0, 0, 1.6]) mirror([1, 0, 0]) sound_plate_main_split();
+
+        translate([0, 0, 4.6]) main_split();
+        translate([0, 0, 4.6]) mirror([1, 0, 0]) main_split();
+
+        translate([0, 0, 6.2]) plate_main_split();
+        translate([0, 0, 6.2]) mirror([1, 0, 0]) plate_main_split();
+
+        translate([0, 0, 8.4]) sound_plate_raised();
+
+        translate([0, 0, 14.4]) raised();
+    }
+}
+
 module half_mantis() {
     hx = 21.5 + $explode/5;
     hy = -hx*cos30;
@@ -488,6 +541,8 @@ if ($preview_mantis) { // Keyboard
         translate([0, 0, 6.2 + 4*$explode]) mirror([1, 0, 0]) half_mantis();
     }
     mantis($fn = 36);
+} else if ($preview_sound) { // sound channels (and some other voids)
+    sound_channels($fn = 36);
 } else if ($preview_switch_key) { // Single key with switch
     intersection() {
         switch_key();
