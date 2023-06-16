@@ -25,6 +25,8 @@ $dish_diam = 14;
 $fillet = 3;
 // Maximum dish excentricity (tilt / 7.5)
 $max_exc = 2.5;
+// Mid layer height
+$mid_layer_height = 6;
 
 // How far the keys are pressed down (0-3mm)
 $travel = 0.1;
@@ -412,7 +414,7 @@ module mantis() {
             offset(delta = -0.1) translate([-254, 127]) import("plate_main_split.dxf", convexity = 10);
     }
     module sound_plate_raised() {
-        linear_extrude(height = 5.99, convexity = 10)
+        linear_extrude(height = $mid_layer_height - 0.01, convexity = 10)
             offset(delta = -0.1) translate([-254, 127]) import("sound_plate_raised.dxf", convexity = 10);
     }
     module raised() {
@@ -434,10 +436,10 @@ module mantis() {
     // Solid parts first
     color("orange") translate([-ex1/2, 0, 4.6 + ex2]) main_split();
     color("orange") translate([ ex1/2, 0, 4.6 + ex2]) mirror([1, 0, 0]) main_split();
-    color("red") translate([0, 0, 14.4 + ex5]) raised();
+    color("red") translate([0, 0, 8.4 + $mid_layer_height + ex5]) raised();
 
     color("white", alpha = 0.4) union() {
-        translate([0, 0, 16.0 + ex6]) plate_raised();
+        translate([0, 0, 10.0 + $mid_layer_height + ex6]) plate_raised();
 
         translate([0, 0, 8.4 + ex4]) sound_plate_raised();
         translate([-ex1/2, 0, 6.2 + ex3]) plate_main_split();
@@ -456,7 +458,7 @@ module sound_channels() {
             translate([-254, 127]) import("base.dxf", convexity = 10);
     }
     module raised_outline() {
-        linear_extrude(height = 9.8, convexity = 10)
+        linear_extrude(height = 3.8 + $mid_layer_height, convexity = 10)
             translate([-254, 127]) import("raised_outline.dxf", convexity = 10);
     }
     module sound_plate_main_split() {
@@ -472,7 +474,7 @@ module sound_channels() {
             offset(delta = 0.01) translate([-254, 127]) import("plate_main_split.dxf", convexity = 10);
     }
     module sound_plate_raised() {
-        linear_extrude(height = 6.01, convexity = 10)
+        linear_extrude(height = $mid_layer_height + 0.01, convexity = 10)
             offset(delta = 0.01) translate([-254, 127]) import("sound_plate_raised.dxf", convexity = 10);
     }
     module raised() {
@@ -497,7 +499,7 @@ module sound_channels() {
 
         translate([0, 0, 8.4]) sound_plate_raised();
 
-        translate([0, 0, 14.4]) raised();
+        translate([0, 0, 8.4 + $mid_layer_height]) raised();
     }
 }
 
@@ -506,7 +508,7 @@ module half_mantis() {
     hy = -hx*cos30;
     dx = 3;
     dy = -dx/cos30;
-    raise = 9.8 + 3*$explode;
+    raise = 3.8 + $mid_layer_height + 3*$explode;
     translate([-4.5*hx-dx/2, -3*hy, 0]) {
         translate([0  *hx, 0*hy   ,     0]) rotate([0, 0,    0]) switch_key($tilt = $tilt2);
         translate([1  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = $tilt2);
