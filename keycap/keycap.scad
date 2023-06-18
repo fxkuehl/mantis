@@ -329,7 +329,7 @@ module sliced_key(slice=[30, 30, 1], dir=[0, 0, 1],
 }
 
 module choc_switch() {
-    color("gray") difference() {
+    color("gray") render(convexity = 4) difference() {
         union() {
             linear_extrude(height = 2.21) {
                 offset(r = 0.4) square(13, center = true);
@@ -355,7 +355,7 @@ module choc_switch() {
     linear_extrude(height = 0.2, center = true) {
         offset(r = 0.5) square([0.01, 3], center = true);
     }
-    color("rosybrown") translate([0, 0, 5+1.01-$travel]) difference() {
+    color("rosybrown") translate([0, 0, 5+1.01-$travel]) render(convexity = 2) difference() {
         union() {
             cube([10.2, 4.5, 4], center = true);
             translate([0, -2.74, 0]) cube([3, 1.02, 4], center = true);
@@ -364,7 +364,7 @@ module choc_switch() {
         translate([ 2.85, 0, 0.51]) cube([1.2, 3, 3], center = true);
         translate([0, -2.76, -0.5]) cube([2, 1.02, 4], center = true);
     }
-    color("white", 0.4) difference() {
+    color("white", 0.2) render(convexity = 4) difference() {
         union() {
             translate([0, 0, 2.99])
             linear_extrude(height = 2.01, scale = 0.9) {
