@@ -556,7 +556,7 @@ if ($preview_mantis) { // Keyboard
 } else if ($preview_switch_key) { // Single key with switch
     intersection() {
         switch_key();
-        translate([-8.8, 0, 0]) cube(30, center = true);
+        translate([-8.8, 0, $explode/2]) cube([30, 30, 30+$explode], center = true);
     }
 } else if ($preview_switch) { // Choc switch
     choc_switch();
