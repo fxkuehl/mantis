@@ -229,11 +229,18 @@ function key_offset() = let (
     min(front_offset, mid_offset);
 
 module key_stem() {
-    linear_extrude(height = 4, convexity = 2) {
-        polygon([
-    [ 0.65,-1.5], [ 0.65,-0.5], [ 0.4,-0.5], [ 0.4,0.5], [ 0.65,0.5], [ 0.65,1.5],
-    [-0.65,1.5], [-0.65,0.5], [-0.4,0.5], [-0.4,-0.5], [-0.65,-0.5], [-0.65,-1.5]
+    r = 0.15;
+    module cross_section() {
+        offset(delta = r) offset(r = -2*r) polygon([
+    [ 0.65,-1.5], [ 0.65,-0.5], [ 0.349,-0.5], [ 0.349,0.5], [ 0.65,0.5], [ 0.65,1.5],
+    [-0.65,1.5], [-0.65,0.5], [-0.349,0.5], [-0.349,-0.5], [-0.65,-0.5], [-0.65,-1.5]
         ]);
+    }
+    translate([0, 0, r]) minkowski() {
+        linear_extrude(height = 4 - 2*r, convexity = 2) {
+            cross_section($fn = 8);
+        }
+        sphere(r, $fn = 12);
     }
 }
 
