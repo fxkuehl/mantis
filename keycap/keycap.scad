@@ -325,12 +325,12 @@ module key() {
 }
 
 // A key cut into slices to make the wall thickness visible
-module sliced_key(slice=[30, 30, 1], dir=[0, 0, 1],
+module sliced_key(slice=[30, 30, 1], offset=[0, 0, 0], dir=[0, 0, 1],
                   slice_list=[0,1,2,3,4,5,6,7], factor=2) {
     for(i = slice_list) {
-        translate(dir*i*factor) intersection() {
+        translate(dir*i*factor) render(convexity = 10) intersection() {
             key($rgb = false);
-            translate(dir*i) cube(slice, center=true);
+            translate(dir*i + offset) cube(slice, center=true);
         }
     }
 }
@@ -561,17 +561,18 @@ if ($preview_mantis) { // Keyboard
 } else if ($preview_switch) { // Choc switch
     choc_switch();
 } else if ($preview_exploded_key) { // Exploded view of key to show wall thickness
-    %key($rgb = false);
-    translate([0, 0, 15])  sliced_key([30, 30, 1], [0, 0, 1],
+    %render(convexity = 10) intersection() {
+        key($rgb = false);
+        translate([-15, 0, 0]) cube(30, center = true);
+    }
+    translate([0, 0, 15])  sliced_key([30, 30, 1], [-15, 0, 0], [0, 0, 1],
                                       [for (i = [-2.01 : 7.99]) i+0.5], 2);
-    translate([0, -15, 0]) sliced_key([30, 1, 20], [0, 1, 0],
+    translate([0, -15, 0]) sliced_key([30, 1, 20], [-15, 0, 0], [0, 1, 0],
                                       [for (i = [-11 : 0]) i-0.5], 2);
-    translate([0, 15, 0])  sliced_key([30, 1, 20], [0, 1, 0],
+    translate([0, 15, 0])  sliced_key([30, 1, 20], [-15, 0, 0], [0, 1, 0],
                                       [for (i = [0 : 11]) i+0.5], 2);
-    translate([-15, 0, 0]) sliced_key([1, 30, 20], [1, 0, 0],
+    translate([-15, 0, 0]) sliced_key([1, 30, 20], [0, 0, 0], [1, 0, 0],
                                       [for (i = [-10 : 0]) i-0.5], 2);
-    translate([15, 0, 0])  sliced_key([1, 30, 20], [1, 0, 0],
-                                      [for (i = [0 : 10]) i+0.5], 2);
 } else {
     key();
 /*
