@@ -213,18 +213,18 @@ function key_offset() = let (
     min(front_offset, mid_offset);
 
 module key_stem() {
-    r = 0.15;
+    r = 0.1;
     module cross_section() {
         offset(delta = r) offset(r = -2*r) polygon([
-    [ 0.65,-1.5], [ 0.65,-0.5], [ 0.349,-0.5], [ 0.349,0.5], [ 0.65,0.5], [ 0.65,1.5],
-    [-0.65,1.5], [-0.65,0.5], [-0.349,0.5], [-0.349,-0.5], [-0.65,-0.5], [-0.65,-1.5]
+    [ 0.65,-1.5], [ 0.65,-0.4], [ 0.449,-0.4], [ 0.449,0.4], [ 0.65,0.4], [ 0.65,1.5],
+    [-0.65,1.5], [-0.65,0.4], [-0.449,0.4], [-0.449,-0.4], [-0.65,-0.4], [-0.65,-1.5]
         ]);
     }
     translate([0, 0, r]) minkowski() {
         linear_extrude(height = 4 - 2*r, convexity = 2) {
             cross_section($fn = 8);
         }
-        sphere(r, $fn = 12);
+        half_sphere(r, $fa = 360/16);
     }
 }
 
@@ -244,7 +244,7 @@ module difkey() {
             difference() {
                 translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                 fillet_hexagon_cone(Ri, R2, ri, r2, exc_i,
-                                    $tilt, $slope, $height-$thickness, da=7.5);
+                                    $tilt, $slope, $height-$thickness, da=5);
             }
             translate([0, 0, offset+3-0.5]) cube([10, 4.5, 6], center = true);
             translate([0, 0, offset+3    ]) cube([12, 6.5, 6], center = true);
@@ -270,12 +270,9 @@ module minkey() {
                 difference() {
                     translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                     fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                                        $tilt, $slope, $height, da=7.5);
+                                        $tilt, $slope, $height, da=5);
                 }
-                intersection() {
-                    sphere(r = $thickness, $fa = 30, $fs = $thickness * 2*PI * 30 / 360);
-                    translate([0, 0, -2*$thickness]) cube($thickness*4, center = true);
-                }
+                half_sphere($thickness, $fa = 360/16);
             }
             translate([0, 0, offset+3-0.5]) cube([10, 4.5, 6], center = true);
             translate([0, 0, offset+3    ]) cube([12, 6.5, 6], center = true);
