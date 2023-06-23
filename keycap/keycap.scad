@@ -1,6 +1,5 @@
 // Angular resulution
 $fa = 2;
-$fs = 0.4;
 // Whether to render RGB LED cutouts in the keycaps
 $rgb = true;
 // Whether to use a minkowski sum for more consistent thickness
@@ -9,8 +8,6 @@ $minkowski = false;
 // Key parameters:
 // Tilt angle of the keycap surface
 $tilt = 15;
-// Tilt angle for outside keys
-$tilt2 = 15;
 // Slope angle of the dish at the rim
 $slope = 15;
 // Height from the bottom of the keycap to the rim at the front of the key
@@ -25,25 +22,21 @@ $dish_diam = 14;
 $fillet = 3;
 // Maximum dish excentricity (tilt / 7.5)
 $max_exc = 2.5;
-// Mid layer height
-$mid_layer_height = 6;
 
 // How far the keys are pressed down (0-3mm)
-$travel = 0.1;
+travel = 0.1;
 // Mantis plate explosion offset
 $explode = 0;
-// Mantis keyboard with switches and keys
-$preview_mantis = false;
-// Model of mantis sound channels
-$preview_sound = false;
-// One switch and key fit check
-$preview_switch_key = false;
-// One switch
-$preview_switch = false;
+// Set by files including this one
+no_key = false;
+// Show the key
+show_key = true;
+// Show the switch
+show_switch = false;
 // One key sliced and exploded to show wall thickness
-$preview_exploded_key = false;
+show_sliced_key = false;
 // Print some key stats
-$show_stats = false;
+print_stats = false;
 
 use <utils.scad>
 
@@ -191,7 +184,7 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
     polyhedron(points, faces, convexity=2);
     
     // Some stats
-    if ($show_stats) {
+    if (print_stats) {
         point_center = points_dish[len(points_dish)-1];
         total_height = h + 2*R2*sin(tilt);
         mounted_height = total_height - h + $thickness;
@@ -374,7 +367,7 @@ module choc_switch() {
     linear_extrude(height = 0.2, center = true) {
         offset(r = 0.5) square([0.01, 3], center = true);
     }
-    color("rosybrown") translate([0, 0, 5+1.01-$travel]) render(convexity = 2) difference() {
+    color("rosybrown") translate([0, 0, 5+1.01-travel]) render(convexity = 2) difference() {
         union() {
             cube([10.2, 4.5, 4], center = true);
             translate([0, -2.74, 0]) cube([3, 1.02, 4], center = true);
@@ -408,171 +401,23 @@ module choc_switch() {
 
 module switch_key() {
     offset = key_offset();
-    if ($show_stats)
+    if (print_stats)
         echo(key_offset = offset);
-    if ($preview_switch_key)
-        translate([0, 0, 5.5 + 3 - $travel - offset + $explode/5]) render(convexity = 10) key(detail = 8);
+    if (show_key)
+        translate([0, 0, 5.5 + 3 - travel - offset + $explode/5]) render(convexity = 10) key(detail = 8);
     choc_switch();
 }
 
-module mantis() {
-    module base() {
-        linear_extrude(height = 1.61, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("base.dxf", convexity = 10);
-    }
-    module sound_plate_main_split() {
-        linear_extrude(height = 2.99, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("sound_plate_main_split.dxf", convexity = 10);
-    }
-    module main_split() {
-        linear_extrude(height = 1.59, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("main_split.dxf", convexity = 10);
-    }
-    module plate_main_split() {
-        linear_extrude(height = 2.21, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("plate_main_split.dxf", convexity = 10);
-    }
-    module sound_plate_raised() {
-        linear_extrude(height = $mid_layer_height - 0.01, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("sound_plate_raised.dxf", convexity = 10);
-    }
-    module raised() {
-        linear_extrude(height = 1.59, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("raised.dxf", convexity = 10);
-    }
-    module plate_raised() {
-        linear_extrude(height = 2.21, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("plate_raised.dxf", convexity = 10);
-    }
-
-    ex1 = $explode;
-    ex2 = 2 * ex1;
-    ex3 = 3 * ex1;
-    ex4 = 4 * ex1;
-    ex5 = 5 * ex1;
-    ex6 = 6 * ex1;
-
-    // Solid parts first
-    color("orange") translate([-ex1/2, 0, 4.6 + ex2]) main_split();
-    color("orange") translate([ ex1/2, 0, 4.6 + ex2]) mirror([1, 0, 0]) main_split();
-    color("red") translate([0, 0, 8.4 + $mid_layer_height + ex5]) raised();
-
-    color("white", alpha = 0.4) union() {
-        translate([0, 0, 10.0 + $mid_layer_height + ex6]) plate_raised();
-
-        translate([0, 0, 8.4 + ex4]) sound_plate_raised();
-        translate([-ex1/2, 0, 6.2 + ex3]) plate_main_split();
-        translate([ ex1/2, 0, 6.2 + ex3]) mirror([1, 0, 0]) plate_main_split();
-
-        translate([-ex1/2, 0, 1.6 + ex1]) sound_plate_main_split();
-        translate([ ex1/2, 0, 1.6 + ex1]) mirror([1, 0, 0]) sound_plate_main_split();
-
-        base();
-    }
-}
-
-module sound_channels() {
-    module base() {
-        linear_extrude(height = 4.59, convexity = 10)
-            translate([-254, 127]) import("base.dxf", convexity = 10);
-    }
-    module raised_outline() {
-        linear_extrude(height = 3.8 + $mid_layer_height, convexity = 10)
-            translate([-254, 127]) import("raised_outline.dxf", convexity = 10);
-    }
-    module sound_plate_main_split() {
-        linear_extrude(height = 3.01, convexity = 10)
-            offset(delta = 0.01) translate([-254, 127]) import("sound_plate_main_split.dxf", convexity = 10);
-    }
-    module main_split() {
-        linear_extrude(height = 1.61, convexity = 10)
-            offset(delta = 0.01) translate([-254, 127]) import("main_split.dxf", convexity = 10);
-    }
-    module plate_main_split() {
-        linear_extrude(height = 2.21, convexity = 10)
-            offset(delta = 0.01) translate([-254, 127]) import("plate_main_split.dxf", convexity = 10);
-    }
-    module sound_plate_raised() {
-        linear_extrude(height = $mid_layer_height + 0.01, convexity = 10)
-            offset(delta = 0.01) translate([-254, 127]) import("sound_plate_raised.dxf", convexity = 10);
-    }
-    module raised() {
-        linear_extrude(height = 1.61, convexity = 10)
-            offset(delta = 0.01) translate([-254, 127]) import("raised.dxf", convexity = 10);
-    }
-
-    color("white", alpha = 0.4) render(convexity = 10) difference() {
-        union() {
-            translate([0, 0, 1.605]) base();
-            translate([0, 0, 6.195]) raised_outline();
-        }
-
-        translate([0, 0, 1.6]) sound_plate_main_split();
-        translate([0, 0, 1.6]) mirror([1, 0, 0]) sound_plate_main_split();
-
-        translate([0, 0, 4.6]) main_split();
-        translate([0, 0, 4.6]) mirror([1, 0, 0]) main_split();
-
-        translate([0, 0, 6.2]) plate_main_split();
-        translate([0, 0, 6.2]) mirror([1, 0, 0]) plate_main_split();
-
-        translate([0, 0, 8.4]) sound_plate_raised();
-
-        translate([0, 0, 8.4 + $mid_layer_height]) raised();
-    }
-}
-
-module half_mantis() {
-    hx = 21.5 + $explode/5;
-    hy = -hx*cos30;
-    dx = 3;
-    dy = -dx/cos30;
-    raise = 3.8 + $mid_layer_height + 3*$explode;
-    translate([-4.5*hx-dx/2, -3*hy, 0]) {
-        translate([0  *hx, 0*hy   ,     0]) rotate([0, 0,    0]) switch_key($tilt = $tilt2);
-        translate([1  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = $tilt2);
-        translate([2  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = $tilt2);
-        translate([3  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = $tilt2);
-        translate([3.5*hx, 1*hy   , raise]) rotate([0, 0,  -60]) switch_key($tilt = $tilt2);
-        translate([4  *hx, 2*hy   , raise]) rotate([0, 0,  -60]) switch_key($tilt = $tilt2);
-
-        translate([0.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key();
-        translate([1.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key();
-        translate([2.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key();
-        translate([3  *hx, 2*hy   , raise]) rotate([0, 0, -120]) switch_key();
-        translate([3.5*hx, 3*hy   , raise]) rotate([0, 0, -120]) switch_key($tilt = $tilt2);
-
-        translate([0  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = $tilt2);
-        translate([1  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = $tilt2);
-        translate([2  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = $tilt2);
-        translate([2.5*hx, 3*hy   , raise]) rotate([0, 0, -180]) switch_key($tilt = $tilt2);
-
-        translate([1.5*hx, 3*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = $tilt2);
-    
-        translate([2  *hx, 4*hy+dy, raise]) rotate([0, 0,   60]) switch_key();
-        translate([3  *hx, 4*hy+dy, raise]) rotate([0, 0,    0]) switch_key();
-        translate([4  *hx, 4*hy+dy, raise]) rotate([0, 0,  -60]) switch_key();
-    
-        translate([3.5*hx, 5*hy+dy,     0]) rotate([0, 0,    0]) switch_key();
-    }
-}
-
-if ($preview_mantis) { // Keyboard
-    if ($preview_switch_key || $preview_switch) {
-        translate([0, 0, 6.2 + 4*$explode]) half_mantis();
-        translate([0, 0, 6.2 + 4*$explode]) mirror([1, 0, 0]) half_mantis();
-    }
-    mantis($fn = 36);
-} else if ($preview_sound) { // sound channels (and some other voids)
-    sound_channels($fn = 36);
-} else if ($preview_switch_key) { // Single key with switch
+if (no_key) {
+    // nothing
+} else if (show_switch && show_key) { // Single key with switch
     intersection() {
         switch_key();
         translate([-8.8, 0, $explode/2]) cube([30, 30, 30+$explode], center = true);
     }
-} else if ($preview_switch) { // Choc switch
+} else if (show_switch) { // Choc switch
     choc_switch();
-} else if ($preview_exploded_key) { // Exploded view of key to show wall thickness
+} else if (show_sliced_key) { // Sliced view of key to show wall thickness
     %render(convexity = 10) intersection() {
         key($rgb = false);
         translate([-15, 0, 0]) cube(30, center = true);
@@ -587,6 +432,7 @@ if ($preview_mantis) { // Keyboard
                                       [for (i = [-10 : 0]) i-0.5], 2);
 } else {
     key();
+}
 /*
     R1 = $key_width / 2;
     R2 = $dish_diam / 2;
@@ -598,5 +444,4 @@ if ($preview_mantis) { // Keyboard
     fillet_hexagon_cone(R1, R2, r1, r2, exc,
                         $tilt, slope, height);
 */
-}
 //translate([0, 0, -2]) fillet_hexagon(21/2, 3, 2);
