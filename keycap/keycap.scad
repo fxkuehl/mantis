@@ -229,8 +229,31 @@ module one_stem() {
 }
 
 module choc_stem(offset) {
-    translate([0, 0, offset + 3-0.5]) cube([10, 4.5, 6], center = true);
-    translate([0, 0, offset + 3    ]) cube([12, 6.5, 6], center = true);
+    translate([0, 0, offset]) difference() {
+        translate([0, 0, 3]) union() {
+            linear_extrude(height = 6, center = true) {
+                offset(r = 2) offset(delta = -2) square([12, 6.5], center = true);
+            }
+            linear_extrude(height = 7, center = true) {
+                offset(r = 1) offset(delta = -1) square([10, 4.5], center = true);
+            }
+        }
+        translate([-1.7, 0, -0.5]) rotate([90, 0, 0])
+            cylinder(3, r = 0.5, center = true);
+        translate([1.7, 0, -0.5]) rotate([90, 0, 0])
+            cylinder(3, r = 0.5, center = true);
+
+        translate([0, 0, -0.5]) cube([3.4, 3, 1], center = true);
+        translate([0, 0, -0.5]) intersection() {
+            union() {
+                translate([-4, 0, 0])  rotate([90, 0, 0])
+                    cylinder(3, r = 0.5, center = true);
+                translate([4, 0, 0]) rotate([90, 0, 0])
+                    cylinder(3, r = 0.5, center = true);
+            }
+            cube([8, 3, 1], center = true);
+        }
+    }
 
     translate([-2.85, 0, offset - 3.5]) one_stem();
     translate([ 2.85, 0, offset - 3.5]) one_stem();
@@ -254,7 +277,7 @@ module difkey() {
                 fillet_hexagon_cone(Ri, R2, ri, r2, exc_i,
                                     $tilt, $slope, $height-$thickness, da=5);
             }
-            choc_stem(offset);
+            choc_stem(offset, $fn = 32);
         }
         union() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
@@ -282,7 +305,7 @@ module minkey() {
                 }
                 half_sphere($thickness, $fa = 360/16);
             }
-            choc_stem(offset);
+            choc_stem(offset, $fn = 32);
         }
         union() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
