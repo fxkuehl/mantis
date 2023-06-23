@@ -215,16 +215,16 @@ function key_offset() = let (
 module one_stem() {
     r = 0.1;
     module cross_section() {
-        offset(delta = r) offset(r = -2*r) polygon([
+        offset(r = -2*r) offset(delta = r) polygon([
     [ 0.65,-1.5], [ 0.65,-0.4], [ 0.449,-0.4], [ 0.449,0.4], [ 0.65,0.4], [ 0.65,1.5],
     [-0.65,1.5], [-0.65,0.4], [-0.449,0.4], [-0.449,-0.4], [-0.65,-0.4], [-0.65,-1.5]
         ]);
     }
     translate([0, 0, r]) minkowski() {
         linear_extrude(height = 4 - 2*r, convexity = 2) {
-            cross_section($fn = 8);
+            cross_section();
         }
-        half_sphere(r, $fa = 360/16);
+        half_sphere(r, $fa = 360/$fn);
     }
 }
 
@@ -255,11 +255,11 @@ module choc_stem(offset) {
         }
     }
 
-    translate([-2.85, 0, offset - 3.5]) one_stem();
-    translate([ 2.85, 0, offset - 3.5]) one_stem();
+    translate([-2.85, 0, offset - 3.5]) one_stem($fn = $fn/2);
+    translate([ 2.85, 0, offset - 3.5]) one_stem($fn = $fn/2);
 }
 
-module difkey() {
+module difkey(detail = 32) {
     R1 = $key_width / 2;
     R2 = $dish_diam / 2;
     r1 = $fillet;
@@ -277,7 +277,7 @@ module difkey() {
                 fillet_hexagon_cone(Ri, R2, ri, r2, exc_i,
                                     $tilt, $slope, $height-$thickness, da=5);
             }
-            choc_stem(offset, $fn = 32);
+            choc_stem(offset, $fn = detail);
         }
         union() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
@@ -287,7 +287,7 @@ module difkey() {
     }
 }
 
-module minkey() {
+module minkey(detail = 32) {
     R1 = $key_width / 2;
     R2 = $dish_diam / 2;
     r1 = $fillet;
@@ -305,7 +305,7 @@ module minkey() {
                 }
                 half_sphere($thickness, $fa = 360/16);
             }
-            choc_stem(offset, $fn = 32);
+            choc_stem(offset, $fn = detail);
         }
         union() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
@@ -315,7 +315,7 @@ module minkey() {
     }
 }
 
-module key() {
+module key(detail = 32) {
     y0 = 5.5;
     dx = 2.3;
     dy = dx * sqrt(3)/2;
@@ -327,9 +327,9 @@ module key() {
 
     render(convexity=8) difference () {
         if ($minkowski)
-            minkey();
+            minkey(detail);
         else
-            difkey();
+            difkey(detail);
         if ($rgb) for (p = hole_pos)
             translate([dx * p.x, y0 + dy * p.y, 0]) rotate([0, 0, 30])
                 cylinder($fn=6, h=10, d=1.6);
@@ -411,7 +411,7 @@ module switch_key() {
     if ($show_stats)
         echo(key_offset = offset);
     if ($preview_switch_key)
-        translate([0, 0, 5.5 + 3 - $travel - offset + $explode/5]) render(convexity = 10) key();
+        translate([0, 0, 5.5 + 3 - $travel - offset + $explode/5]) render(convexity = 10) key(detail = 8);
     choc_switch();
 }
 
