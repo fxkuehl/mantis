@@ -45,23 +45,7 @@ $preview_exploded_key = false;
 // Print some key stats
 $show_stats = false;
 
-function rotate_x(point, angle) = [
-    point.x,
-    point.y*cos(angle) - point.z*sin(angle),
-    point.z*cos(angle) + point.y*sin(angle)
-];
-function rotate_x_around(point, angle, origin=[0, 0, 0]) =
-    rotate_x(point - origin, angle) + origin;
-
-function rotate_z(point, angle) = [
-    point.x*cos(angle) - point.y*sin(angle),
-    point.y*cos(angle) + point.x*sin(angle),
-    point.z
-];
-
-function part_sums(seq) = [for (a = 0, i = 0; i <= len(seq);
-                                a = a + seq[min(i, len(seq)-1)],
-                                i = i + 1) a];
+use <utils.scad>
 
 cos30 = cos(30);
 function fillet_unit_hex_segment(r, a) = a < r*30 ?
