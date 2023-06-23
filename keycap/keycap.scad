@@ -212,7 +212,7 @@ function key_offset() = let (
         [0, -exc - $dish_diam/2, $height - $thickness]).z)
     min(front_offset, mid_offset);
 
-module key_stem() {
+module one_stem() {
     r = 0.1;
     module cross_section() {
         offset(delta = r) offset(r = -2*r) polygon([
@@ -226,6 +226,14 @@ module key_stem() {
         }
         half_sphere(r, $fa = 360/16);
     }
+}
+
+module choc_stem(offset) {
+    translate([0, 0, offset + 3-0.5]) cube([10, 4.5, 6], center = true);
+    translate([0, 0, offset + 3    ]) cube([12, 6.5, 6], center = true);
+
+    translate([-2.85, 0, offset - 3.5]) one_stem();
+    translate([ 2.85, 0, offset - 3.5]) one_stem();
 }
 
 module difkey() {
@@ -246,14 +254,14 @@ module difkey() {
                 fillet_hexagon_cone(Ri, R2, ri, r2, exc_i,
                                     $tilt, $slope, $height-$thickness, da=5);
             }
-            translate([0, 0, offset+3-0.5]) cube([10, 4.5, 6], center = true);
-            translate([0, 0, offset+3    ]) cube([12, 6.5, 6], center = true);
+            choc_stem(offset);
         }
-        fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                            $tilt, $slope, $height);
+        union() {
+            fillet_hexagon_cone(R1, R2, r1, r2, exc,
+                                $tilt, $slope, $height);
+            translate([0, 0, -4.99]) cube(10, center = true);
+        }
     }
-    translate([-2.85, 0, offset - 3.5]) key_stem();
-    translate([ 2.85, 0, offset - 3.5]) key_stem();
 }
 
 module minkey() {
@@ -264,7 +272,7 @@ module minkey() {
     exc = min($max_exc, $tilt/7.5);
     offset = key_offset();
 
-    render(convexity=4) intersection() {
+    intersection() {
         union() {
             minkowski() {
                 difference() {
@@ -274,14 +282,14 @@ module minkey() {
                 }
                 half_sphere($thickness, $fa = 360/16);
             }
-            translate([0, 0, offset+3-0.5]) cube([10, 4.5, 6], center = true);
-            translate([0, 0, offset+3    ]) cube([12, 6.5, 6], center = true);
+            choc_stem(offset);
         }
-        fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                            $tilt, $slope, $height);
+        union() {
+            fillet_hexagon_cone(R1, R2, r1, r2, exc,
+                                $tilt, $slope, $height);
+            translate([0, 0, -4.99]) cube(10, center = true);
+        }
     }
-    translate([-2.85, 0, offset - 3.5]) key_stem();
-    translate([ 2.85, 0, offset - 3.5]) key_stem();
 }
 
 module key() {
@@ -294,7 +302,7 @@ module key() {
          [-3.0,-2],                                                  [ 3.0,-2],
     [-3.5,-3],                                                            [ 3.5,-3]];
 
-    difference () {
+    render(convexity=8) difference () {
         if ($minkowski)
             minkey();
         else
