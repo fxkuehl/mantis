@@ -105,7 +105,7 @@ points:
           #rows.r.shift: [23hx/6, -hy/3]
           rows.r.shift: [4hx-hx/8, -hy/4]
         header:
-          rows.r.shift: [9hx/2+dx/2, -3hy-dy/4]
+          rows.r.shift: [9hx/2+dx/2, -3hy-dy/4+1.5]
       key:
         spread: 0
 
@@ -402,13 +402,15 @@ outlines:
   _header_cutout:
     - what: polygon
       points:
+        # 2x .5mm wider
+        # 1.5mm higher
         - ref: thumb_c3_rt
-          shift: [hx/2+kx, 5hy/3+ky/2+dy/2]
-        - shift: [0, 2hy/3+dy/2-ky]
+          shift: [hx/2-0.5, 5hy/3+ky/2+dy/2]
+        - shift: [0, 2hy/3+dy/2-ky+1.5]
         #- shift: [hx/2-kx+dx/2, hy/3-ky/2+dx/4]
         #- shift: [hx/2-kx+dx/2, -hy/3+ky/2-dx/4]
-        - shift: [hx-2kx+dx, 0]
-        - shift: [0, -2hy/3-dy/2+ky]
+        - shift: [hx+1+dx, 0]
+        - shift: [0, -2hy/3-dy/2+ky-1.5]
         #- shift: [-hx/2+kx-dx/2, -hy/3+ky/2-dx/4]
     - what: rectangle
       size: [hx, wc]
@@ -588,7 +590,7 @@ outlines:
     - what: outline
       name: _main
     - what: circle
-      radius: 1.6
+      radius: 1.1
       where: [mount_base1_r, mount_base2_r, mount_base3_r, mount_raise1_r, mount_raise2_r, mount_raise3_r]
       asym: both
       operation: subtract
