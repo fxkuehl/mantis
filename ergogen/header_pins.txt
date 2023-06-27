@@ -1,0 +1,47 @@
+Pro-Micro and header footprint pin numbering
+
+Pad Pin  MCU   Headers   Side
+-----------------------------
+ 1  RAW                   R
+ 2  GND  GND
+ 3  RST  RST
+ 4  VCC  VCC    VCC
+ 5  P21         R3
+ 6  P20         R2
+ 7  P19  M_C1   M_C1
+ 8  P18  M_C2   M_C2
+ 9  P15  M_C3   M_C3
+10  P14  M_C4   R1
+11  P16  M_C5   RT
+12  P10         DIN
+-----------------------------
+13  P01  R3     R3        L
+14  P00  R2     R2
+15  GND  GND
+16  GND  GND
+17  P02  R1     R1
+18  P03  RT     RT
+19  P04  C1     C1
+20  P05  C2     C2
+21  P06  C3     C3
+22  P07  C4     VCC
+23  P08  C5     DOU
+24  P09  DIN    DIN
+
+Header Pins
+
+Raised:
+C3  C2  C1          C1  C2  C3
+R3  R2  R1  RT  RT  R1  R2  R3
+    VCC DOU DIN --- DIN VCC
+
+Main-Split:
+C3  C2  C1
+R3  R2  R1  RT
+    VCC DIN DOU
+
+Header Pads
+
+21  20  19           7   8   9
+13  14  17  18  11  10   6   5
+    22  23  24  --- 12   4

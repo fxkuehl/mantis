@@ -954,6 +954,7 @@ pcbs:
           P6: C3
           P7: C4
           P8: C5
+          P9: di_c4_r3
           P14: M_C4
           P15: M_C3
           P16: M_C5
@@ -1069,8 +1070,26 @@ pcbs:
           net: GND
       # Pad as place holder for headers
       header:
-        what: pad
+        what: promicro
         where: [mount_header_r]
         params:
-          net: VCC
+          orientation: up
+          P0: R2
+          P1: R3
+          P2: R1
+          P3: RT
+          P4: C1
+          P5: C2
+          P6: C3
+          P7: VCC
+          P8: do_c5_r2
+          P9: di_mirror_c3_r3
+          P10: di_mirror_c3_r3
+          P14: R1
+          P15: M_C3
+          P16: RT
+          P18: M_C2
+          P19: M_C1
+          P20: R2
+          P21: R3
 
