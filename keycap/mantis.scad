@@ -27,6 +27,11 @@ tilt1 = 15;
 // Tilt angle for outside keys
 tilt2 = 15;
 
+// Bottom PCB color
+bottom_color = "green";
+// Top PCB color
+top_color = "white";
+
 module mantis() {
     module base() {
         linear_extrude(height = 1.61, convexity = 10)
@@ -65,9 +70,9 @@ module mantis() {
     ex6 = 6 * ex1;
 
     // Solid parts first
-    color("green") translate([-ex1/2, 0, 4.6 + ex2]) main_split();
-    color("green") translate([ ex1/2, 0, 4.6 + ex2]) mirror([1, 0, 0]) main_split();
-    color("white") translate([0, 0, 8.4 + mid_layer_height + ex5]) raised();
+    color(bottom_color) translate([-ex1/2, 0, 4.6 + ex2]) main_split();
+    color(bottom_color) translate([ ex1/2, 0, 4.6 + ex2]) mirror([1, 0, 0]) main_split();
+    color(top_color) translate([0, 0, 8.4 + mid_layer_height + ex5]) raised();
 
     color("white", alpha = 0.2) union() {
         translate([0, 0, 10.0 + mid_layer_height + ex6]) plate_raised();
