@@ -27,10 +27,88 @@ tilt1 = 15;
 // Tilt angle for outside keys
 tilt2 = 15;
 
+// Render PCBs accurately
+render_pcbs = false;
 // Bottom PCB color
-bottom_color = "green";
+bottom_color = "lime";
 // Top PCB color
 top_color = "white";
+
+module pcb(outline, prefix, thickness, mcolor, scolor, alpha = 1) {
+    d = 0.05;
+    module holes() {
+        intersection() {
+            import(str(prefix, "-B_Silkscreen.dxf"), convexity = 10);
+            import(str(prefix, "-B_Mask.dxf"), convexity = 10);
+        }
+    }
+    module bulk() {
+        difference() {
+            offset(delta = -0.1) import(outline, convexity = 10);
+            holes();
+        }
+    }
+    color("Coral") translate([-254, 127, thickness - 1.5 * d])
+        render(convexity = 10)
+        linear_extrude(height = d, convexity = 10) difference() {
+            import(str(prefix, "-F_Cu.dxf"), convexity = 10);
+            holes();
+        }
+    color("Coral") translate([-254, 127, 0.5 * d])
+        render(convexity = 10)
+        linear_extrude(height = d, convexity = 10) difference() {
+            import(str(prefix, "-B_Cu.dxf"), convexity = 10);
+            holes();
+        }
+    color(scolor) translate([-254, 127, thickness - 0.5*d])
+        render(convexity = 10)
+        linear_extrude(height = d, convexity = 10) difference() {
+            import(str(prefix, "-F_Silkscreen.dxf"), convexity = 10);
+            holes();
+        }
+    color(scolor) translate([-254, 127, -0.5*d])
+        render(convexity = 10)
+        linear_extrude(height = d, convexity = 10) difference() {
+            import(str(prefix, "-B_Silkscreen.dxf"), convexity = 10);
+            holes();
+        }
+    color("Gold") translate([-254, 127, thickness - 1.5*d])
+        render(convexity = 10)
+        linear_extrude(height = 1.5*d, convexity = 10) intersection() {
+            difference() {
+                import(str(prefix, "-F_Cu.dxf"), convexity = 10);
+                holes();
+            }
+            import(str(prefix, "-F_Mask.dxf"), convexity = 10);
+        }
+    color("Gold") translate([-254, 127, 0])
+        render(convexity = 10)
+        linear_extrude(height = 1.5*d, convexity = 10) intersection() {
+            difference() {
+                import(str(prefix, "-B_Cu.dxf"), convexity = 10);
+                holes();
+            }
+            import(str(prefix, "-B_Mask.dxf"), convexity = 10);
+        }
+    color("DarkSlateGrey", alpha = 0.95) translate([-254, 127, d])
+        render(convexity = 10)
+        linear_extrude(height = thickness-2*d, convexity = 10)
+        bulk();
+    color(mcolor, alpha) translate([-254, 127, thickness - 1.5*d])
+        render(convexity = 10)
+        linear_extrude(height = 1.5*d, convexity = 10) difference() {
+            bulk();
+            import(str(prefix, "-F_Mask.dxf"), convexity = 10);
+        }
+    color(mcolor, alpha) translate([-254, 127, 0])
+        render(convexity = 10)
+        linear_extrude(height = 1.5*d, convexity = 10) difference() {
+            bulk();
+            import(str(prefix, "-B_Mask.dxf"), convexity = 10);
+        }
+}
+
+function opacity(mcolor) = (mcolor == "white" || mcolor == "black") ? 0.95 : mcolor == "yellow" ? 0.5 : 0.75;
 
 module mantis() {
     module base() {
@@ -42,8 +120,12 @@ module mantis() {
             offset(delta = -0.1) translate([-254, 127]) import("sound_plate_main_split.dxf", convexity = 10);
     }
     module main_split() {
-        linear_extrude(height = 1.59, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("main_split.dxf", convexity = 10);
+        if (render_pcbs) {
+            pcb("main_split.dxf", "pcbs/mantis_reversible_split_leds", 1.59, bottom_color, bottom_color == "white" ? "black" : "white", opacity(bottom_color), $fs = 1);
+        } else {
+            color(bottom_color) linear_extrude(height = 1.59, convexity = 10)
+                offset(delta = -0.1) translate([-254, 127]) import("main_split.dxf", convexity = 10);
+        }
     }
     module plate_main_split() {
         linear_extrude(height = 2.21, convexity = 10)
@@ -54,8 +136,12 @@ module mantis() {
             offset(delta = -0.1) translate([-254, 127]) import("sound_plate_raised.dxf", convexity = 10);
     }
     module raised() {
-        linear_extrude(height = 1.59, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("raised.dxf", convexity = 10);
+        if (render_pcbs) {
+            pcb("raised.dxf", "pcbs/mantis_raised_leds", 1.59, top_color, top_color == "white" ? "black" : "white", opacity(top_color), $fs = 0.5);
+        } else {
+            color(top_color) linear_extrude(height = 1.59, convexity = 10)
+                offset(delta = -0.1) translate([-254, 127]) import("raised.dxf", convexity = 10);
+        }
     }
     module plate_raised() {
         linear_extrude(height = 2.21, convexity = 10)
@@ -70,9 +156,9 @@ module mantis() {
     ex6 = 6 * ex1;
 
     // Solid parts first
-    color(bottom_color) translate([-ex1/2, 0, 4.6 + ex2]) main_split();
-    color(bottom_color) translate([ ex1/2, 0, 4.6 + ex2]) mirror([1, 0, 0]) main_split();
-    color(top_color) translate([0, 0, 8.4 + mid_layer_height + ex5]) raised();
+    translate([-ex1/2, 0, 4.6 + ex2]) main_split();
+    translate([ ex1/2, 0, 4.6 + 1.59 + ex2]) rotate([0, 180, 0])  main_split();
+    translate([0, 0, 8.4 + mid_layer_height + ex5]) raised();
 
     color("white", alpha = 0.2) union() {
         translate([0, 0, 10.0 + mid_layer_height + ex6]) plate_raised();
