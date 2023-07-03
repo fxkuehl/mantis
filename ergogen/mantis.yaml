@@ -875,27 +875,28 @@ pcbs:
         adjust.shift: [-4.2, 4.7]
         params:
           net: "do_{{colrow}}"
-      vcc_vias:
-        what: via
-        where: [top_c1_r3, top_c2_r3, top_c3_r3,
-                home_c1_r2, home_c2_r2, home_c3_r2,
-                bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
-                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
-        adjust.shift: [-5.2, 4.7]
-        params:
-          net: VCC
       # Pads as place holders for mounting points
       mount:
         what: pad
         where: [mount_base1_r, mount_base2_r, mount_base3_r, mount_raise1_r, mount_raise2_r, mount_raise3_r]
         params:
           net: GND
-      # Pad as place holder for headers
+      # Promicro as place holder for headers
       header:
-        what: pad
+        what: promicro
         where: [mount_header_r]
         params:
-          net: VCC
+          orientation: up
+          P0: R2
+          P1: R3
+          P2: R1
+          P3: RT
+          P4: C1
+          P5: C2
+          P6: C3
+          P7: VCC
+          P8: di_c3_r3
+          P9: do_c3_rt
 
   mantis_raised:
     outlines:
@@ -988,7 +989,7 @@ pcbs:
         asym: both
         params:
           net: GND
-      # Pad as place holder for headers
+      # Promicro as place holder for headers
       header:
         what: promicro
         where: [mount_header_r]
