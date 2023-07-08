@@ -121,7 +121,7 @@ module mantis() {
     }
     module main_split() {
         if (render_pcbs) {
-            pcb("main_split.dxf", "pcbs/mantis_reversible_split_leds", 1.59, bottom_color, bottom_color == "white" ? "black" : "white", opacity(bottom_color), $fs = 1);
+            pcb("main_split.dxf", "pcbs/mantis_reversible_split_leds", 1.59, bottom_color, bottom_color == "white" ? "black" : "white", opacity(bottom_color), $fs = $fs/2);
         } else {
             color(bottom_color) linear_extrude(height = 1.59, convexity = 10)
                 offset(delta = -0.1) translate([-254, 127]) import("main_split.dxf", convexity = 10);
@@ -137,7 +137,7 @@ module mantis() {
     }
     module raised() {
         if (render_pcbs) {
-            pcb("raised.dxf", "pcbs/mantis_raised_leds", 1.59, top_color, top_color == "white" ? "black" : "white", opacity(top_color), $fs = 0.5);
+            pcb("raised.dxf", "pcbs/mantis_raised_leds", 1.59, top_color, top_color == "white" ? "black" : "white", opacity(top_color), $fs = $fs/2);
         } else {
             color(top_color) linear_extrude(height = 1.59, convexity = 10)
                 offset(delta = -0.1) translate([-254, 127]) import("raised.dxf", convexity = 10);
@@ -262,12 +262,12 @@ module half_mantis() {
 }
 
 if (show_switch || show_key) {
-    translate([0, 0, 6.2 + 4*$explode]) half_mantis();
-    translate([0, 0, 6.2 + 4*$explode]) mirror([1, 0, 0]) half_mantis();
+    translate([0, 0, 6.2 + 4*$explode]) half_mantis($fs = 0.5);
+    translate([0, 0, 6.2 + 4*$explode]) mirror([1, 0, 0]) half_mantis($fs = 0.5);
 }
 
 if (!show_sound) { // Keyboard
-    mantis($fn = 36);
+    mantis($fs = 1);
 } else { // sound channels (and some other voids)
-    sound_channels($fn = 36);
+    sound_channels($fs = 1);
 }
