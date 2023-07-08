@@ -230,21 +230,22 @@ module choc_stem(offset) {
             linear_extrude(height = 7, center = true) {
                 offset(r = 1) offset(delta = -1) square([10, 4.5], center = true);
             }
+            translate([0, 0, -3.5]) cube([8.3, 2.8, 0.502], center = true);
         }
-        translate([-1.7, 0, -0.5]) rotate([90, 0, 0])
-            cylinder(3, r = 0.5, center = true);
-        translate([1.7, 0, -0.5]) rotate([90, 0, 0])
-            cylinder(3, r = 0.5, center = true);
+        translate([-1.65, 0, -0.751]) rotate([90, 0, 0])
+            cylinder(3, r = 0.751, center = true);
+        translate([1.65, 0, -0.751]) rotate([90, 0, 0])
+            cylinder(3, r = 0.751, center = true);
 
-        translate([0, 0, -0.5]) cube([3.4, 3, 1], center = true);
-        translate([0, 0, -0.5]) intersection() {
+        translate([0, 0, -0.5]) cube([3.3, 3, 1], center = true);
+        translate([0, 0, -0.751]) intersection() {
             union() {
-                translate([-4, 0, 0])  rotate([90, 0, 0])
-                    cylinder(3, r = 0.5, center = true);
-                translate([4, 0, 0]) rotate([90, 0, 0])
-                    cylinder(3, r = 0.5, center = true);
+                translate([-4.05, 0, 0])  rotate([90, 0, 0])
+                    cylinder(3, r = 0.751, center = true);
+                translate([4.05, 0, 0]) rotate([90, 0, 0])
+                    cylinder(3, r = 0.751, center = true);
             }
-            cube([8, 3, 1], center = true);
+            cube([8.5, 3, 1.502], center = true);
         }
     }
 
