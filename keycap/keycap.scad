@@ -344,11 +344,14 @@ module sliced_key(slice=[30, 30, 1], offset=[0, 0, 0], dir=[0, 0, 1],
 module choc_switch() {
     color("gray") render(convexity = 4) difference() {
         union() {
-            linear_extrude(height = 2.21) {
-                offset(r = 0.4) square(13, center = true);
+            linear_extrude(height = 0.701, scale = 1.05) {
+                offset(r = 0.6/1.05) square(12.6/1.05, center = true);
+            }
+            translate([0, 0, 0.7]) linear_extrude(height = 1.51) {
+                offset(r = 0.6) square(12.6, center = true);
             }
             translate([0, 0, 2.2]) linear_extrude(height = 0.8) {
-                offset(r = 1.0) square(13, center = true);
+                offset(r = 1.2) square(12.6, center = true);
             }
             translate([0, 0, -2]) cylinder(h = 2.01, d = 3.2);
             translate([0, 0, -2.65]) cylinder(h = 0.66, d1 = 2.8, d2 = 3.2);
@@ -357,8 +360,10 @@ module choc_switch() {
             translate([ 5.22, 0, -2   ]) cylinder(h = 2.01, d = 1.8);
             translate([ 5.22, 0, -2.65]) cylinder(h = 0.66, d1 = 1.4, d2 = 1.8);
         }
-        translate([0, 0, 6.9]) cube(13, center = true);
+        translate([0, 0, 6.9]) cube(12.65, center = true);
         translate([0, 4.7, 0]) cube([5.3, 3.25, 2], center = true);
+        translate([7.4, 0, 2.5]) cube([1, 10.8, 1], center = true);
+        translate([-7.4, 0, 2.5]) cube([1, 10.8, 1], center = true);
     }
     color("gold") translate([0, -5.9, -1]) rotate([90, 0, 0])
     linear_extrude(height = 0.2, center = true) {
@@ -368,7 +373,7 @@ module choc_switch() {
     linear_extrude(height = 0.2, center = true) {
         offset(r = 0.5) square([0.01, 3], center = true);
     }
-    color("rosybrown") translate([0, 0, 5+1.01-travel]) render(convexity = 2) difference() {
+    color("red") translate([0, 0, 5+1.01-travel]) render(convexity = 4) difference() {
         union() {
             cube([10.2, 4.5, 4], center = true);
             translate([0, -2.74, 0]) cube([3, 1.02, 4], center = true);
@@ -380,11 +385,15 @@ module choc_switch() {
     color("white", 0.2) render(convexity = 4) difference() {
         union() {
             translate([0, 0, 2.99])
-            linear_extrude(height = 2.01, scale = 0.9) {
-                offset(r = 0.4) square([12.8, 13], center = true);
+            linear_extrude(height = 0.51) {
+                offset(r = 0.6) square([12.4, 12.6], center = true);
+            }
+            translate([0, 0, 3.499])
+            linear_extrude(height = 1.501, scale = 0.9) {
+                offset(r = 0.6) square([12.4, 12.6], center = true);
             }
             translate([0, 0, 4.99])
-            linear_extrude(height = 0.51, convexity = 2, scale = 0.98) {
+            linear_extrude(height = 0.51, convexity = 2, scale = 0.96) {
                 offset(r = 0.4) polygon([
                 [-5.7, -2.85], [-5.7,  2.85], [ 5.7,  2.85], [ 5.7, -2.85],
                 [ 2.0, -2.85], [ 2.0, -1.85], [-2.0, -1.85], [-2.0, -2.85]
@@ -392,8 +401,8 @@ module choc_switch() {
             }
         }
         translate([0, 0, 2.98])
-        linear_extrude(height = 1.62, scale = 0.9) {
-            square(13, center = true);
+        linear_extrude(height = 1.52, scale = 0.9) {
+            square(12.65, center = true);
         }
         translate([0, 0, 5]) cube([10.22, 4.52, 2], center = true);
         translate([0, -2.74, 5]) cube([3.02, 1.04, 2], center = true);
@@ -413,11 +422,11 @@ if (no_key) {
     // nothing
 } else if (show_switch && show_key) { // Single key with switch
     intersection() {
-        switch_key();
-        translate([-8.8, 0, $explode/2]) cube([30, 30, 30+$explode], center = true);
+        switch_key($fn = 32);
+        color("white", 0.75) translate([-8.8, 0, $explode/2]) cube([30, 30, 30+$explode], center = true);
     }
 } else if (show_switch) { // Choc switch
-    choc_switch();
+    choc_switch($fn = 32);
 } else if (show_sliced_key) { // Sliced view of key to show wall thickness
     %render(convexity = 10) intersection() {
         key($rgb = false);
