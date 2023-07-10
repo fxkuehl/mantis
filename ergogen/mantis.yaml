@@ -370,7 +370,7 @@ outlines:
     - what: circle
       radius: 7
       where:
-        shift: [0, -1.5]
+        shift: [0, -2]
       operation: stack
   _m2_nut:
     - what: polygon
