@@ -427,6 +427,7 @@ outlines:
       where: [top_c4_r3, home_c4_r2,
               bottom_c4_r1, bottom_c5_r1,
               thumb_c4_rt, thumb_c5_rt]
+      asym: both
   _main_cutouts:
     - what: outline
       name: _mcu_cutout
@@ -624,6 +625,33 @@ outlines:
               thumb_c4_rt, thumb_c5_rt]
       asym: both
       operation: subtract
+  plate_main:
+    - what: outline
+      name: _main
+    - what: outline
+      name: _switch_cutout1
+      where: [top_c1_r3, top_c2_r3, top_c3_r3,
+              home_c1_r2, home_c2_r2, home_c3_r2,
+              bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
+              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+      asym: both
+      operation: subtract
+    - what: outline
+      name: _main_cutouts
+      operation: subtract
+    - what: outline
+      name: _header_cutout
+      operation: subtract
+    - what: outline
+      name: _m2_nut
+      where: [mount_base1_r, mount_base2_r, mount_base3_r]
+      asym: both
+      operation: subtract
+    - what: circle
+      radius: 1.6
+      where: [mount_raise1_r, mount_raise2_r, mount_raise3_r]
+      asym: both
+      operation: subtract
   plate_main_split:
     - what: outline
       name: _main
@@ -674,6 +702,23 @@ outlines:
     - what: outline
       name: _m2_nut
       where: [mount_raise1_r, mount_raise2_r, mount_raise3_r]
+      asym: both
+      operation: subtract
+  sound_plate_main:
+    - what: outline
+      name: _main
+    - what: outline
+      name: _mcu_cutout
+      operation: subtract
+    - what: outline
+      name: _header_cutout
+      operation: subtract
+    - what: outline
+      name: _sound_channel_main
+      operation: subtract
+    - what: circle
+      radius: 1.6
+      where: [mount_base1_r, mount_base2_r, mount_base3_r, mount_raise1_r, mount_raise2_r, mount_raise3_r]
       asym: both
       operation: subtract
   sound_plate_main_split:
@@ -768,10 +813,12 @@ outlines:
   composites:
     - what: outline
       name: composite_keys
+      operation: stack
     - what: outline
       name: composite_sound
       where:
         shift: [0, -6hy-2dy-2my]
+      operation: stack
 
 pcbs:
   plate_main_split:
