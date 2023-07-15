@@ -30,7 +30,7 @@ tilt2 = 15;
 // Render PCBs accurately
 render_pcbs = false;
 // Bottom PCB color
-bottom_color = "lime";
+bottom_color = "purple";
 // Top PCB color
 top_color = "white";
 
@@ -44,7 +44,7 @@ module pcb(outline, prefix, thickness, mcolor, scolor, alpha = 1) {
     }
     module bulk() {
         difference() {
-            offset(delta = -0.1) import(outline, convexity = 10);
+            offset(delta = -0.05) import(outline, convexity = 10);
             holes();
         }
     }
@@ -113,39 +113,39 @@ function opacity(mcolor) = (mcolor == "white" || mcolor == "black") ? 0.95 : mco
 module mantis() {
     module base() {
         linear_extrude(height = 1.61, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("base.dxf", convexity = 10);
+            translate([-254, 127]) import("base.dxf", convexity = 10);
     }
-    module sound_plate_main_split() {
+    module sound_plate_main() {
         linear_extrude(height = 2.99, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("sound_plate_main_split.dxf", convexity = 10);
+            translate([-254, 127]) import("sound_plate_main.dxf", convexity = 10);
     }
     module main_split() {
         if (render_pcbs) {
             pcb("main_split.dxf", "pcbs/mantis_reversible_split_leds", 1.59, bottom_color, bottom_color == "white" ? "black" : "white", opacity(bottom_color), $fs = $fs/2);
         } else {
             color(bottom_color) linear_extrude(height = 1.59, convexity = 10)
-                offset(delta = -0.1) translate([-254, 127]) import("main_split.dxf", convexity = 10);
+                offset(delta = -0.05) translate([-254, 127]) import("main_split.dxf", convexity = 10);
         }
     }
-    module plate_main_split() {
+    module plate_main() {
         linear_extrude(height = 2.21, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("plate_main_split.dxf", convexity = 10);
+            translate([-254, 127]) import("plate_main.dxf", convexity = 10);
     }
     module sound_plate_raised() {
         linear_extrude(height = mid_layer_height - 0.01, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("sound_plate_raised.dxf", convexity = 10);
+            translate([-254, 127]) import("sound_plate_raised.dxf", convexity = 10);
     }
     module raised() {
         if (render_pcbs) {
             pcb("raised.dxf", "pcbs/mantis_raised_leds", 1.59, top_color, top_color == "white" ? "black" : "white", opacity(top_color), $fs = $fs/2);
         } else {
             color(top_color) linear_extrude(height = 1.59, convexity = 10)
-                offset(delta = -0.1) translate([-254, 127]) import("raised.dxf", convexity = 10);
+                offset(delta = -0.05) translate([-254, 127]) import("raised.dxf", convexity = 10);
         }
     }
     module plate_raised() {
         linear_extrude(height = 2.21, convexity = 10)
-            offset(delta = -0.1) translate([-254, 127]) import("plate_raised.dxf", convexity = 10);
+            translate([-254, 127]) import("plate_raised.dxf", convexity = 10);
     }
 
     ex1 = $explode;
@@ -164,11 +164,9 @@ module mantis() {
         translate([0, 0, 10.0 + mid_layer_height + ex6]) plate_raised();
 
         translate([0, 0, 8.4 + ex4]) sound_plate_raised();
-        translate([-ex1/2, 0, 6.2 + ex3]) plate_main_split();
-        translate([ ex1/2, 0, 6.2 + ex3]) mirror([1, 0, 0]) plate_main_split();
+        translate([0, 0, 6.2 + ex3]) plate_main();
 
-        translate([-ex1/2, 0, 1.6 + ex1]) sound_plate_main_split();
-        translate([ ex1/2, 0, 1.6 + ex1]) mirror([1, 0, 0]) sound_plate_main_split();
+        translate([0, 0, 1.6 + ex1]) sound_plate_main();
 
         base();
     }
@@ -183,25 +181,25 @@ module sound_channels() {
         linear_extrude(height = 3.8 + mid_layer_height, convexity = 10)
             translate([-254, 127]) import("raised_outline.dxf", convexity = 10);
     }
-    module sound_plate_main_split() {
+    module sound_plate_main() {
         linear_extrude(height = 3.01, convexity = 10)
-            offset(delta = 0.01) translate([-254, 127]) import("sound_plate_main_split.dxf", convexity = 10);
+            translate([-254, 127]) import("sound_plate_main.dxf", convexity = 10);
     }
     module main_split() {
         linear_extrude(height = 1.61, convexity = 10)
             offset(delta = 0.01) translate([-254, 127]) import("main_split.dxf", convexity = 10);
     }
-    module plate_main_split() {
+    module plate_main() {
         linear_extrude(height = 2.21, convexity = 10)
-            offset(delta = 0.01) translate([-254, 127]) import("plate_main_split.dxf", convexity = 10);
+            translate([-254, 127]) import("plate_main.dxf", convexity = 10);
     }
     module sound_plate_raised() {
         linear_extrude(height = mid_layer_height + 0.01, convexity = 10)
-            offset(delta = 0.01) translate([-254, 127]) import("sound_plate_raised.dxf", convexity = 10);
+            translate([-254, 127]) import("sound_plate_raised.dxf", convexity = 10);
     }
     module raised() {
         linear_extrude(height = 1.61, convexity = 10)
-            offset(delta = 0.01) translate([-254, 127]) import("raised.dxf", convexity = 10);
+            translate([-254, 127]) import("raised.dxf", convexity = 10);
     }
 
     color("white", alpha = 0.4) render(convexity = 10) difference() {
@@ -210,14 +208,12 @@ module sound_channels() {
             translate([0, 0, 6.195]) raised_outline();
         }
 
-        translate([0, 0, 1.6]) sound_plate_main_split();
-        translate([0, 0, 1.6]) mirror([1, 0, 0]) sound_plate_main_split();
+        translate([0, 0, 1.6]) sound_plate_main();
 
         translate([0, 0, 4.6]) main_split();
         translate([0, 0, 4.6]) mirror([1, 0, 0]) main_split();
 
-        translate([0, 0, 6.2]) plate_main_split();
-        translate([0, 0, 6.2]) mirror([1, 0, 0]) plate_main_split();
+        translate([0, 0, 6.2]) plate_main();
 
         translate([0, 0, 8.4]) sound_plate_raised();
 
