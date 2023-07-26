@@ -375,13 +375,13 @@ outlines:
   _m2_nut:
     - what: polygon
       points:
-        - shift: [-2.1, -1.215]
-        - shift: [0, 2.43]
-        - shift: [2.1, 1.215]
-        - shift: [2.1, -1.215]
-        - shift: [0, -2.43]
-        - shift: [-2.1, -1.215]
-      fillet: 1
+        - shift: [-2.0, -1.155]
+        - shift: [0, 2.31]
+        - shift: [2.0, 1.155]
+        - shift: [2.0, -1.155]
+        - shift: [0, -2.31]
+        - shift: [-2.0, -1.155]
+      fillet: .6
   _rgb_cutout:
     - what: rectangle
       where:
@@ -391,7 +391,7 @@ outlines:
   _switch_cutout1:
     - what: rectangle
       size: [13.8, 13.8]
-      fillet: 0.4
+      fillet: 0.6
   _mcu_cutout:
     - what: rectangle
       size: [17.78 + 1, 33.02 + 1]
@@ -402,14 +402,13 @@ outlines:
   _header_cutout:
     - what: polygon
       points:
-        # 2x .5mm wider
         # 1.5mm higher
         - ref: thumb_c3_rt
-          shift: [hx/2-0.5, 5hy/3+ky/2+dy/2]
+          shift: [hx/2-kx, 5hy/3+ky/2+dy/2]
         - shift: [0, 2hy/3+dy/2-ky+1.5]
         #- shift: [hx/2-kx+dx/2, hy/3-ky/2+dx/4]
         #- shift: [hx/2-kx+dx/2, -hy/3+ky/2-dx/4]
-        - shift: [hx+1+dx, 0]
+        - shift: [hx+dx+2kx, 0]
         - shift: [0, -2hy/3-dy/2+ky-1.5]
         #- shift: [-hx/2+kx-dx/2, -hy/3+ky/2-dx/4]
     - what: rectangle
