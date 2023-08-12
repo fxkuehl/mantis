@@ -36,7 +36,7 @@ show_switch = false;
 // One key sliced and exploded to show wall thickness
 show_sliced_key = false;
 // Print some key stats
-print_stats = false;
+$print_stats = false;
 
 use <utils.scad>
 
@@ -184,14 +184,15 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
     polyhedron(points, faces, convexity=2);
     
     // Some stats
-    if (print_stats) {
+    if ($print_stats) {
         point_center = points_dish[len(points_dish)-1];
         total_height = h + 2*R2*sin(tilt);
         mounted_height = total_height - h + $thickness;
         target_depth = -point_center.y/tan(tilt) - (point_center.z - h)
                      - $thickness;
         echo(total_height=total_height, mounted_height=mounted_height,
-             dish_depth=dish_depth, target_depth=target_depth);
+             dish_depth=dish_depth, target_depth=target_depth,
+             center_y=point_center.y, center_z=point_center.z);
     }
 }
 
@@ -269,7 +270,8 @@ module difkey(detail = 32) {
             difference() {
                 translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                 fillet_hexagon_cone(Ri, R2, ri, r2, exc_i,
-                                    $tilt, $slope, $height-$thickness, da=5);
+                                    $tilt, $slope, $height-$thickness, da=5,
+                                    $print_stats=false);
             }
             choc_stem(offset, $fn = detail);
         }
@@ -295,7 +297,8 @@ module minkey(detail = 32) {
                 difference() {
                     translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                     fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                                        $tilt, $slope, $height, da=5);
+                                        $tilt, $slope, $height, da=5,
+                                        $print_stats=false);
                 }
                 half_sphere($thickness, $fa = 360/16);
             }
@@ -411,7 +414,7 @@ module choc_switch() {
 
 module switch_key() {
     offset = key_offset();
-    if (print_stats)
+    if ($print_stats)
         echo(key_offset = offset);
     if (show_key)
         translate([0, 0, 5.5 + 3 - travel - offset + $explode/5]) render(convexity = 10) key(detail = 8);
