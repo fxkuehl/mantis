@@ -100,19 +100,22 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
     yb2 = yf2 + 2*R2*cos(tilt);
     zb2 = zf2 + 2*R2*sin(tilt);
 
-    // parabolas for interpolating zf/zb-coordinates that is
+    // parabola for interpolating zf-coordinates that is
     // 0 at b=0
     // 1 at b=1
     // has slope s at b=1 (the rim) that matches the slope of the dish
-    df = yf2 - yf1;
-    sf = tan(tilt-slope) * (zf2 - zf1) / df;
+    sf = tan(tilt-slope) * (yf2 - yf1) / (zf2 - zf1);
     af = sf - 1;
     bf = 2 - sf;
 
-    db = yb2 - yb1;
-    sb = /*tan(tilt+slope)*/0 * (zb2 - zb1) / db;
-    ab = sb - 1;
-    bb = 2 - sb;
+    // parabola for interpolating yb-coordinates that is
+    // 0 at b = 0
+    // 1 at b = 1
+    // has slope s at b=0 (the outside edge) that matches the slope at the
+    // front edge of the key
+    sb = -0.5 * (zb2 - zb1) / (yb2 - yb1);
+    ab = 1 - sb;
+    bb = sb;
 
     steps_cone = max(3, floor(steps / 15));
     points_cone = [for (b = [0 : 1/steps_cone : 1 - 1/steps_cone]) each
@@ -121,8 +124,8 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
              r = interpolate(r1, r2, b2f),
              yf = interpolate(yf1, yf2, b),
              zf = interpolate(zf1, zf2, b2f),
-             yb = interpolate(yb1, yb2, b),
-             zb = interpolate(zb1, zb2, b2b),
+             yb = interpolate(yb1, yb2, b2b),
+             zb = interpolate(zb1, zb2, b),
              D = sqrt((yb - yf)^2 + (zb - zf)^2),
              R = D/2 * cos30 + r * (1 - cos30),
              t = atan2(zb - zf, yb - yf),
