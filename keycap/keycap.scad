@@ -1,4 +1,4 @@
-// Angular resulution
+// Angular resolution
 $fa = 2;
 // Whether to render RGB LED cutouts in the keycaps
 $rgb = true;
@@ -10,9 +10,11 @@ $minkowski = false;
 $tilt = 15;
 // Slope angle of the dish at the rim
 $slope = 15;
-// Height from the bottom of the keycap to the rim at the front of the key
-$height = 2.4;
-// Approximate thickness of the wall (may be thicker in some places)
+// Droop from the stem interface to the base of the key
+$droop = 1.5;
+// Rise from the stem interface to the front rim of the dish (minus thickness)
+$rise = -0.5;
+// Approximate thickness of the wall
 $thickness = 1.4;
 // Width of the hexagonal key
 $key_width = 20.96;
@@ -203,13 +205,14 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
 function key_offset() = let (
     exc = min($max_exc, $tilt/7.5),
     dish_radius = $dish_diam/2 * sqrt(1 + 1/tan($slope)^2),
-    front_offset = $height - $thickness + 0.5,
+    dish_depth = (1.0-cos($slope))*dish_radius,
+    front_offset = $droop + $rise + 0.5,
     mid_offset = rotate_x_around(
-        [0, -3, $height - $thickness - (1.0-cos($slope))*dish_radius], $tilt,
-        [0, -exc - $dish_diam/2, $height - $thickness]).z)
+        [0, -3, $droop + $rise - dish_depth], $tilt,
+        [0, -exc - $dish_diam/2, $droop + $rise]).z)
     min(front_offset, mid_offset);
 
-module one_stem() {
+module choc_peg() {
     r = 0.1;
     module cross_section() {
         offset(r = -2*r) offset(delta = r) polygon([
@@ -253,8 +256,8 @@ module choc_stem(offset) {
         }
     }
 
-    translate([-2.85, 0, offset - 3.5]) one_stem($fn = $fn/2);
-    translate([ 2.85, 0, offset - 3.5]) one_stem($fn = $fn/2);
+    translate([-2.85, 0, offset - 3.5]) choc_peg($fn = $fn/2);
+    translate([ 2.85, 0, offset - 3.5]) choc_peg($fn = $fn/2);
 }
 
 module difkey(detail = 32) {
@@ -266,21 +269,27 @@ module difkey(detail = 32) {
     Ri = R1 - $thickness;
     ri = max(0, r1 - $thickness);
     exc_i = exc - $thickness * sin($tilt);
-    offset = key_offset();
+    height = $droop + $rise + $thickness;
+    height_i = $droop + $rise;
+    max_offset = key_offset();
+    if ($droop > max_offset) {
+        echo("Warning: key interferes with switch. Increase $rise by",
+             $droop - max_offset);
+    }
 
     intersection() {
         union() {
             difference() {
                 translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                 fillet_hexagon_cone(Ri, R2, ri, r2, exc_i,
-                                    $tilt, $slope, $height-$thickness, da=5,
+                                    $tilt, $slope, height_i, da=5,
                                     $print_stats=false);
             }
-            choc_stem(offset, $fn = detail);
+            choc_stem($droop, $fn = detail);
         }
         union() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                                $tilt, $slope, $height);
+                                $tilt, $slope, height);
             translate([0, 0, -4.99]) cube(10, center = true);
         }
     }
@@ -292,7 +301,12 @@ module minkey(detail = 32) {
     r1 = $fillet;
     r2 = R2;
     exc = min($max_exc, $tilt/7.5);
-    offset = key_offset();
+    height = $droop + $rise + $thickness;
+    max_offset = key_offset();
+    if ($droop > max_offset) {
+        echo("Warning: key interferes with switch. Increase $rise by",
+             $droop - max_offset);
+    }
 
     intersection() {
         union() {
@@ -300,16 +314,16 @@ module minkey(detail = 32) {
                 difference() {
                     translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                     fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                                        $tilt, $slope, $height, da=5,
+                                        $tilt, $slope, height, da=5,
                                         $print_stats=false);
                 }
                 half_sphere($thickness, $fa = 360/16);
             }
-            choc_stem(offset, $fn = detail);
+            choc_stem($droop, $fn = detail);
         }
         union() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                                $tilt, $slope, $height);
+                                $tilt, $slope, height);
             translate([0, 0, -4.99]) cube(10, center = true);
         }
     }
@@ -416,11 +430,8 @@ module choc_switch() {
 }
 
 module switch_key() {
-    offset = key_offset();
-    if ($print_stats)
-        echo(key_offset = offset);
     if (show_key)
-        translate([0, 0, 5.5 + 3 - travel - offset + $explode/5]) render(convexity = 10) key(detail = 8);
+        translate([0, 0, 5.5 + 3 - travel - $droop + $explode/5]) render(convexity = 10) key(detail = 8);
     choc_switch();
 }
 

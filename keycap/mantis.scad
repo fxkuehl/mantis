@@ -2,7 +2,7 @@
 // from propagating into keycap.scad.
 include <keycap.scad>
 
-// Angular resulution of keycap surface
+// Angular resolution of keycap surface
 $fa = 2;
 
 // Whether to render RGB LED cutouts in the keycaps
@@ -24,8 +24,12 @@ show_sound = false;
 mid_layer_height = 6;
 // Tilt angle for home keys
 tilt1 = 15;
+// Rise of the home keys
+rise1 = -0.5;
 // Tilt angle for outside keys
-tilt2 = 15;
+tilt2 = 28;
+// Rise of the outside keys
+rise2 = 2.9;
 
 // Render PCBs accurately
 render_pcbs = false;
@@ -229,31 +233,31 @@ module half_mantis() {
     dy = -dx/cos30;
     raise = 3.8 + mid_layer_height + 3*$explode;
     translate([-4.5*hx-dx/2, -3*hy, 0]) {
-        translate([0  *hx, 0*hy   ,     0]) rotate([0, 0,    0]) switch_key($tilt = tilt2);
-        translate([1  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = tilt2);
-        translate([2  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = tilt2);
-        translate([3  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = tilt2);
-        translate([3.5*hx, 1*hy   , raise]) rotate([0, 0,  -60]) switch_key($tilt = tilt2);
-        translate([4  *hx, 2*hy   , raise]) rotate([0, 0,  -60]) switch_key($tilt = tilt2);
+        translate([0  *hx, 0*hy   ,     0]) rotate([0, 0,    0]) switch_key($tilt = tilt1, $rise = rise1);
+        translate([1  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = tilt2, $rise = rise2);
+        translate([2  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = tilt2, $rise = rise2);
+        translate([3  *hx, 0*hy   ,     0]) rotate([0, 0,  -60]) switch_key($tilt = tilt2, $rise = rise2);
+        translate([3.5*hx, 1*hy   , raise]) rotate([0, 0,  -60]) switch_key($tilt = tilt2, $rise = rise2);
+        translate([4  *hx, 2*hy   , raise]) rotate([0, 0,  -60]) switch_key($tilt = tilt2, $rise = rise2);
 
-        translate([0.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key($tilt = tilt1);
-        translate([1.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key($tilt = tilt1);
-        translate([2.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key($tilt = tilt1);
-        translate([3  *hx, 2*hy   , raise]) rotate([0, 0, -120]) switch_key($tilt = tilt1);
-        translate([3.5*hx, 3*hy   , raise]) rotate([0, 0, -120]) switch_key($tilt = tilt2);
+        translate([0.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key($tilt = tilt1, $rise = rise1);
+        translate([1.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key($tilt = tilt1, $rise = rise1);
+        translate([2.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key($tilt = tilt1, $rise = rise1);
+        translate([3  *hx, 2*hy   , raise]) rotate([0, 0, -120]) switch_key($tilt = tilt1, $rise = rise1);
+        translate([3.5*hx, 3*hy   , raise]) rotate([0, 0, -120]) switch_key($tilt = tilt2, $rise = rise2);
 
-        translate([0  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2);
-        translate([1  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2);
-        translate([2  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2);
-        translate([2.5*hx, 3*hy   , raise]) rotate([0, 0, -180]) switch_key($tilt = tilt2);
+        translate([0  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2, $rise = rise2);
+        translate([1  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2, $rise = rise2);
+        translate([2  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2, $rise = rise2);
+        translate([2.5*hx, 3*hy   , raise]) rotate([0, 0, -180]) switch_key($tilt = tilt2, $rise = rise2);
 
-        translate([1.5*hx, 3*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2);
+        translate([1.5*hx, 3*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2, $rise = rise2);
     
-        translate([2  *hx, 4*hy+dy, raise]) rotate([0, 0,   60]) switch_key($tilt = tilt1);
-        translate([3  *hx, 4*hy+dy, raise]) rotate([0, 0,    0]) switch_key($tilt = tilt1);
-        translate([4  *hx, 4*hy+dy, raise]) rotate([0, 0,  -60]) switch_key($tilt = tilt1);
+        translate([2  *hx, 4*hy+dy, raise]) rotate([0, 0,   60]) switch_key($tilt = tilt1, $rise = rise1);
+        translate([3  *hx, 4*hy+dy, raise]) rotate([0, 0,    0]) switch_key($tilt = tilt1, $rise = rise1);
+        translate([4  *hx, 4*hy+dy, raise]) rotate([0, 0,  -60]) switch_key($tilt = tilt1, $rise = rise1);
     
-        translate([3.5*hx, 5*hy+dy,     0]) rotate([0, 0,    0]) switch_key($tilt = tilt1);
+        translate([3.5*hx, 5*hy+dy,     0]) rotate([0, 0,    0]) switch_key($tilt = tilt1, $rise = rise1);
     }
 }
 
