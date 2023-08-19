@@ -202,15 +202,15 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
 }
 
 // How far the the switch can be inserted into the bottom of the key
-function key_offset() = let (
+function min_rise() = let (
     exc = min($max_exc, $tilt/7.5),
     dish_radius = $dish_diam/2 * sqrt(1 + 1/tan($slope)^2),
     dish_depth = (1.0-cos($slope))*dish_radius,
-    front_offset = $droop + $rise + 0.5,
+    front_offset = 0.5,
     mid_offset = rotate_x_around(
-        [0, -3, $droop + $rise - dish_depth], $tilt,
-        [0, -exc - $dish_diam/2, $droop + $rise]).z)
-    min(front_offset, mid_offset);
+        [0, -3, -dish_depth], $tilt,
+        [0, -exc - $dish_diam/2, 0]).z)
+    -min(front_offset, mid_offset);
 
 module choc_peg() {
     r = 0.1;
@@ -228,8 +228,8 @@ module choc_peg() {
     }
 }
 
-module choc_stem(offset) {
-    translate([0, 0, offset]) difference() {
+module choc_stem() {
+    difference() {
         translate([0, 0, 3]) union() {
             linear_extrude(height = 6, center = true) {
                 offset(r = 2) offset(delta = -2) square([12, 6.5], center = true);
@@ -256,8 +256,8 @@ module choc_stem(offset) {
         }
     }
 
-    translate([-2.85, 0, offset - 3.5]) choc_peg($fn = $fn/2);
-    translate([ 2.85, 0, offset - 3.5]) choc_peg($fn = $fn/2);
+    translate([-2.85, 0, -3.5]) choc_peg($fn = $fn/2);
+    translate([ 2.85, 0, -3.5]) choc_peg($fn = $fn/2);
 }
 
 module difkey(detail = 32) {
@@ -271,10 +271,10 @@ module difkey(detail = 32) {
     exc_i = exc - $thickness * sin($tilt);
     height = $droop + $rise + $thickness;
     height_i = $droop + $rise;
-    max_offset = key_offset();
-    if ($droop > max_offset) {
-        echo("Warning: key interferes with switch. Increase $rise by",
-             $droop - max_offset);
+    min_rise = min_rise();
+    if ($rise < min_rise) {
+        echo("Warning: Key interferes with switch. Increase $rise to",
+             min_rise);
     }
 
     intersection() {
@@ -285,7 +285,7 @@ module difkey(detail = 32) {
                                     $tilt, $slope, height_i, da=5,
                                     $print_stats=false);
             }
-            choc_stem($droop, $fn = detail);
+            translate([0, 0, $droop]) choc_stem($fn = detail);
         }
         union() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
@@ -302,10 +302,10 @@ module minkey(detail = 32) {
     r2 = R2;
     exc = min($max_exc, $tilt/7.5);
     height = $droop + $rise + $thickness;
-    max_offset = key_offset();
-    if ($droop > max_offset) {
-        echo("Warning: key interferes with switch. Increase $rise by",
-             $droop - max_offset);
+    min_rise = min_rise();
+    if ($rise < min_rise) {
+        echo("Warning: Key interferes with switch. Increase $rise to",
+             min_rise);
     }
 
     intersection() {
@@ -319,7 +319,7 @@ module minkey(detail = 32) {
                 }
                 half_sphere($thickness, $fa = 360/16);
             }
-            choc_stem($droop, $fn = detail);
+            translate([0, 0, $droop]) choc_stem($fn = detail);
         }
         union() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
