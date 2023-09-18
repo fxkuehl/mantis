@@ -516,7 +516,7 @@ if (no_key) {
 } else if (show_switch && show_key) { // Single key with switch
     intersection() {
         switch_key($fn = 32);
-        color("white", 0.75) translate([-8.8, 0, $explode/2]) cube([30, 30, 30+$explode], center = true);
+        color("white", 0.75) translate([-8.8, 0, $explode/2]) cube([30, 30, 50+$explode], center = true);
     }
 } else if (show_switch) { // Choc switch
     choc_switch($fn = 32);
@@ -525,13 +525,13 @@ if (no_key) {
         key($rgb = false);
         translate([-15, 0, 0]) cube(30, center = true);
     }
-    translate([0, 0, 15])  sliced_key([30, 30, 1], [-15, 0, 0], [0, 0, 1],
-                                      [for (i = [-2.01 : 7.99]) i+0.5], 2);
-    translate([0, -15, 0]) sliced_key([30, 1, 20], [-15, 0, 0], [0, 1, 0],
+    translate([0, 0, 17])  sliced_key([30, 30, 1], [-15, 0, 0], [0, 0, 1],
+                                      [for (i = [-2.01 : 10.99]) i+0.5], 2);
+    translate([0, -15, 0]) sliced_key([30, 1, 30], [-15, 0, 0], [0, 1, 0],
                                       [for (i = [-11 : 0]) i-0.5], 2);
-    translate([0, 15, 0])  sliced_key([30, 1, 20], [-15, 0, 0], [0, 1, 0],
+    translate([0, 15, 0])  sliced_key([30, 1, 30], [-15, 0, 0], [0, 1, 0],
                                       [for (i = [0 : 11]) i+0.5], 2);
-    translate([-15, 0, 0]) sliced_key([1, 30, 20], [0, 0, 0], [1, 0, 0],
+    translate([-15, 0, 0]) sliced_key([1, 30, 30], [0, 0, 0], [1, 0, 0],
                                       [for (i = [-10 : 0]) i-0.5], 2);
 } else {
     key();
