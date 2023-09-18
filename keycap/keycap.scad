@@ -281,6 +281,28 @@ module choc_stem() {
     translate([ 2.85, 0, -3.5]) choc_peg($fn = $fn/2);
 }
 
+module rgb_holes() {
+    exc = min($max_exc, $tilt/7.5);
+    dy_tilt = $dish_diam * (1 - cos($tilt)) + exc;
+    y0 = 8.0 - dy_tilt + (dy_tilt > 4 ? 0.1 : 0);
+    dx = 2.3;
+    dy = dx * sqrt(3)/2;
+    hole_pos_steep = [       [-1.0, 2],[ 0.0, 2],[ 1.0, 2],
+              [-2.5, 1],                                         [ 2.5, 1]];
+    hole_pos = [        [-1.5, 1],[-0.5, 1],[ 0.5, 1],[ 1.5,  1],
+         [-3.0, 0],[-2.0, 0],[-1.0, 0],[ 0.0, 0],[ 1.0, 0],[ 2.0, 0],[ 3.0,  0],
+    [-3.5,-1],[-2.5,-1],                                        [ 2.5,-1],[ 3.5,-1],
+         [-3.0,-2],                                                  [ 3.0,-2],
+    [-3.5,-3],                                                            [ 3.5,-3]];
+
+    if ($rgb) for (p = hole_pos)
+        translate([dx * p.x, y0 + dy * p.y, 0]) rotate([0, 0, 30])
+            cylinder($fn=6, h=15, d=1.6);
+    if ($rgb && y0 < 4) for (p = hole_pos_steep)
+        translate([dx * p.x, y0 + dy * p.y, 0]) rotate([0, 0, 30])
+            cylinder($fn=6, h=15, d=1.6);
+}
+
 module offsetkey(detail = 32) {
     R1 = $key_width / 2;
     R2 = $dish_diam / 2;
@@ -301,6 +323,7 @@ module offsetkey(detail = 32) {
                 fillet_hexagon_cone(R1, R2, r1, r2, exc,
                                     $tilt, $slope, height, $thickness, da=5,
                                     $print_stats=false);
+                rgb_holes();
             }
             translate([0, 0, $droop]) choc_stem($fn = detail);
         }
@@ -346,6 +369,7 @@ module difkey(detail = 32) {
                 fillet_hexagon_cone(Ri, R2, ri, r2, exc_i,
                                     tilt_i, slope_i, height_i, 0, da=5,
                                     $print_stats=false);
+                rgb_holes();
             }
             translate([0, 0, $droop]) choc_stem($fn = detail);
         }
@@ -372,7 +396,7 @@ module minkey(detail = 32) {
 
     intersection() {
         union() {
-            minkowski() {
+            difference() { minkowski() {
                 difference() {
                     translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                     fillet_hexagon_cone(R1, R2, r1, r2, exc,
@@ -380,6 +404,8 @@ module minkey(detail = 32) {
                                         $print_stats=false);
                 }
                 half_sphere($thickness, $fa = 360/16);
+            }
+                rgb_holes();
             }
             translate([0, 0, $droop]) choc_stem($fn = detail);
         }
@@ -392,23 +418,11 @@ module minkey(detail = 32) {
 }
 
 module key(detail = 32) {
-    y0 = 5.5;
-    dx = 2.3;
-    dy = dx * sqrt(3)/2;
-    hole_pos = [        [-1.5, 1],[-0.5, 1],[ 0.5, 1],[ 1.5,  1],
-         [-3.0, 0],[-2.0, 0],[-1.0, 0],[ 0.0, 0],[ 1.0, 0],[ 2.0, 0],[ 3.0,  0],
-    [-3.5,-1],[-2.5,-1],                                        [ 2.5,-1],[ 3.5,-1],
-         [-3.0,-2],                                                  [ 3.0,-2],
-    [-3.5,-3],                                                            [ 3.5,-3]];
-
     render(convexity=8) difference () {
         if ($minkowski)
             minkey(detail);
         else
             offsetkey(detail);
-        if ($rgb) for (p = hole_pos)
-            translate([dx * p.x, y0 + dy * p.y, 0]) rotate([0, 0, 30])
-                cylinder($fn=6, h=10, d=1.6);
     }
 }
 
