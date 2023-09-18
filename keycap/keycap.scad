@@ -89,7 +89,8 @@ function interpolate(x0, x1, b) = x0 * (1 - b) + x1 * b;
 // tilt: tilt angle of the top
 // slope: slope at the inside rim of the dish
 // h: padding height
-module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
+// offset: Shrink/expand outline along the normal vector
+module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, offset, da=$fa) {
     steps = floor(360/da);
 
     // y-z coordinates of front and back perimeter and rim for interpolation
@@ -101,12 +102,21 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
     zb1 = 0;
     yb2 = yf2 + 2*R2*cos(tilt);
     zb2 = zf2 + 2*R2*sin(tilt);
+    D0 = 2*yb1;
+
+    // Average slopes dz / dy front and back
+    dyf = yf2 - yf1;
+    dzf = zf2 - zf1;
+    dyb = yb2 - yb1;
+    dzb = zb2 - zb1;
+    dzdyf = dzf / dyf;
+    dzdyb = dzb / dyb;
 
     // parabola for interpolating zf-coordinates that is
     // 0 at b=0
     // 1 at b=1
     // has slope s at b=1 (the rim) that matches the slope of the dish
-    sf = tan(tilt-slope) * (yf2 - yf1) / (zf2 - zf1);
+    sf = tan(tilt-slope) / dzdyf;
     af = sf - 1;
     bf = 2 - sf;
 
@@ -115,26 +125,55 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
     // 1 at b = 1
     // has slope s at b=0 (the outside edge) that matches the slope at the
     // front edge of the key
-    sb = -0.5 * (zb2 - zb1) / (yb2 - yb1);
+    sb = -0.5 * dzdyb;
     ab = 1 - sb;
     bb = sb;
 
+    // slope (dy/dz) at the back rim
+    sb1 = -(2*ab + bb) / dzdyb;
+    // angle to vertical of the slope at the back rim
+    asb = atan(sb1);
+    // angle to vertical of the dish at the back rim
+    adb = 90 - tilt - slope;
+    // z-value where the offset dish and back slope intersect
+    zbmax = zb2 - offset * cos(asb) / tan((asb + adb) / 2);
+    qbmax = (zbmax - zb1) / dzb;
+
+    // maximum y-value (approx.) at front slope to avoid self-intersecting
+    qfmax = offset > 0 ? 0.8 : 1;
+
     steps_cone = max(3, floor(steps / 15));
-    points_cone = [for (b = [0 : 1/steps_cone : 1 - 1/steps_cone]) each
-        let (b2f = b * (af*b + bf),
-             b2b = b * (ab*b + bb),
+    n_points_cone = [for (b = [0 : 1/steps_cone : 1]) steps];
+    points_cone = [for (b = [0 : 1/steps_cone : 1]) each
+        let (qf = b * qfmax,
+             qb = b * qbmax,
+             b2f = qf * (af*qf + bf),
+             b2b = qb * (ab*qb + bb),
              r = interpolate(r1, r2, b2f),
-             yf = interpolate(yf1, yf2, b),
+             yf = interpolate(yf1, yf2, qf),
              zf = interpolate(zf1, zf2, b2f),
              yb = interpolate(yb1, yb2, b2b),
-             zb = interpolate(zb1, zb2, b),
-             D = sqrt((yb - yf)^2 + (zb - zf)^2),
-             R = D/2 * cos30 + r * (1 - cos30),
-             t = atan2(zb - zf, yb - yf),
-             shift = yf + D/2)
+             zb = interpolate(zb1, zb2, qb),
+             ynf = (2*af*qf + bf) / dyf,
+             znf = -1.0 / dzf,
+             snf = offset / sqrt(ynf^2 + znf^2),
+             ynb = 1.0 / dyb,
+             znb = (-2*ab*qb - bb) / dzb,
+             snb = offset / sqrt(ynb^2 + znb^2),
+             yof = yf + ynf * snf,
+             zof = zf + znf * snf,
+             yob = yb + ynb * snb,
+             zob = zb + znb * snb,
+             w = yob - yof,
+             D = sqrt((yob - yof)^2 + (zob - zof)^2),
+             ro = max(0, r - (1 - b2f) * (D0 - D)/2),
+             R = D/2 * cos30 + ro * (1 - cos30),
+             t = atan2(zob - zof, yob - yof),
+             shift = yof + D/2)
         [for (a = [0 : da : (steps-1) * da])
-            rotate_x_around(fillet_unit_hex_point(r/R, a)*R,
-                            t, [0, -D/2, 0]) + [0, shift, zf]
+            scale_x(
+                rotate_x_around(fillet_unit_hex_point(ro/R, a)*R,
+                                t, [0, -D/2, 0]), offset > 0 ? w/D : 1) + [0, shift, zof]
         ]
     ];
 
@@ -143,48 +182,27 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, da=$fa) {
     dish_radius = R2 * sqrt(1 + 1/tan(slope)^2);
     dish_depth = dish_radius * (1 - cos(slope));
     //echo(true_excentricity=(exc + (1-cos(tilt))*R2 - sin(tilt)*dish_depth));
+    offset_radius = dish_radius + offset;
 
     steps_dish = max(2, floor(slope / da));
     da_dish = slope / steps_dish;
-    n_points_dish = [for (b = [slope : -da_dish : 0])
+    n_points_dish = [for (b = [slope-da_dish : -da_dish : 0])
         max(1, ceil(steps * sin(b) / sin(slope)))];
-    points_dish = [for (i = [0 : 1 : steps_dish]) each
-        let (b = (steps_dish - i) * da_dish, n = n_points_dish[i], da = 360 / n)
+    points_dish = [for (i = [0 : 1 : steps_dish - 1]) each
+        let (b = (steps_dish - i - 1) * da_dish, n = n_points_dish[i], da = 360 / n)
         [for (j = [0 : 1 : n-1]) let (a = j * da)
-            rotate_x_around(dish_radius*sin(b)*[-sin(a), cos(a), 0] +
-                            [0, 0, dish_radius*(1-cos(b)) - dish_depth],
+            rotate_x_around(offset_radius*sin(b)*[-sin(a), cos(a), 0] +
+                            [0, 0, offset_radius*(1-cos(b)) - dish_depth - offset],
                             tilt, [0, -R2, 0]) + [0, -exc, h]
         ]
     ];
 
     points = concat(points_cone, points_dish);
+    n_points = concat(n_points_cone, n_points_dish);
 
     face_bot = [for (i = [0 : 1 : steps-1]) i];
-    faces_cone = [for (j = [0 : 1 : steps_cone-1]) each let (o = j * steps)
-        [for (i = [0 : 1 : steps-1])
-            [(i + 1) % steps + o, i + o, 
-             steps + i + o, steps + (i + 1) % steps + o]
-        ]
-    ];
-    o_dish = part_sums(n_points_dish);
-    faces_dish1 = [for (j = [0 : 1 : steps_dish-1]) each let (
-            o = o_dish[j] + len(points_cone),
-            n = n_points_dish[j],
-            m = n_points_dish[j + 1],
-            r = m / n
-        )
-        [for (i = [0 : 1 : n-1])
-            [(i + 1) % n + o, i + o,
-             n + round((i + 0.5)*r) % m + o]
-        ]
-    ];
-    faces_dish2 = [for (i = 1; i < len(faces_dish1); i = i + 1)
-        if (faces_dish1[i-1][2] != faces_dish1[i][2])
-            [faces_dish1[i-1][2], faces_dish1[i][2],
-             faces_dish1[i][1]]
-    ];
-
-    faces = concat([face_bot], faces_cone, faces_dish1, faces_dish2);
+    faces_cone = concentric_faces(steps_cone + steps_dish, n_points);
+    faces = concat([face_bot], faces_cone);
 
     polyhedron(points, faces, convexity=2);
     
@@ -260,17 +278,58 @@ module choc_stem() {
     translate([ 2.85, 0, -3.5]) choc_peg($fn = $fn/2);
 }
 
-module difkey(detail = 32) {
+module offsetkey(detail = 32) {
     R1 = $key_width / 2;
     R2 = $dish_diam / 2;
     r1 = $fillet;
     r2 = R2;
     exc = min($max_exc, $tilt/7.5);
-    Ri = R1 - $thickness;
-    ri = max(0, r1 - $thickness);
-    exc_i = exc - $thickness * sin($tilt);
     height = $droop + $rise + $thickness;
-    height_i = $droop + $rise;
+    min_rise = min_rise();
+    if ($rise < min_rise) {
+        echo("Warning: Key interferes with switch. Increase $rise to",
+             min_rise);
+    }
+
+    intersection() {
+        union() {
+            difference() {
+                translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
+                fillet_hexagon_cone(R1, R2, r1, r2, exc,
+                                    $tilt, $slope, height, $thickness, da=5,
+                                    $print_stats=false);
+            }
+            translate([0, 0, $droop]) choc_stem($fn = detail);
+        }
+        union() {
+            fillet_hexagon_cone(R1, R2, r1, r2, exc,
+                                $tilt, $slope, height, 0);
+            translate([0, 0, -4.99]) cube(10, center = true);
+        }
+    }
+/*
+            #fillet_hexagon_cone(R1, R2, r1, r2, exc,
+                                $tilt, $slope, height, 0);
+                fillet_hexagon_cone(R1, R2, r1, r2, exc,
+                                    $tilt, $slope, height, $thickness, da=4,
+                                    $print_stats=false);*/
+}
+
+module difkey(detail = 32) {
+    R1 = $key_width / 2;
+    R2 = $dish_diam / 2;
+    r1 = $fillet;
+    r2 = R2;
+    height = $droop + $rise + $thickness;
+    exc = min($max_exc, $tilt/7.5);
+    Ri = R1 - $thickness/cos(atan(0.5));
+    ri = max(0, Ri - R1 + r1);
+    dish_radius = $dish_diam/2 * sqrt(1 + 1/tan($slope)^2);
+    slope_i = $slope * dish_radius / (dish_radius + $thickness);
+    tilt_i = $tilt - $slope + slope_i;
+    exc_i = exc - $thickness * sin($tilt - $slope);
+    //height_i = $droop + $rise;
+    height_i = height - $thickness * cos($tilt - $slope);
     min_rise = min_rise();
     if ($rise < min_rise) {
         echo("Warning: Key interferes with switch. Increase $rise to",
@@ -282,14 +341,14 @@ module difkey(detail = 32) {
             difference() {
                 translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                 fillet_hexagon_cone(Ri, R2, ri, r2, exc_i,
-                                    $tilt, $slope, height_i, da=5,
+                                    tilt_i, slope_i, height_i, 0, da=5,
                                     $print_stats=false);
             }
             translate([0, 0, $droop]) choc_stem($fn = detail);
         }
         union() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                                $tilt, $slope, height);
+                                $tilt, $slope, height, 0);
             translate([0, 0, -4.99]) cube(10, center = true);
         }
     }
@@ -314,7 +373,7 @@ module minkey(detail = 32) {
                 difference() {
                     translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                     fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                                        $tilt, $slope, height, da=5,
+                                        $tilt, $slope, height, 0, da=5,
                                         $print_stats=false);
                 }
                 half_sphere($thickness, $fa = 360/16);
@@ -323,7 +382,7 @@ module minkey(detail = 32) {
         }
         union() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                                $tilt, $slope, height);
+                                $tilt, $slope, height, 0);
             translate([0, 0, -4.99]) cube(10, center = true);
         }
     }
@@ -343,7 +402,7 @@ module key(detail = 32) {
         if ($minkowski)
             minkey(detail);
         else
-            difkey(detail);
+            offsetkey(detail);
         if ($rgb) for (p = hole_pos)
             translate([dx * p.x, y0 + dy * p.y, 0]) rotate([0, 0, 30])
                 cylinder($fn=6, h=10, d=1.6);
