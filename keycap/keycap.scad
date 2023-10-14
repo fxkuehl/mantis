@@ -1,5 +1,7 @@
 // Angular resolution
 $fa = 2;
+// Generate several keys as one part for lower printing cost (see https://3d.jlcpcb.com/help/article/213-Connected-Parts-Printing-Guide)
+n_keys = 1;
 // Whether to render RGB LED cutouts in the keycaps
 $rgb = true;
 // Whether to use a minkowski sum for more consistent thickness
@@ -511,6 +513,20 @@ module switch_key() {
     choc_switch();
 }
 
+module half_torus(D, d, angle) {
+    rotate([0, 90, 0]) rotate_extrude(angle = angle) {
+        translate([D/2, 0, 0]) circle(d = d);
+    }
+}
+
+module key_with_tab(dy, dz, t, fn) {
+    key();
+    translate([0, -dy/2, -dz/2]) {
+        half_torus(dz + t, t, 120, $fn = fn);
+        rotate([120, 0, 0]) half_torus(dz + t, t / 2 * sqrt(3), 60, $fn = 8*fn);
+    }
+}
+
 if (no_key) {
     // nothing
 } else if (show_switch && show_key) { // Single key with switch
@@ -533,6 +549,42 @@ if (no_key) {
                                       [for (i = [0 : 11]) i+0.5], 2);
     translate([-15, 0, 0]) sliced_key([1, 30, 30], [0, 0, 0], [1, 0, 0],
                                       [for (i = [-10 : 0]) i-0.5], 2);
+} else if (n_keys > 1) {
+    t = 1.5 * 2 / sqrt(3);
+    fn = 6;
+    dz = 2.6;
+    dx = $key_width + dz;
+    dy = dx * sqrt(3) / 2;
+    rows = ceil(sqrt(ceil(n_keys / 4)));
+
+    for (r = [0 : 1 : rows-1]) {
+        cols = floor((n_keys + r) / rows);
+        y = dy * 2 * r;
+
+        for (x = [0 : dx : dx * (cols-1) / 2]) {
+            translate([x, -y, 0]) key_with_tab(dy, dz, t, fn);
+        }
+        for (x = [dx/2 : dx : dx * (cols-1) / 2]) {
+            translate([x, -y - dy, 0]) rotate([0, 0, 180]) key_with_tab(dy, dz, t, fn);
+        }
+        translate([0, -y - dy/2, -t/2 - dz]) rotate([0, 90, 0]) {
+            cylinder(dx * (cols-1) / 2, d = t, $fn = fn);
+            sphere(d = t, $fn = fn);
+            translate([0, 0, dx * (cols-1) / 2]) sphere(d = t, $fn = fn);
+        }
+    }
+    if (rows > 1) {
+        cols = floor(n_keys / rows);
+
+        translate([dx / 4, -dy/2, -t/2 - dz])
+            rotate([0, 90, -90])
+            cylinder(dy * 2 * (rows-1), d = t, $fn = fn);
+        if (cols > 1) {
+            translate([(cols-1) * dx/2 - dx/4, -dy/2, -t/2 - dz])
+                rotate([0, 90, -90])
+                cylinder(dy * 2 * (rows-1), d = t, $fn = fn);
+        }
+    }
 } else {
     key();
 }
