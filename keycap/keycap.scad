@@ -8,6 +8,8 @@ $rgb = true;
 $minkowski = false;
 
 // Key parameters:
+// Rotation of the stem
+$rot = 0;
 // Tilt angle of the keycap surface
 $tilt = 15;
 // Slope angle of the dish at the rim
@@ -249,11 +251,11 @@ module choc_peg() {
 }
 
 module choc_stem() {
-    difference() {
+    rotate([0, 0, $rot]) difference() {
         union() {
-            multmatrix([[1, 0, 0, 0],
+            rotate([0, 0, -$rot]) multmatrix([[1, 0, 0, 0],
                         [0, 1, -sin($tilt), -5*sin($tilt)],
-                        [0, 0, 1, 5]])
+                        [0, 0, 1, 5]]) rotate([0, 0, $rot])
             linear_extrude(height = 10, center = true) {
                 offset(r = 2) offset(delta = -2) square([12, 6.5], center = true);
             }
@@ -279,8 +281,8 @@ module choc_stem() {
         }
     }
 
-    translate([-2.85, 0, -3.5]) choc_peg($fn = $fn/2);
-    translate([ 2.85, 0, -3.5]) choc_peg($fn = $fn/2);
+    rotate([0, 0, $rot]) translate([-2.85, 0, -3.5]) choc_peg($fn = $fn/2);
+    rotate([0, 0, $rot]) translate([ 2.85, 0, -3.5]) choc_peg($fn = $fn/2);
 }
 
 module rgb_holes() {
