@@ -169,6 +169,8 @@ points:
             column_net: C4
             mirror.column_net: M_C4
         c5:
+          rows.r2:
+            rotate: 180
           key:
             spread: hx/2
             stagger: -hy
