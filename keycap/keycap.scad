@@ -28,6 +28,10 @@ $dish_diam = 14;
 $fillet = 3;
 // Maximum dish excentricity (tilt / 7.5)
 $max_exc = 2.5;
+// Start soft-clamping Z at
+$clamp_z1 = 8.25;
+// Clamp infinity Z to
+$clamp_z2 = 10.25;
 
 // How far the keys are pressed down (0-3mm)
 travel = 0.1;
@@ -201,7 +205,7 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, offset, da=$fa) 
         ]
     ];
 
-    points = concat(points_cone, points_dish);
+    points = clamp_z_exp(concat(points_cone, points_dish), $clamp_z1 - offset, $clamp_z2 - offset);
     n_points = concat(n_points_cone, n_points_dish);
 
     face_bot = [for (i = [0 : 1 : steps-1]) i];

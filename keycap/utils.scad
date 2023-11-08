@@ -14,6 +14,28 @@ function rotate_z(point, angle) = [
 
 function scale_x(point, factor) = [point.x * factor, point.y, point.z];
 
+// Soft clamping of z coordinates using hyperbola
+// z1: z value to start clamping at
+// z2: asymptotic maximum z value
+// Uses an inverted hyperbolic functon to compress z values
+// from [z1, inf) into the range [z1, z2)
+function clamp_z_hyper(points, z1, z2) = let (d = z2 - z1)
+    [for (p = points)
+        [p.x, p.y, p.z < z1 ? p.z :
+         z2 - d / (1 + (p.z - z1) / d)]
+    ];
+
+// Soft clamping of z coordinates using exponential function
+// z1: z value to start clamping at
+// z2: asymptotic maximum z value
+// Uses an inverted exponential functino to compress z values
+// from [z1, inf) into the range [z1, z2)
+function clamp_z_exp(points, z1, z2) = let (d = z2 - z1)
+    [for (p = points)
+        [p.x, p.y, p.z < z1 ? p.z :
+         z2 - d * exp((z1 - p.z) / d)]
+    ];
+
 function part_sums(seq) = [for (a = 0, i = 0; i <= len(seq);
                                 a = a + seq[min(i, len(seq)-1)],
                                 i = i + 1) a];
