@@ -26,15 +26,21 @@ mid_layer_height = 6;
 tilt1 = 15;
 // Rise of the home keys
 rise1 = -0.5;
-// Tilt angle for outside keys
+// Tilt angle for top row keys
 tilt2 = 28;
-// Rise of the outside keys
+// Rise of the top row keys
 rise2 = 2.9;
+// Tilt angle for bottom row keys
+tilt3 = 15;
+// Rise of the top bottom keys
+rise3 = -0.5;
 
 // Render PCBs accurately
 render_pcbs = false;
-// Bottom PCB color
-bottom_color = "purple";
+// Left bottom PCB color
+bottom_color1 = "purple";
+// Left bottom PCB color
+bottom_color2 = "lime";
 // Top PCB color
 top_color = "white";
 
@@ -123,11 +129,11 @@ module mantis() {
         linear_extrude(height = 2.99, convexity = 10)
             translate([-254, 127]) import("sound_plate_main.dxf", convexity = 10);
     }
-    module main_split() {
+    module main_split(color) {
         if (render_pcbs) {
-            pcb("main_split.dxf", "pcbs/mantis_reversible_split_leds", 1.59, bottom_color, bottom_color == "white" ? "black" : "white", opacity(bottom_color), $fs = $fs/2);
+            pcb("main_split.dxf", "pcbs/mantis_reversible_split_leds", 1.59, color, color == "white" ? "black" : "white", opacity(color), $fs = $fs/2);
         } else {
-            color(bottom_color) linear_extrude(height = 1.59, convexity = 10)
+            color(color) linear_extrude(height = 1.59, convexity = 10)
                 offset(delta = -0.05) translate([-254, 127]) import("main_split.dxf", convexity = 10);
         }
     }
@@ -160,8 +166,8 @@ module mantis() {
     ex6 = 6 * ex1;
 
     // Solid parts first
-    translate([-ex1/2, 0, 4.6 + ex2]) main_split();
-    translate([ ex1/2, 0, 4.6 + 1.59 + ex2]) rotate([0, 180, 0])  main_split();
+    translate([-ex1/2, 0, 4.6 + ex2]) main_split(bottom_color1);
+    translate([ ex1/2, 0, 4.6 + 1.59 + ex2]) rotate([0, 180, 0])  main_split(bottom_color2);
     translate([0, 0, 8.4 + mid_layer_height + ex5]) raised();
 
     color("white", alpha = 0.2) union() {
@@ -244,18 +250,18 @@ module half_mantis() {
         translate([1.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key($tilt = tilt1, $rise = rise1);
         translate([2.5*hx, 1*hy   ,     0]) rotate([0, 0, -120]) switch_key($tilt = tilt1, $rise = rise1);
         translate([3  *hx, 2*hy   , raise]) rotate([0, 0, -120]) switch_key($tilt = tilt1, $rise = rise1);
-        translate([3.5*hx, 3*hy   , raise]) rotate([0, 0, -120]) switch_key($tilt = tilt2, $rise = rise2);
+        translate([3.5*hx, 3*hy   , raise]) rotate([0, 0, -180]) switch_key($tilt = tilt3, $rise = rise3);
 
-        translate([0  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2, $rise = rise2);
-        translate([1  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2, $rise = rise2);
-        translate([2  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2, $rise = rise2);
-        translate([2.5*hx, 3*hy   , raise]) rotate([0, 0, -180]) switch_key($tilt = tilt2, $rise = rise2);
+        translate([0  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt3, $rise = rise3);
+        translate([1  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt3, $rise = rise3);
+        translate([2  *hx, 2*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt3, $rise = rise3);
+        translate([2.5*hx, 3*hy   , raise]) rotate([0, 0, -180]) switch_key($tilt = tilt3, $rise = rise3);
 
         translate([1.5*hx, 3*hy   ,     0]) rotate([0, 0, -180]) switch_key($tilt = tilt2, $rise = rise2);
     
         translate([2  *hx, 4*hy+dy, raise]) rotate([0, 0,   60]) switch_key($tilt = tilt1, $rise = rise1);
         translate([3  *hx, 4*hy+dy, raise]) rotate([0, 0,    0]) switch_key($tilt = tilt1, $rise = rise1);
-        translate([4  *hx, 4*hy+dy, raise]) rotate([0, 0,  -60]) switch_key($tilt = tilt1, $rise = rise1);
+        translate([4  *hx, 4*hy+dy, raise]) rotate([0, 0,  -60]) switch_key($tilt = tilt2, $rise = rise2);
     
         translate([3.5*hx, 5*hy+dy,     0]) rotate([0, 0,    0]) switch_key($tilt = tilt1, $rise = rise1);
     }
