@@ -448,6 +448,14 @@ outlines:
       where:
         shift: [hx/2, 0]
       operation: add
+  _linear_channel_1u_dx:
+    - what: rectangle
+      size: [hx+dx+0.01, wc]
+    - what: circle
+      radius: wc/2
+      where:
+        shift: [(hx+dx)/2, 0]
+      operation: add
   _linear_channel_2u:
     - what: rectangle
       size: [2hx+0.01, wc]
@@ -555,10 +563,10 @@ outlines:
       where: [t_c2_r1, t_c3_r2]
       asym: both
       fillet: 1
-  _sound_channel_raised:
+  _sound_channel_raised_common:
     - what: outline
       name: _linear_channel_1u
-      where: [f_c5_r3, f_c5_r2, t_c2_r1, t_c3_r2]
+      where: [f_c5_r2, t_c2_r1, t_c3_r2]
       asym: both
       adjust:
         shift: [-hx/4, hy/2]
@@ -587,6 +595,37 @@ outlines:
       adjust:
         shift: [-hx/2-wc/2+kx, 0]
       fillet: (hx-wc)/4
+  _sound_channel_raised:
+    - what: outline
+      name: _linear_channel_1u
+      where: [f_c5_r3]
+      asym: both
+      adjust:
+        shift: [-hx/4, hy/2]
+        rotate: -60
+    - what: outline
+      name: _sound_channel_raised_common
+  _sound_channel_raised_asym:
+    - what: outline
+      name: _linear_channel_1u
+      where: [f_c5_r3]
+      asym: left
+      adjust:
+        shift: [-hx/4, hy/2]
+        rotate: -60
+    - what: outline
+      name: _linear_channel_1u_dx
+      where: [f_c5_r3]
+      asym: left
+      adjust:
+        shift: [(hx+dx)/2, 0]
+      fillet: 1
+    - what: circle
+      radius: wc/2
+      where: [f_c4_r3]
+      asym: right
+    - what: outline
+      name: _sound_channel_raised_common
 
   base:
     - what: outline
@@ -761,6 +800,23 @@ outlines:
       where: [mount_raise1_r, mount_raise2_r, mount_raise3_r]
       asym: both
       operation: subtract
+  sound_plate_raised_asym:
+    - what: outline
+      name: _raised
+    - what: outline
+      name: _mcu_cutout
+      operation: subtract
+    - what: outline
+      name: _header_cutout
+      operation: subtract
+    - what: outline
+      name: _sound_channel_raised_asym
+      operation: subtract
+    - what: circle
+      radius: 1.6
+      where: [mount_raise1_r, mount_raise2_r, mount_raise3_r]
+      asym: both
+      operation: subtract
   composite_keys:
     - what: outline
       name: _main
@@ -802,7 +858,7 @@ outlines:
       name: _sound_channel_main
       operation: subtract
     - what: outline
-      name: sound_plate_raised
+      name: sound_plate_raised_asym
       where:
         shift: [0, 0.01]
       operation: stack
