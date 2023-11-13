@@ -1003,12 +1003,14 @@ pcbs:
           P6: C3
           P7: C4
           P8: C5
-          P9: di_c4_r3
+          P9: LED
           P14: M_C4
           P15: M_C3
           P16: M_C5
           P18: M_C2
           P19: M_C1
+          RAW: VCC
+          VCC: 3_3V
       reset:
         what: button
         where:
