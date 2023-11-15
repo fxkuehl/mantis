@@ -19,6 +19,8 @@ units:
   wc: 15.2
   # MCU vertical offset
   mcu_top: hy/3+2my
+  # Gap between plates
+  gap: 1
 
 points:
   zones:
@@ -875,6 +877,62 @@ outlines:
       name: composite_sound
       where:
         shift: [0, -6hy-2dy-2my]
+      operation: stack
+  plates:
+    - what: outline
+      name: base
+      adjust.shift: [-254, 127]
+      where:
+        rotate: 90
+        shift: [4hy+my, -(hy/3+5hx+dx/2+mx+gap)]
+    - what: outline
+      name: plate_main
+      adjust.shift: [-254, 127]
+      where:
+        shift: [5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2, -(4hy+my)]
+      operation: stack
+    - what: outline
+      name: plate_raised
+      adjust.shift: [-254, 127]
+      where:
+        rotate: 180
+        shift: [5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2, -(8hy+2dy+2my+gap/.866)]
+      operation: stack
+    - what: outline
+      name: sound_plate_raised_asym
+      adjust.shift: [-254, 127]
+      where:
+        shift: [5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2 - (7hx/2+dx-rx+gap), -(8hy+2dy+2my+gap/.866 + 3hy+2ry+gap/.866)]
+      operation: stack
+    - what: outline
+      name: sound_plate_raised_asym
+      adjust.shift: [-254, 127]
+      where:
+        shift: [5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2 + (7hx/2+dx-rx+gap), -(8hy+2dy+2my+gap/.866 + 3hy+2ry+gap/.866)]
+      operation: stack
+    - what: outline
+      name: sound_plate_main
+      adjust.shift: [-254, 127]
+      where:
+        rotate: -90
+        shift: [2*(5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2) - (4hy+my), -(hy/3+5hx+dx/2+mx+gap)]
+      operation: stack
+  plates2x:
+    - what: outline
+      name: plates
+    - what: outline
+      name: plates
+      where:
+        shift: [0, -(8hy+2dy+2my+gap/.866 + 3hy+2ry+gap/.866 + 5hy/3+dy+my+gap/.866)]
+      operation: stack
+  plates4x:
+    - what: outline
+      name: plates2x
+    - what: outline
+      name: plates2x
+      where:
+        rotate: 180
+        shift: [4*(5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2) - 2hy/3+2my/3+gap/.866, -2*(8hy+2dy+2my+gap/.866 + 3hy+2ry+gap/.866 + 5hy/3+dy+my+gap/.866) - my-gap]
       operation: stack
 
 pcbs:
