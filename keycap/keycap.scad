@@ -515,7 +515,7 @@ module choc_switch() {
 
 module switch_key() {
     if (show_key)
-        translate([0, 0, 5.5 + 3 - travel - $droop + $explode/5]) render(convexity = 10) key(detail = 8);
+        translate([0, 0, 5.5 + 3 - travel - $droop + $explode/5]) key(detail = 8);
     choc_switch();
 }
 
