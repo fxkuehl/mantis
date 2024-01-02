@@ -77,9 +77,9 @@ The cheapest way to build a Mantis is without a case. However, to protect the el
 
 To help with cost-effective manufacturing I created several [DXF files](https://github.com/fxkuehl/mantis/tree/main/plates/v0.3.3) that combine all the plates for one, two or four keyboards in a single efficient layout. The four-keyboard layout fits on 60x90cm sheets of material and got the case cost for my latest builds down to about $50 CAD per keyboard from a local laser cutting shop.
 
-## Firmware
+## Firmware and Keymap
 
-Firmware is available in my [QMK fork](https://github.com/fxkuehl/qmk_firmware/tree/mantis-v0.3/keyboards/mantis).
+Firmware is available in my [QMK fork](https://github.com/fxkuehl/qmk_firmware/tree/mantis-vial-v0.3/keyboards/mantis). It is now based on the Vial version of QMK, so you can use [Vial](https://get.vial.today/) to customize the keymap more easily. You can print a [one-page cheat-sheet](https://github.com/fxkuehl/mantis/blob/main/keymap.pdf) of the layout with a brief introduction to the default keymap.
 
 ## Concept
 

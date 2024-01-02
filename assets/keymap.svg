@@ -1,0 +1,280 @@
+<svg version="1.1"
+     width="1034" height="481"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+<!-- Units:
+ Use mm as units. MX: 19x19mm, Hex: 21.5x18.62mm
+
+ Scale factor 4: 19x19 => 76x76   21.5x18.62 => 86x74.5
+ Gap around keys:         70x70                 80x69
+
+ MX 10 key width:  190mm x 4 => 760
+ Hex 10 key width: 215mm x 4 => 860
+
+ Hexagon coordinates: vertical sections: 69/3 = 23
+ -->
+
+<defs>
+  <path id="hex"
+        d="M0 22.5 a20 20 0 0 1 10 -17.25
+           l20 -11.5 a20 20 0 0 1 20 0
+           l20 11.5 a20 20 0 0 1 10 17.25
+           v23 a20 20 0 0 1 -10 17.25
+           l-20 11.5 a20 20 0 0 1 -20 0
+           l-20 -11.5 a20 20 0 0 1 -10 -17.25 Z"
+        stroke-width="1" stroke="black" stroke-opacity="0.15"/>
+  <rect id="square" width="70" height="70" rx="20" ry="20"
+        stroke-width="3" stroke="black"/>
+  <circle id="home" cx="40" cy="34.5" r="16" fill="black" fill-opacity="0.15"/>
+  <g id="col2">
+    <use xlink:href="#hex"/>
+    <use xlink:href="#hex" x="43" y="74.5"/>
+  </g>
+  <g id="col3">
+    <use xlink:href="#col2"/>
+    <use xlink:href="#hex" x="86" y="149"/>
+  </g>
+  <g id="colh">
+    <use xlink:href="#col3"/>
+    <use xlink:href="#home" x="43" y="74.5"/>
+  </g>
+  <g id="halfboard" fill="linen">
+    <use xlink:href="#col2" x="0" y="149" fill="#e2d8cd"/>
+    <use xlink:href="#colh" x="43" y="74.5" fill="#e2d8cd"/>
+    <use xlink:href="#colh" x="86" y="0"/>
+    <use xlink:href="#hex" x="215" y="223.5"/>
+    <use xlink:href="#colh" x="172" y="0" fill="#e2d8cd"/> 
+    <use xlink:href="#colh" x="258" y="0"/>
+    <use xlink:href="#hex" x="344" y="0"/>
+
+    <use xlink:href="#hex" x="0" y="312"/>
+    <use xlink:href="#hex" x="86" y="312"/>
+    <use xlink:href="#hex" x="172" y="312"/>
+    <use xlink:href="#hex" x="43" y="386.5"/>
+    <use xlink:href="#home" x="86" y="312"/>
+  </g>
+  <g id="halfboard-inv"  fill="#e2d8cd">
+    <use xlink:href="#col2" x="0" y="149" fill="linen"/>
+    <use xlink:href="#colh" x="43" y="74.5" fill="linen"/>
+    <use xlink:href="#colh" x="86" y="0"/>
+    <use xlink:href="#hex" x="215" y="223.5"/>
+    <use xlink:href="#colh" x="172" y="0" fill="linen"/> 
+    <use xlink:href="#colh" x="258" y="0"/>
+    <use xlink:href="#hex" x="344" y="0"/>
+
+    <use xlink:href="#hex" x="0" y="312"/>
+    <use xlink:href="#hex" x="86" y="312"/>
+    <use xlink:href="#hex" x="172" y="312"/>
+    <use xlink:href="#hex" x="43" y="386.5"/>
+    <use xlink:href="#home" x="86" y="312"/>
+  </g>
+  <filter id="shadow">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+    <feOffset dx="3" dy="3"/>
+  </filter>
+</defs>
+
+<g transform="translate(514,10)" filter="url(#shadow)">
+  <use xlink:href="#halfboard-inv" x="9"/>
+  <use xlink:href="#halfboard" x="9" transform="scale(-1,1)"/>
+</g>
+
+<g transform="translate(514,10)" font-family="Helvetica, sans-serif" font-size="22">
+  <use xlink:href="#halfboard-inv" x="9"/>
+  <use xlink:href="#halfboard" x="9" transform="scale(-1,1)"/>
+  <g transform="translate(-50,37)" id="left-alpha" font-size="26" font-weight="bold">
+    <text transform="translate(-344,0)     rotate(30)">B</text>
+    <text transform="translate(-258,0)     rotate(30)">Q</text>
+    <text transform="translate(-172,0)     rotate(30)">W</text>
+    <text transform="translate(-86,0)      rotate(30)">E</text>
+    <text transform="translate(-43,74.5)   rotate(30)">R</text>
+    <text transform="translate(0,149)      rotate(30)">T</text>
+
+    <text transform="translate(-301,74.5)  rotate(30)">A</text>
+    <text transform="translate(-215,74.5)  rotate(30)">S</text>
+    <text transform="translate(-129,74.5)  rotate(30)">D</text>
+    <text transform="translate(-86,149)    rotate(30)">F</text>
+    <text transform="translate(-43,223.5)  rotate(30)">G</text>
+
+    <text transform="translate(-344,149)   rotate(30)">Z</text>
+    <text transform="translate(-258,149)   rotate(30)">X</text>
+    <text transform="translate(-172,149)   rotate(30)">C</text>
+    <text transform="translate(-129,223.5) rotate(30)">V</text>
+
+    <text transform="translate(-215,223.5) rotate(30)" style="fill:dodgerblue" font-size="36"><!--⌘☯☺⬡◰☣-->⚜</text>
+
+    <text transform="translate(-172,312)   rotate(30)" style="fill:dodgerblue">⎇</text>
+    <text transform="translate(-86,312)    rotate(30)"><!--⌫-->←</text>
+    <text transform="translate(-0,312)     rotate(30)">_</text>
+    <text transform="translate(-43,386.5)  rotate(30)">-</text>
+  </g>
+  <g transform="translate(50,37)" id="right-alpha" font-size="26" font-weight="bold">
+    <text transform="translate(0,149)     rotate(-30)">Y</text>
+    <text transform="translate(43,74.5)   rotate(-30)">U</text>
+    <text transform="translate(86,0)      rotate(-30)">I</text>
+    <text transform="translate(172,0)     rotate(-30)">O</text>
+    <text transform="translate(258,0)     rotate(-30)">P</text>
+    <text transform="translate(344,0)     rotate(-30)">'</text>
+
+    <text transform="translate(43,223.5)  rotate(-30)">H</text>
+    <text transform="translate(86,149)    rotate(-30)">J</text>
+    <text transform="translate(129,74.5)  rotate(-30)">K</text>
+    <text transform="translate(215,74.5)  rotate(-30)">L</text>
+    <text transform="translate(301,74.5)  rotate(-30)">M</text>
+
+    <text transform="translate(129,223.5) rotate(-30)">N</text>
+    <text transform="translate(172,149)   rotate(-30)">,</text>
+    <text transform="translate(258,149)   rotate(-30)">.</text>
+    <text transform="translate(344,149)   rotate(-30)">/</text>
+
+    <text transform="translate(215,223.5) rotate(-30)">☰</text>
+
+    <text transform="translate(0,312)     rotate(-30)"><!--↵-->⏎</text>
+    <text transform="translate(86,312)    rotate(-30)" font-weight="normal">⎵</text>
+    <text transform="translate(172,312)   rotate(-30)" font-size="18" font-weight="normal">Del</text>
+    <text transform="translate(43,386.5)  rotate(-30)">↹</text>
+  </g>
+  <g transform="translate(72,25)" id="right-alpha2" font-size="26">
+    <text transform="translate(344,0)     rotate(-30)">"</text>
+
+    <text transform="translate(172,149)   rotate(-30)">&lt;</text>
+    <text transform="translate(258,149)   rotate(-30)">&gt;</text>
+    <text transform="translate(344,149)   rotate(-30)">?</text>
+  </g>
+
+  <g transform="translate(-63,59)" id="left-mods" style="fill:dodgerblue">
+    <text transform="translate(-344,149)   rotate(30)" font-size="18"><!--⎈-->Ctrl</text>
+
+    <text transform="translate(-129,223.5) rotate(30)" style="fill:green" font-size="18">AltGr</text>
+
+    <!--<text transform="translate(-215,223.5) rotate(30)">⌘</text>
+
+    <text transform="translate(-172,312)   rotate(30)">⎇</text>-->
+    <text transform="translate(-86,312)    rotate(30)">⇧</text>
+    <!--<text transform="translate(-0,312)     rotate(30)">_</text>-->
+    <text transform="translate(-43,386.5)  rotate(30)" style="fill:green" font-size="18" font-weight="bold">Sym</text>
+  </g>
+  <g transform="translate(63,59)" id="right-mods" style="fill:dodgerblue">
+    <text transform="translate(344,149)   rotate(-30)" font-size="18"><!--⎈-->Ctrl</text>
+
+    <text transform="translate(215,223.5) rotate(-30)" font-size="26"><!--⌘-->⚜</text>
+
+    <!--<text transform="translate(0,312)     rotate(-30)">_</text>-->
+    <!--<text transform="translate(86,312)    rotate(-30)">⇧</text>-->
+    <text transform="translate(172,312)   rotate(-30)" font-size="18"><!--⇮-->AltGr</text>
+    <text transform="translate(43,386.5)  rotate(-30)" style="fill:firebrick" font-size="18" font-weight="bold">Fn</text>
+  </g>
+
+  <g transform="translate(-72,25)" style="fill:green" id="left-sym">
+    <text transform="translate(-344,0)     rotate(30)">~</text>
+    <text transform="translate(-258,0)     rotate(30)">!</text>
+    <text transform="translate(-172,0)     rotate(30)">@</text>
+    <text transform="translate(-86,0)      rotate(30)">#</text>
+    <text transform="translate(-43,74.5)   rotate(30)">$</text>
+    <text transform="translate(0,149)      rotate(30)">%</text>
+
+    <text transform="translate(-301,74.5)  rotate(30)">1</text>
+    <text transform="translate(-215,74.5)  rotate(30)">2</text>
+    <text transform="translate(-129,74.5)  rotate(30)">3</text>
+    <text transform="translate(-86,149)    rotate(30)">4</text>
+    <text transform="translate(-43,223.5)  rotate(30)">5</text>
+
+    <text transform="translate(-344,149)   rotate(30)">[</text>
+    <text transform="translate(-258,149)   rotate(30)">{</text>
+    <text transform="translate(-172,149)   rotate(30)">}</text>
+    <text transform="translate(-129,223.5) rotate(30)">]</text>
+
+    <g font-size="18">
+    <text transform="translate(-172,312)   rotate(30)">m0</text>
+    <text transform="translate(-86,312)    rotate(30)">m1</text>
+    <text transform="translate(-0,312)     rotate(30)">m2</text>
+    </g>
+  </g>
+  <g transform="translate(28,49)" style="fill:green" id="right-sym">
+    <text transform="translate(0,149)     rotate(-30)">^</text>
+    <text transform="translate(43,74.5)   rotate(-30)">&amp;</text>
+    <text transform="translate(86,0)      rotate(-30)">(</text>
+    <text transform="translate(172,0)     rotate(-30)">)</text>
+    <text transform="translate(258,0)     rotate(-30)">|</text>
+    <text transform="translate(344,0)     rotate(-30)">:</text>
+
+    <text transform="translate(43,223.5)  rotate(-30)">6</text>
+    <text transform="translate(86,149)    rotate(-30)">7</text>
+    <text transform="translate(129,74.5)  rotate(-30)">8</text>
+    <text transform="translate(215,74.5)  rotate(-30)">9</text>
+    <text transform="translate(301,74.5)  rotate(-30)">0</text>
+
+    <text transform="translate(129,223.5) rotate(-30)">+</text>
+    <text transform="translate(172,149)   rotate(-30)">-</text>
+    <text transform="translate(258,149)   rotate(-30)">*</text>
+    <text transform="translate(344,149)   rotate(-30)">\</text>
+
+    <text transform="translate(215,223.5) rotate(-30)">±=</text>
+
+    <text transform="translate(0,312)     rotate(-30)">;</text>
+    <text transform="translate(86,312)    rotate(-30)">=</text>
+    <text transform="translate(172,312)   rotate(-30)">`</text>
+    <text transform="translate(43,386.5)  rotate(-30)">.</text>
+  </g>
+
+  <g transform="translate(-37,15)" style="fill:firebrick" id="left-fn" font-size="18">
+    <text transform="translate(-344,0)     rotate(30)">F1</text>
+    <text transform="translate(-258,0)     rotate(30)">F2</text>
+    <text transform="translate(-172,0)     rotate(30)">F3</text>
+    <text transform="translate(-86,0)      rotate(30)">F4</text>
+    <text transform="translate(-43,74.5)   rotate(30)">F5</text>
+    <text transform="translate(0,149)      rotate(30)">F6</text>
+
+    <text transform="translate(-301,74.5)  rotate(30)">Esc</text>
+    <text transform="translate(-215,74.5)  rotate(30)">Ins</text>
+    <text transform="translate(-129,74.5)  rotate(30)" font-size="22"><!--⌫-->←</text>
+    <text transform="translate(-86,149)    rotate(30)"><!--⌦-->Del</text>
+    <text transform="translate(-43,223.5)  rotate(30)" font-size="22">⎙</text>
+
+    <text transform="translate(-344,149)   rotate(30)"><!--⇪-->Scroll</text>
+    <text transform="translate(-258,149)   rotate(30)">⌨</text>
+    <text transform="translate(-172,149)   rotate(30)">☼</text>
+    <text transform="translate(-129,223.5) rotate(30)">›››</text>
+
+    <g font-size="22">
+    <text transform="translate(-86,312)    rotate(30)">⎵</text>
+    <text transform="translate(-0,312)     rotate(30)"><!--↵-->⏎</text>
+    </g>
+    <text transform="translate(-43,386.5)  rotate(30)">↹</text>
+  </g>
+  <g transform="translate(37,15)" style="fill:firebrick" id="right-fn" font-size="18">
+    <text transform="translate(0,149)     rotate(-30)">F7</text>
+    <text transform="translate(43,74.5)   rotate(-30)">F8</text>
+    <text transform="translate(86,0)      rotate(-30)">F9</text>
+    <text transform="translate(172,0)     rotate(-30)">F10</text>
+    <text transform="translate(258,0)     rotate(-30)">F11</text>
+    <text transform="translate(344,0)     rotate(-30)">F12</text>
+
+    <text transform="translate(43,223.5)  rotate(-30)"><!--⇱-->Home</text>
+    <g font-size="22">
+    <text transform="translate(86,149)    rotate(-30)">⬅</text>
+    <text transform="translate(129,74.5)  rotate(-30)">⬆</text>
+    <text transform="translate(215,74.5)  rotate(-30)">➡</text>
+    </g>
+    <text transform="translate(301,74.5)  rotate(-30)"><!--⇲-->End</text>
+
+    <text transform="translate(129,223.5) rotate(-30)"><!--⎗⇞-->Page↑</text>
+    <text transform="translate(172,149)   rotate(-30)" font-size="22">⬇</text>
+    <text transform="translate(258,149)   rotate(-30)"><!--⎘⇟-->Page↓</text>
+    <text transform="translate(344,149)   rotate(-30)"><!--⇳-->Caps</text>
+
+    <text transform="translate(0,312)     rotate(-30)">◉</text>
+    <text transform="translate(86,312)    rotate(-30)">◓</text>
+    <text transform="translate(172,312)   rotate(-30)">☀</text>
+  </g>
+</g>
+
+<style>
+    <![CDATA[
+      text{
+        text-anchor: middle;
+	dominant-baseline: middle;
+      }
+    ]]>
+</style>
+</svg>
