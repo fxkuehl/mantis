@@ -5,7 +5,9 @@
 
 ## Contents
 
-This repository contains Ergogen, KiCad and OpenSCAD files for the PCB and case design and key caps, as well as this readme with some basic information. Mantis is approaching the end of the prototyping phase, currently at version is v0.3.3. You can check the git history for older prototype versions.
+This repository contains Ergogen, KiCad and OpenSCAD files for the PCB and case design and key caps, as well as this readme with some basic information. You can print a [one-page reference and quick start guide](https://github.com/fxkuehl/mantis/blob/main/keymap.pdf) of the default keymap.
+
+Mantis is approaching the end of the prototyping phase, currently at version is v0.3.3. You can check the git history for older prototype versions.
 
 Mantis v0.3 consists of three PCBs. Two identical bottom PCBs are reversible. The top PCB is stacked on top with M2 standoffs and headers to create an approximation of two tented, shallow key wells together with the sculpted 3D printed key caps and the rotation of switches. Thank you to [PCBWay](https://www.pcbway.com/) for sponsoring the PCB and key cap production for my prototypes since v0.2.
 
@@ -79,7 +81,7 @@ To help with cost-effective manufacturing I created several [DXF files](https://
 
 ## Firmware and Keymap
 
-Firmware is available in my [QMK fork](https://github.com/fxkuehl/qmk_firmware/tree/mantis-vial-v0.3/keyboards/mantis). It is now based on the Vial version of QMK, so you can use [Vial](https://get.vial.today/) to customize the keymap more easily. You can print a [one-page cheat-sheet](https://github.com/fxkuehl/mantis/blob/main/keymap.pdf) of the layout with a brief introduction to the default keymap.
+Firmware is available in my [QMK fork](https://github.com/fxkuehl/qmk_firmware/tree/mantis-vial-v0.3/keyboards/mantis). It is now based on the Vial version of QMK, so you can use [Vial](https://get.vial.today/) to customize the keymap more easily.
 
 ## Concept
 
