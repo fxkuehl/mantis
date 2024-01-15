@@ -83,7 +83,7 @@
   <use xlink:href="#halfboard-inv" x="9"/>
   <use xlink:href="#halfboard" x="9" transform="scale(-1,1)"/>
   <g transform="translate(-50,37)" id="left-alpha" font-size="26" font-weight="bold">
-    <text transform="translate(-344,0)     rotate(30)">B</text>
+    <text transform="translate(-344,0)     rotate(30)">J</text>
     <text transform="translate(-258,0)     rotate(30)">Q</text>
     <text transform="translate(-172,0)     rotate(30)">W</text>
     <text transform="translate(-86,0)      rotate(30)">E</text>
@@ -117,12 +117,12 @@
     <text transform="translate(344,0)     rotate(-30)">'</text>
 
     <text transform="translate(43,223.5)  rotate(-30)">H</text>
-    <text transform="translate(86,149)    rotate(-30)">J</text>
+    <text transform="translate(86,149)    rotate(-30)">N</text>
     <text transform="translate(129,74.5)  rotate(-30)">K</text>
     <text transform="translate(215,74.5)  rotate(-30)">L</text>
-    <text transform="translate(301,74.5)  rotate(-30)">M</text>
+    <text transform="translate(301,74.5)  rotate(-30)">B</text>
 
-    <text transform="translate(129,223.5) rotate(-30)">N</text>
+    <text transform="translate(129,223.5) rotate(-30)">M</text>
     <text transform="translate(172,149)   rotate(-30)">,</text>
     <text transform="translate(258,149)   rotate(-30)">.</text>
     <text transform="translate(344,149)   rotate(-30)">/</text>
