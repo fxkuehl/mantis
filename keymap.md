@@ -1,17 +1,18 @@
 ![Keymap](./assets/keymap.svg)
 
->Mantis is a column-staggered unibody keyboard with the columns rotated inwards. The alternating shading of the keys in the diagram above highlights per-finger columns and four-key thumb clusters. Dark circles indicate the home keys for each digit.
+>Here is a really-quick intro to the Mantis keyboard layout. Don't let the hexagonal keys confuse you! The diagram above highlights the rotated and staggered columns with alternating shading for each finger. Dark circles indicate the home keys for each digit.
 
->The letter keys are mostly QWERTY but with one less key on each index finger. Therefore **J** and **B** are moved to the pinkies. The thumb home keys are **Space** (right) and **Shift** (left). To provide the same functionality as a normal 85% keyboard, there are two additional layers shown by coloured legends in the diagram:
+>The letter keys are mostly QWERTY but the index fingers are missing one key. Therefore **J** and **B** are moved to the pinkies. **Space** is on the right thumb home key. To provide the same functionality as a normal 85% keyboard, each key performs multiple jobs (colored legends):
 
 >- Black: Alpha layer for normal letters with a (nearly) QWERTY layout
-- Green: Symbol layer with numbers and symbols
-- Red: Function layer with function, navigation and editing keys
+>- Green: Symbol layer with numbers and symbols
+>- Red: Function layer with function, navigation and editing keys
+>- Blue: Modifiers **Ctrl**, **Win/OS** (⚜), **Alt** (⎇), **Shift** (⇧), **AltGr**
 
->Symbol and Function layers are activated by holding **Sym** or **Fn** respectively, similar to how **Shift** works. **Fn+X** toggles an alternate Alpha layer based on Colemak-DH.
+>Activate the Symbol and Function layer by holding **Sym** or **Fn** respectively, just like you'd hold shift to type UPPERCASE. Modifiers are also (mostly) activated by holding a key, rather than tapping it. **Fn+X** toggles an alternate Alpha layer based on Colemak-DH.
 
->The blue legends in the diagram indicate modifiers: **Ctrl**, **Win/OS** (⚜), **Alt** (⎇), **Shift** (⇧), **AltGr**. They are usually activated by holding the key, rather than tapping it.
+>The Sym layer has numbers on the home row and most shifted number symbols above. The Fn layer has a navigation cluster on the right, editing keys on the left, F1-F12 across the top row. **C**, **V** and the right thumb keys control the RGB backlight, from left to right: mode, speed, colour, saturation, brightness. Hold **Shift** to decrease instead of increase.
 
->Modifiers and layers can be combined without contortions, within reason. Each thumb can only comfortably hold or tap one key at once. **AltGr** should not be needed while holding **Fn**. The Symbol layer works without **Shift** and it has a second **AltGr** key on the left index finger to use with symbols on the right thumb. **Alt** can work as a one-shot key. For example, if you need type **Alt+1**, you can tap **Alt**, then hold **Sym** and tap **1**.
+>Common combos of layers and modifiers are comfortable without twisting or moving your hands. Uncommon combos with multiple keys on the same thumb are **Fn**+**AltGr** and **Sym**+**Alt**/**Shift**. The Sym layer works without **Shift**, while **Alt** can be used as a one-shot mod. E.g. if you need to type **Alt+1**, tap **Alt**, then hold **Sym** and tap **1**. The Symbol layer has a second **AltGr** on the left index finger to combine with symbols on the right thumb.
 
->You can easily customize your keymap with [Vial](https://get.vial.today/) without having to build and flash new firmware. The keymap is stored on the keyboard itself, so it works the same on any computer you connect it to. Some examples of the things you can do with Vial: Change the Alpha layouts, change the Symbol layer to a number pad instead of a number row, replace the alternate Alpha layer with a layer for macros and multimedia keys, define custom macros, try out home-row mods, ...
+>Customize the keymap for your needs with [Vial](https://get.vial.today/) (_https://get.vial.today/_). It updates the keymap on-the-fly and stores it on the keyboard itself. You'll have your custom keymap with you wherever you take your keyboard. Happy typing!
