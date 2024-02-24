@@ -1,5 +1,5 @@
 <svg version="1.1"
-     width="878" height="481" viewBox="78 0 878 481"
+     width="220mm" height="120.5mm" viewBox="78 0 878 481"
      xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink">
 <!-- Units:
@@ -231,7 +231,7 @@
     <text transform="translate(-86,149)    rotate(30)"><!--⌦-->Del</text>
     <text transform="translate(-43,223.5)  rotate(30)" font-size="22">⎙</text>
 
-    <text transform="translate(-344,149)   rotate(30)"><!--⇪-->Scroll</text>
+    <text transform="translate(-344,149)   rotate(30)"><!--⇪-->Caps</text>
     <text transform="translate(-258,149)   rotate(30)">⌨</text>
     <text transform="translate(-172,149)   rotate(30)">☼</text>
     <text transform="translate(-129,223.5) rotate(30)">›››</text>
@@ -261,7 +261,7 @@
     <text transform="translate(129,223.5) rotate(-30)"><!--⎗⇞-->Page↑</text>
     <text transform="translate(172,149)   rotate(-30)" font-size="22">⬇</text>
     <text transform="translate(258,149)   rotate(-30)"><!--⎘⇟-->Page↓</text>
-    <text transform="translate(344,149)   rotate(-30)"><!--⇳-->Caps</text>
+    <text transform="translate(344,149)   rotate(-30)"><!--⇳-->Scroll</text>
 
     <text transform="translate(0,312)     rotate(-30)">◉</text>
     <text transform="translate(86,312)    rotate(-30)">◓</text>
