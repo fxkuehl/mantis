@@ -17,46 +17,7 @@ v0.3.3 also includes DXF files for laser-cut plates. I have built keyboards with
 
 ## Build Guide
 
-I will eventually write or record a complete build guide. Meanwhile, here is a full parts list:
-
-- 1x upper PCB
-- 2x lower PCBs
-- 40x custom 3D printed keycaps (FK Keycaps Hex keys also work but not ideal)
-- Case plates (3mm. If different thickness is used, you may need to use different headers and standoffs)
-    - 1x base plate
-    - 1x lower sound plate
-    - 1x lower switch plate
-    - 2x upper sound plate
-    - 1x upper switch plate
-- 1x ProMicro or pin-compatible controller (I used Adafruit's KB2040 in my latest builds)
-- 1x Logic Level Inverter / Level Shifter (74AHCT14, only need for RGB with 3.3V controllers)
-- 1x reset switch (optional, only useful with ProMicro)
-- 40x SMD diodes (SOD-123)
-- Up to 40x RBG LEDs (SK6812 MINI-E)
-- 40x Choc v1 switches
-- Headers: (I used 5mm short headers from Adafruit in my latest builds. 8mm headers work if you mount the male headers from the bottom of the lower PCBs, pushing the pins all the way through)
-    - 2x 12-pin headers for controllers
-    - 2x 3-pin, 1x 8-pin and 1x 6-pin headers for connecting the upper and lower PCBs
-- 12x 3mm knurled M2 male-female standoffs
-- 6x 9mm knurled metal M2 male-female standoffs (don't use plastic standoffs, they serve as GND connection between the PCBs)
-- 12x M2 screws
-- 12x M2 hex nuts
-- Adhesive rubber feet
-
-### Optional components
-
-The reset switch is optional. You can reset the controller for loading new firmware by shorting the GND and RST pins with a paper clip or a short wire or by adding a RESET key to your keymap. You can also enter the bootloader by holding down "Q" while plugging in the cable.
-
-The case plates are optional. If you're building Mantis without a case you also don't need the 3mm standoffs. Just put rubber feet directly on the lower PCB. Make sure to support the center of the keyboard with rubber feet to avoid unnecessary stress on the split bottom PCBs.
-
-The chaining of LEDs enables a few options for populating RGB LEDs:
-
-- None
-- 6: top center keys only
-- 16: all keys on the upper PCB
-- 40: all keys
-
-The 74AHCT14 level shifter is only needed if you use RGB LEDs with a controller that uses 3.3V logic. The original ProMicro with 5V logic does not need a level shifter. Just bridge the jumper for directly connecting the LEDs to the controller pin.
+See the [complete build guide](./buildguide.md) for detailed instructions and all the tools and parts required.
 
 ### Keycap recommendations
 
