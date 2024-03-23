@@ -4,26 +4,6 @@
 
 Before you start, make sure you have all the parts and tools you will need to complete the build, and that you have a working QMK build environment.
 
-### Tools
-
->![Tools](./assets/build-guide/tools.jpg)
-
-You will need the following tools:
-
-- Soldering iron (ideally digitally temperature controlled)
-- Solder (I prefer lead-free solder, but leaded solder is easier to work with especially for soldering temperature-sensitive RGB LEDs)
-- Flux (helps with soldering RGB LEDs)
-- Rubbing alcohol (for cleaning up flux residue)
-- Tweezers (for placing SMD diodes and LEDs)
-- Pliers (for pulling header pins and tightening standoffs)
-- Diagonal cutter (for cutting headers)
-- Adhesive tape (for securing headers while soldering)
-- Small file or sand paper (for adjusting standoffs)
-- Small screw driver (for M2 screws in the bottom of the case)
-- Paper clips (for testing the key matrix before installing the switches)
-
-I would also recommend a magnifying glass and good lighting for placing and soldering the SMD components. I use a magnifying lamp.
-
 ### Parts
 
 >![Parts](./assets/build-guide/parts.jpg)
@@ -53,6 +33,26 @@ These are all the parts needed to build a Mantis keyboard.
 - 12x M2 screws
 - 12x M2 hex nuts
 - Adhesive rubber feet
+
+### Tools
+
+>![Tools](./assets/build-guide/tools.jpg)
+
+You will need the following tools:
+
+- Soldering iron (ideally digitally temperature controlled)
+- Solder (I prefer lead-free solder, but leaded solder is easier to work with especially for soldering temperature-sensitive RGB LEDs)
+- Flux (helps with soldering RGB LEDs)
+- Rubbing alcohol (for cleaning up flux residue)
+- Tweezers (for placing SMD diodes and LEDs)
+- Pliers (for pulling header pins and tightening standoffs)
+- Diagonal cutter (for cutting headers)
+- Adhesive tape (for securing headers while soldering)
+- Small file or sand paper (for adjusting standoffs)
+- Small screw driver (for M2 screws in the bottom of the case)
+- Paper clips (for testing the key matrix before installing the switches)
+
+I would also recommend a magnifying glass and good lighting for placing and soldering the SMD components. I use a magnifying lamp.
 
 ## Build Process Overview
 
