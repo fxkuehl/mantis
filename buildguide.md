@@ -10,10 +10,10 @@ Before you start, make sure you have all the parts and tools you will need to co
 
 These are all the parts needed to build a Mantis keyboard.
 
-- 1x upper PCB
-- 2x lower PCBs
-- 40x custom 3D printed keycaps (FK Keycaps Hex keys also work but not ideal)
-- Case plates (3mm. If different thickness is used, you may need to use different headers and standoffs)
+- 1x [upper PCB](https://github.com/fxkuehl/mantis/raw/main/pcb/gerber/mantis-v0.3.3-top.zip)
+- 2x [lower PCBs](https://github.com/fxkuehl/mantis/raw/main/pcb/gerber/mantis-v0.3-bottom.zip)
+- 40x [custom 3D printed keycaps](https://github.com/fxkuehl/mantis/tree/main/keycap) (FK Keycaps Hex keys also work but not ideal)
+- [Case plates](https://github.com/fxkuehl/mantis/tree/main/plates/v0.3.3) (3mm. If different thickness is used, you may need to use different headers and standoffs)
     - 1x base plate
     - 1x lower sound plate
     - 1x lower switch plate

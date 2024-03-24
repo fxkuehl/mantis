@@ -1,0 +1,5 @@
+# Mantis Case Plates
+
+The cheapest way to build a Mantis is without a case. However, to protect the electronic components, and to get a more solid feel and sound, it is better to add a case. The case design for v0.3.3 uses laser cut plates of 3mm thickness. You can use different thickness, but that will also change the height of the standoffs and headers you need. I have built a few keyboard with clear acrylic plates, which looks nice with RGB LEDs and shows off the colors of the PCBs. I used birch plywood in another build for a slightly more rustic look.
+
+To help with cost-effective manufacturing I created several DXF files in this folder that combine all the plates for [one](./plates.dxf), [two](./plates2x.dxf) or [four](./plates4x.dxf) keyboards in a single efficient layout. The four-keyboard layout fits on 60x90cm sheets of material and got the case cost for my latest builds down to about $50 CAD per keyboard from a local laser cutting shop.
