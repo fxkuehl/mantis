@@ -1,5 +1,7 @@
 # Mantis v0.3.3 Build Guide
 
+![Banner](./assets/build-guide/banner.jpg)
+
 ## Pre-requisites
 
 Before you start, make sure you have all the parts and tools you will need to complete the build, and that you have a working QMK build environment.
