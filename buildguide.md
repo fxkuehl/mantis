@@ -1,6 +1,6 @@
-# Mantis v0.3.3 Build Guide
-
 ![Banner](./assets/build-guide/banner.jpg)
+
+# Mantis v0.3.3 Build Guide
 
 ## Pre-requisites
 
@@ -10,7 +10,7 @@ Before you start, make sure you have all the parts and tools you will need to co
 
 >![Parts](./assets/build-guide/parts.jpg)
 
-These are all the parts needed to build a Mantis keyboard.
+These are all the parts needed to build one Mantis keyboard.
 
 - 1x [upper PCB](https://github.com/fxkuehl/mantis/raw/main/pcb/gerber/mantis-v0.3.3-top.zip)
 - 2x [lower PCBs](https://github.com/fxkuehl/mantis/raw/main/pcb/gerber/mantis-v0.3-bottom.zip)
@@ -40,7 +40,7 @@ These are all the parts needed to build a Mantis keyboard.
 
 >![Tools](./assets/build-guide/tools.jpg)
 
-You will need the following tools:
+You will need the following tools and materials:
 
 - Soldering iron (ideally digitally temperature controlled)
 - Solder (I prefer lead-free solder, but leaded solder is easier to work with especially for soldering temperature-sensitive RGB LEDs)
@@ -103,7 +103,7 @@ First we'll prepare the controller with the correct firmware. This will allow yo
 
 I will assume that you already have a QMK build environment set up. I use a Linux PC to build and flash firmware. Refer to the [QMK documentation](https://docs.qmk.fm/#/newbs_getting_started) if you haven't built QMK before.
 
-We will add a new remote (my fork of QMK) to your local QMK git repository, create a new local tracking branch or my mantis-vial-v0.3 branch and checkout that branch. In my example I will assume that you have QMK checked out in `~/qmk_firmware`.
+We will add a new remote (my fork of QMK) to your local QMK git repository, create a new local branch tracking my mantis-vial-v0.3 branch and checkout that branch. In my example I will assume that you have QMK checked out in `~/qmk_firmware`.
 
 Before you start, make sure your ```git status``` is clean.
 
@@ -139,7 +139,7 @@ $ qmk flash -kb mantis -km vial -e CONVERT_TO=kb2040
 
 ### 1.4 Verify the firmware with Vial
 
-If you don't have Vial yet, [get.vial.today](https://get.vial.today/). You can use either the web version, if your browser supported, or download the correct package for your OS. At this point, we only want to make sure that Vial detects your controller as a "Felix Kuehling Mantis" keyboard. You should see the layout with the default keymap.
+If you don't have Vial yet, [get.vial.today](https://get.vial.today/). You can use either the web version, if your browser is supported, or download the correct package for your OS. At this point, we only want to make sure that Vial detects your controller as a "Felix Kuehling Mantis" keyboard. You should see the layout with the default keymap.
 
 >![Vial screenshot](./assets/vial-screenshot.png)
 
@@ -153,7 +153,7 @@ Before starting, identify the bottom side of the top PCB (shown in the picture a
 
 ### 2.1 Solder level shifter (if using 3.3V controller and RGB LEDs)
 
->![Level shifter](./assets/build-guide/level_shifter.jpg)
+![Level shifter](./assets/build-guide/level_shifter.jpg)
 
 If you're using a controller with 3.3V logic and want to use RGB LEDs, you need to install the voltage level shifter to adapt the output voltage of the controller for the DIN pin of the first RGB LED. Insert the pins of the 74AHCT14 from the bottom of the PCB in the correct orientation with the notch as indicated on the silk-screen. Then solder the pins from the top of the PCB.
 
@@ -163,23 +163,23 @@ If you just installed the level-shifter skip this step. If you are using a 5V (o
 
 ### 2.3 Solder controller headers to PCB
 
->![Cutting headers to size](./assets/build-guide/cut_female_header.jpg)
+![Cutting headers to size](./assets/build-guide/cut_female_header.jpg)
 
 The controller will be mounted using the same type of headers used to connect the top and bottom PCBs later. Insert two rows of 12-pin female headers on the bottom of the top PCB. If you need to cut 40-pin headers to the correct size, see this [tutorial](https://learn.adafruit.com/how-to-solder-headers/female-headers#cutting-female-headers-to-size-3076508).
 
->![Soldering controller headers](./assets/build-guide/controller_headers.jpg)
+![Soldering controller headers](./assets/build-guide/controller_headers.jpg)
 
-Secure them with tape. Make sure they're parallel and straight before you solder them. Turn the PCB around and solder the pins from the top. The remove the tape.
+Secure them with tape. Make sure they're parallel and straight before you solder them. Turn the PCB over and solder the pins from the top. Then remove the tape.
 
 ### 2.4 Socket the controller
 
 > _The following instructions assume that you're using short headers (5mm) available from Adafruit. If  you're using normal 8mm headers, there is a trick to make them work. See the section about 8mm headers in the Appendix._
 
->![Socket the controller](./assets/build-guide/socket_controller.jpg)
+![Socket the controller](./assets/build-guide/socket_controller.jpg)
 
 We'll solder the corresponding male headers to the controller. Insert the long side of the male headers into the female headers already mounted on the PCB. Place the controller on the male headers so that the short side sticks through the plated through-holes on the controller with the components of the controller facing the Mantis PCB and the USB port pointing to the edge of the PCB. If your controller has 13 through-holes on each side, ignore the ones closest to the USB port (labelled D+ and D-).
 
->![Adjust socket pins](./assets/build-guide/adjust_socket_pins.jpg)
+![Adjust socket pins](./assets/build-guide/adjust_socket_pins.jpg)
 
 If some components (e.g. reset switches) on the controller are too close to the header, you may need to file down the plastic part of the header to make it fit. Once you have a good fit, solder the pins to the controller.
 
@@ -187,11 +187,11 @@ Unplug the controller carefully from the socket to avoid bending any pins and ke
 
 ### 2.5 Solder diodes
 
->![Solder diode part 1](./assets/build-guide/solder_diode_1.jpg)
+![Solder diode part 1](./assets/build-guide/solder_diode_1.jpg)
 
 First use the soldering iron to add a small blob of solder to one pad of each diode. To make it easier to install the diodes in the correct orientation, do this on the same side for each diode. The silkscreen markings may be a bit hard to read if the silk screen isn't perfectly aligned with the solder mask (I'll use more obvious silkscreen legend on the next PCB revision). On the top PCB the bar on the diode will face towards the outer switch pin. The silkscreen outline should be closed on that side. Add the solder blob to the pad on that side for reference.
 
->![Solder diode part 2](./assets/build-guide/solder_diode_2.jpg)
+![Solder diode part 2](./assets/build-guide/solder_diode_2.jpg)
 
 Now carefully place the diodes, one at a time, using tweezers. Make sure the bar on the diode is facing toward the pad where you just placed the solder blob. Melt the solder blob with the soldering iron and push the diode into place. Then remove the iron to let the solder solidify. The diode should be firmly in place now. If you need to reposition it, melt the solder again and move the diode using the tweezers.
 
@@ -199,13 +199,19 @@ Once you've placed all the diodes, you can revisit each diode and solder the oth
 
 ### 2.6 Solder RGB LEDs
 
-LEDs add some bling to your keyboard. However, this is the trickiest part of the build, in my experience. If you overheat the LEDs, some colors may not work any more or they may be broken altogether. Also, because of the way the LEDs are chained, one broken link (bad solder joint) in the chain will affect all the downstream LEDs. The keyboard works without LEDs, so you can skip this step to save yourself time and hassle.
+LEDs add some bling to your keyboard and can be useful indicators. However, this is the trickiest part of the build, in my experience. If you overheat the LEDs, some colors may not work any more or they may be broken altogether. Also, because of the way the LEDs are chained, one broken link (bad solder joint) in the chain will affect all the downstream LEDs. The keyboard works without LEDs, so you can skip this step to save yourself time and hassle.
+
+>_The way the LEDs are chained, you also have a few options to build the keyboard with fewer LEDs:_
+>
+> 1. _Only the top 6 LEDs on the top PCB, to use as indicators_
+> 2. _Only the 16 LEDs on the top PCB_
+> 3. _All 40 LEDs_
 
 Soldering the LEDs is easier with leaded solder, which melts at a lower temperature. I ruined two PCBs when I tried to solder LEDs with a cheap soldering iron and lead-free solder. For best results, prepare the pads on the PCB with flux and use a decent soldering iron with good temperature control. Choose a tip that is large enough to ensure good heat transfer but small enough so you can heat one pad at a time.
 
 Take your time with this step and take breaks if you need to. If it's not working, make sure the solder tip is clean and free of oxidation, and that the temperature is right.
 
->![Solder LEDs](./assets/build-guide/solder_led.jpg)
+![Solder LEDs](./assets/build-guide/solder_led.jpg)
 
 When placing the LEDs, make sure the orientation is correct. The light-emitting side should go into the cut-out in the PCB. One of the pins is missing a corner, which should align with the arrow on the silkscreen. Place the LED into the cut-out and push it down until the pins are flush with the pads.
 
@@ -219,7 +225,7 @@ I like to place a few LEDs with the same orientation on the PCB at once. That wa
 
 This is a good time to plug the controller into the top PCB and connect it to your computer to test your work. You should see all the LEDs light up. If some of them are not working, check all the pins on the first LED in the chain that's off, and check the DOUT pin on the last working LED. If necessary, unplug the USB and reflow the solder on any LED pins that need it. Then try again. Repeat this until all the LEDs are lit.
 
->![Test](./assets/build-guide/test_top_pcb.jpg)
+![Test](./assets/build-guide/test_top_pcb.jpg)
 
 You can test the diodes by bridging the two pads of each switch with a paper clip or short piece of stripped wire. You can use the matrix tester tab in Vial to check that all the keys are working. To unlock the matrix tester, you need to bridge two keys at once (use two paper clips or short wires). Make sure you look at the PCB from the top to hit the right keys.
 
@@ -229,21 +235,21 @@ If an individual key is not working, check that the diode is soldered on both en
 
 ## 3. Solder Bottom PCBs
 
-Now we'll move on to the bottom PCBs. These PCBs are reversible. We'll build one left and one right side by installing components on opposite sides.
+Now we'll move on to the bottom PCBs. These PCBs are reversible. We'll build one left and one right side by installing components on opposite sides. The switch plate will be flush with the PCBs, so all the components go on the respective bottom side of the PCB.
 
 ### 3.1 Solder diodes
 
-Because the bottom PCBs are reversible, you cannot use the switch pins to infer the diode directions. Orient the bar on the diode with the closed side of the diode outline on the silkscreen.
+Because the bottom PCBs are reversible, you cannot use the switch pins to infer the diode directions. Orient the bar on the diode with the closed side of the diode outline on the silkscreen. When soldering the second PCB, pay attention that you're using the opposite side. You don't want to end up with two left halves or two right halves.
 
 ### 3.2 Solder RGB LEDs
 
-This works the same as on the top PCB as well. Use flux, make sure your soldering iron is clean and at the right temperature. You got this!
+This works the same as on the top PCB. Make sure you solder the LEDs on the same side as the diodes. Use flux, make sure your soldering iron is clean and at the right temperature. You got this!
 
 ### 3.3 Cut and solder male headers on bottom PCBs
 
 > _The following instructions assume that you're using short headers (5mm) available from Adafruit. If  you're using normal 8mm headers, there is a trick to make them work. See the section about 8mm headers in the Appendix._
 
->![Solder bottom headers](./assets/build-guide/bottom_headers.jpg)
+![Solder bottom headers](./assets/build-guide/bottom_headers.jpg)
 
 Each of the bottom PCBs uses three male headers to connect to the top PCB: 2x 3-pin and 1x 4-pin. Cut the headers to the right size and insert them from the top of each PCB (the opposite side of where you installed the diodes and LEDs). The plated through holes are very tight (for some reason that's how the header footprints came out in KiCad). If you need force, push on the pins, not on the plastic piece. Be careful to push the pins in straight to avoid bending them.
 
@@ -253,7 +259,7 @@ On the positive side, the tight holes should ensure that the pins will be straig
 
 ## 4. Preliminary assembly and testing
 
-In this step we will partially assemble the keyboard in order to install the female headers on the top PCB and test the LEDs and keys on the bottom PCB.
+In this step we will partially assemble the keyboard in order to install the female headers on the top PCB and test the LEDs and diodes on the bottom PCB.
 
 ### 4.1 Cut female headers for the top PCB
 
@@ -263,33 +269,33 @@ You will need 2x 3-pin, 1x 6-pin and 1x 8-pin female headers.
 
 Fasten the 9mm standoffs to the six mounting holes in the top PCB with hex nuts. The standoffs go on the bottom side. Place the top PCB bottom-side-up on your work surface. The controller should be in the socket to make sure everything will fit properly.
 
->![Top and bottom assembly](./assets/build-guide/prelim_assembly_1.jpg)
+![Top and bottom assembly](./assets/build-guide/prelim_assembly_1.jpg)
 
 Line up the two bottom PCBs with the switch plate and insert a few switches to keep everything in place. Don't solder the switches yet. Friction should be enough to keep things in place for now. The header pins should stick up through the cutout in the middle of the switch plate. The inner edges of the two bottom PCBs should be completely flush with each other. If necessary, file down any rough edges of the male headers.
 
->![Whole keyboard assembly](./assets/build-guide/prelim_assembly_2.jpg)
+![Whole keyboard assembly](./assets/build-guide/prelim_assembly_2.jpg)
 
-Loosely insert the female headers into the footprints on the top PCB. Turn over the loose bottom PCB assembly and carefully lower it on the bottom PCB. Make sure the cutout for the controller lines up correctly, that all the pins of the male headers are correctly inserted into the corresponding female headers and that the standoffs line up with the mounting holes the bottom PCB. Fasten the bottom PCBs to the standoffs with M2 screws. Make sure the two bottom PCBs are properly aligned and flush before you tighten the screws all the way.
+Loosely insert the female headers into the footprints on the top PCB. Turn over the loose bottom PCB assembly and carefully lower it on the top PCB. Make sure the cutout for the controller lines up correctly, that all the pins of the male headers are correctly inserted into the corresponding female headers and that the standoffs line up with the mounting holes the bottom PCB. Fasten the bottom PCBs to the standoffs with M2 screws. Make sure the two bottom PCBs are properly aligned and flush before you tighten the screws all the way.
 
 ### 4.3 Solder female headers on top PCB
 
-Now turn the whole assembly over. Make sure that the female headers are still in place and that their pins are sticking evenly through the top PCB. If something is not looking right, disassemble the keyboard and redo the previous step.
+Turn the whole assembly over. Make sure that the female headers are still in place and that their pins are sticking evenly through the top PCB. If something is not looking right, disassemble the keyboard and redo the previous step.
 
->![Solder headers to top PCB](./assets/build-guide/solder_top_headers.jpg)
+![Solder headers to top PCB](./assets/build-guide/solder_top_headers.jpg)
 
-Now you can solder the female headers from the top of the top PCB.
+Solder the female headers from the top of the top PCB.
 
 ### 4.4 Test LEDs and diodes on bottom PCBs
 
-Now, with the keyboard assembled you can plug in the USB cable. You should see the LEDs on the bottom PCBs light up. If the LEDs are flickering, you probably don't have a good ground connection. Ground is connected through the standoffs, so make sure the standoffs are in place and properly fastened.
+Now, with the keyboard assembled you can plug in the USB cable. You should see the LEDs on the top and bottom PCBs light up. If the bottom LEDs are flickering, you probably don't have a good ground connection. Ground is connected through the standoffs, so make sure the standoffs are in place and properly fastened.
 
->![Solder headers to top PCB](./assets/build-guide/test_bottom_pcb.jpg)
+![Test bottom PCB](./assets/build-guide/test_bottom_pcb.jpg)
 
 Use the same procedure for diagnosing and fixing LEDs as on the top PCB. Use the matrix tester in Vial or a reactive LED mode to make sure all the keys are recognized. On the reversible switch footprint, bridge the middle pad and one of the outer ones. If individual keys are not responding, check the diode direction and connections. If whole rows or columns are not working, check the controller and header pins.
 
 ### 4.5 Disassemble top and bottom PCBs again
 
-We need to disassemble the keyboard again before installing the switches and final assembly. This is also a good time to cleanup any leftover flux from all the PCBs.
+We need to disassemble the keyboard again before installing the switches and final assembly. This is also a good time to cleanup any leftover flux from all the PCBs, especially if you're using clear acrylic case plates.
 
 ## 5. Switch installation and final assembly and testing
 
@@ -299,13 +305,13 @@ We've made it through the most difficult and tedious parts of the build now. We'
 
 In this step we install the top switch plate and switches on the top PCB. After this step you won't be able to remove the top switch plate without desoldering the switches. If the switch plate is still covered by protective plastic or paper films, remove them now. If you're using clear acrylic plates, avoid leaving finger prints especially on the bottom side that won't be accessible once the switches are installed.
 
->![Top assembly](./assets/build-guide/assembly_top_1.jpg)
+![Top assembly](./assets/build-guide/assembly_top_1.jpg)
 
 The edges of laser cut plates can be sharp. One side may be sharper than the other. Place the sharp edges down towards the PCB.
 
 Insert the switches at the corners first. Make sure the the pins are straight and line up with the through-holes before you push the switches down. Once the switch plate and PCB are aligned and held in place by the corner switches, insert the remaining switches.
 
->![Top assembly](./assets/build-guide/assembly_top_2.jpg)
+![Top assembly](./assets/build-guide/assembly_top_2.jpg)
 
 With all the switches firmly in place, turn the assembly over. Make sure the switch pins protrude through the holes. They won't protrude much because the 3mm switch plate is a bit thicker than the bottom switch housing, but they should protrude enough to make a solder joint. Then solder the switch pins from the bottom. Heat both the pad and the pin and make sure the solder flows into the hole.
 
@@ -317,9 +323,11 @@ This is a good time to test the switches you just installed. If any switches are
 
 You already did a partial assembly of the bottom PCBs and the switch plate earlier. If the plate still had protective film on it, remove it now. Align the plate with the two bottom PCBs and insert the switches starting with the corners. The header pins should stick up through the cut-out in the center of the switch plate. If the edges of the plate are sharper on one side, turn the sharper edges down towards the PCBs. Make sure the switch pins are straight before inserting them.
 
->![Bottom assembly](./assets/build-guide/assembly_bottom.jpg)
+![Bottom assembly](./assets/build-guide/assembly_bottom.jpg)
 
 Once all the switches are in place check the alignment of the PCBs and the switch plate. The PCBs should be flush in the middle and all the edges aligned with the switch plate. Check that all the switches are properly inserted, then solder the switch pins from the bottom.
+
+If you're using clear acrylic case plates and you want a clean look, you may want to clean up any flux residue from soldering the switches.
 
 ### 5.4 Adjust standoffs
 
@@ -329,15 +337,15 @@ In order to get a case that closes firmly without any rattling plates, it may be
 
 ### 5.5 Install 9mm standoffs on top PCB assembly and align with top sound plates
 
->![Standoffs](./assets/build-guide/assembly_top_3.jpg)
+![Standoffs](./assets/build-guide/assembly_top_3.jpg)
 
 The switch plates have small hexagonal holes that should hold M2 hex nuts. Screw the 9mm standoffs through the mounting holes of the top PCB into the hex nuts. Turn the PCB with the standoffs sticking up and lower the two upper sound plates. If necessary, loosen the standoffs and tighten them after placing the sound plates.
 
 ### 5.6 Align and connect bottom PCB assembly, install 3mm standoffs
 
->![Stack bottom on top](./assets/build-guide/assembly_whole.jpg)
+![Stack bottom on top](./assets/build-guide/assembly_whole.jpg)
 
-Turn the bottom PCB assembly up-side-down and lower it on to the bottom PCB. Make sure it's properly aligned around the controller and the standoffs, and that the pins line up with the the headers on the top PCB. Screw the 3mm standoffs through the mounting holes into the 9mm standoffs.
+Turn the bottom PCB assembly up-side-down and lower it onto the top PCB. Make sure it's properly aligned around the controller and the standoffs, and that the pins line up with the the headers on the top PCB. Screw the 3mm standoffs through the mounting holes into the 9mm standoffs.
 
 Fasten the remaining six 3mm standoffs with hex nuts onto the bottom PCBs.
 
@@ -347,7 +355,7 @@ Plug in the keyboard and use the Vial Matrix Tester to make sure all the switche
 
 ### 5.8 Align bottom switch plate and base plate, close the case
 
->![Case closed](./assets/build-guide/close_case.jpg)
+![Case closed](./assets/build-guide/close_case.jpg)
 
 Fit the bottom sound plate over the 3mm standoffs with the sharper edges towards the PCBs. Then add the base plate in the same way and close the case with 12 M2 screws.
 
@@ -359,15 +367,15 @@ Stick some rubber bumpers on the bottom of the case at the corners and one in th
 
 ### 5.10 Install key caps
 
-During keycap installation be careful to align the pegs with the slots in the switch stems. Push down evenly to avoid breaking the pegs. It a key doesn't want to go in, check the pegs for any extra support material and file it off if necessary.
+During keycap installation be careful to align the pegs with the slots in the switch stems. Push down evenly to avoid breaking the pegs. If a key doesn't want to go in, check the pegs for any extra support material and file it off if necessary.
 
 If you need to remove the keys later, use a key cap puller and pull up straight.
 
->![Keycap installation](./assets/build-guide/keycaps.jpg)
+![Keycap installation](./assets/build-guide/keycaps.jpg)
 
 The switches are rotated to give the right key profile with only one or two types of key caps. There are only two possible orientations for each key cap. If you're not sure what's the right orientation for each key, use the picture for reference.
 
-To minimize finger movement, I recommend the taller keys in the top row (except in the outer pinky key), for the lower middle finger keys, and for the four innermost thumb keys.
+To minimize finger movement, I recommend the taller keys in the top row (except the outer pinkie key), for the lower middle finger keys, and for the four innermost thumb keys.
 
 ## Done!
 
