@@ -9,7 +9,7 @@
 >- Red: Function layer with function, navigation and editing keys
 >- Blue: Modifiers **Ctrl**, **Win/OS** (⚜), **Alt** (⎇), **Shift** (⇧), **AltGr**
 
->Activate the Symbol and Function layer by holding **Sym** or **Fn** respectively, just like you'd hold shift to type UPPERCASE. Modifiers are also (mostly) activated by holding a key, rather than tapping it. **Fn+X** toggles an alternate Alpha layer based on Colemak-DH.
+>Activate the Symbol and Function layer by holding **Sym** or **Fn** respectively, just like you'd hold shift to type UPPERCASE. Modifiers are also (mostly) activated by holding a key, rather than tapping it. **Fn+X** toggles a sticky navigation and Num pad layer.
 
 >The Sym layer has numbers on the home row and most shifted number symbols above. The Fn layer has a navigation cluster on the right, editing keys on the left, F1-F12 across the top row. **C**, **V** and the right thumb keys control the RGB backlight, from left to right: mode, speed, colour, saturation, brightness. Hold **Shift** to decrease instead of increase.
 

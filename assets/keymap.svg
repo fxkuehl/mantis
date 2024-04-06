@@ -209,7 +209,7 @@
     <text transform="translate(258,149)   rotate(-30)">*</text>
     <text transform="translate(344,149)   rotate(-30)">\</text>
 
-    <text transform="translate(215,223.5) rotate(-30)">±=</text>
+    <text transform="translate(215,223.5) rotate(-30)" font-size="18"><!--±=-->PC</text>
 
     <text transform="translate(0,312)     rotate(-30)">;</text>
     <text transform="translate(86,312)    rotate(-30)">=</text>
@@ -233,8 +233,10 @@
 
     <text transform="translate(-344,149)   rotate(30)"><!--⇪-->Caps</text>
     <text transform="translate(-258,149)   rotate(30)">⌨</text>
-    <text transform="translate(-172,149)   rotate(30)">☼</text>
-    <text transform="translate(-129,223.5) rotate(30)">›››</text>
+    <text transform="translate(-172,149)   rotate(30)"><!--☼-->Vol+</text>
+    <text transform="translate(-129,223.5) rotate(30)"><!--›››-->Mute</text>
+
+    <text transform="translate(-215,223.5) rotate(30)">Vol-</text>
 
     <g font-size="22">
     <text transform="translate(-86,312)    rotate(30)">⎵</text>
@@ -263,9 +265,11 @@
     <text transform="translate(258,149)   rotate(-30)"><!--⎘⇟-->Page↓</text>
     <text transform="translate(344,149)   rotate(-30)"><!--⇳-->Scroll</text>
 
-    <text transform="translate(0,312)     rotate(-30)">◉</text>
-    <text transform="translate(86,312)    rotate(-30)">◓</text>
-    <text transform="translate(172,312)   rotate(-30)">☀</text>
+    <text transform="translate(215,223.5) rotate(-30)">Media</text>
+
+    <text transform="translate(0,312)     rotate(-30)"><!--◉-->Prev</text>
+    <text transform="translate(86,312)    rotate(-30)"><!--◓-->Play</text>
+    <text transform="translate(172,312)   rotate(-30)"><!--☀-->Next</text>
   </g>
 </g>
 
