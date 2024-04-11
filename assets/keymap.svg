@@ -114,7 +114,7 @@
     <text transform="translate(86,0)      rotate(-30)">I</text>
     <text transform="translate(172,0)     rotate(-30)">O</text>
     <text transform="translate(258,0)     rotate(-30)">P</text>
-    <text transform="translate(344,0)     rotate(-30)">'</text>
+    <text transform="translate(344,0)     rotate(-30)" font-weight="normal">' "</text>
 
     <text transform="translate(43,223.5)  rotate(-30)">H</text>
     <text transform="translate(86,149)    rotate(-30)">N</text>
@@ -123,9 +123,11 @@
     <text transform="translate(301,74.5)  rotate(-30)">B</text>
 
     <text transform="translate(129,223.5) rotate(-30)">M</text>
-    <text transform="translate(172,149)   rotate(-30)">,</text>
-    <text transform="translate(258,149)   rotate(-30)">.</text>
-    <text transform="translate(344,149)   rotate(-30)">/</text>
+    <g font-weight="normal">
+    <text transform="translate(172,149)   rotate(-30)">,&lt;</text>
+    <text transform="translate(258,149)   rotate(-30)">.&gt;</text>
+    <text transform="translate(344,149)   rotate(-30)">/?</text>
+    </g>
 
     <text transform="translate(215,223.5) rotate(-30)">☰</text>
 
@@ -134,14 +136,6 @@
     <text transform="translate(172,312)   rotate(-30)" font-size="18" font-weight="normal">Del</text>
     <text transform="translate(43,386.5)  rotate(-30)">↹</text>
   </g>
-  <g transform="translate(72,25)" id="right-alpha2" font-size="26">
-    <text transform="translate(344,0)     rotate(-30)">"</text>
-
-    <text transform="translate(172,149)   rotate(-30)">&lt;</text>
-    <text transform="translate(258,149)   rotate(-30)">&gt;</text>
-    <text transform="translate(344,149)   rotate(-30)">?</text>
-  </g>
-
   <g transform="translate(-63,59)" id="left-mods" style="fill:dodgerblue">
     <text transform="translate(-344,149)   rotate(30)" font-size="18"><!--⎈-->Ctrl</text>
 
@@ -163,6 +157,59 @@
     <!--<text transform="translate(86,312)    rotate(-30)">⇧</text>-->
     <text transform="translate(172,312)   rotate(-30)" font-size="18"><!--⇮-->AltGr</text>
     <text transform="translate(43,386.5)  rotate(-30)" style="fill:firebrick" font-size="18" font-weight="bold">Fn</text>
+  </g>
+
+  <g transform="translate(-28,49)" style="fill:purple" id="left-sticky">
+    <text transform="translate(-344,0)     rotate(-60)" font-size="18">Num</text>
+    <text transform="translate(-258,0)     rotate(30)">/</text>
+    <text transform="translate(-172,0)     rotate(30)">7</text>
+    <text transform="translate(-86,0)      rotate(30)">8</text>
+    <text transform="translate(-43,74.5)   rotate(30)">9</text>
+    <text transform="translate(0,149)      rotate(30)">-</text>
+
+    <text transform="translate(-301,74.5)  rotate(30)">*</text>
+    <text transform="translate(-215,74.5)  rotate(30)">4</text>
+    <text transform="translate(-129,74.5)  rotate(30)">5</text>
+    <text transform="translate(-86,149)    rotate(30)">6</text>
+    <text transform="translate(-43,223.5)  rotate(30)">+</text>
+
+    <text transform="translate(-344,149)   rotate(30)">.</text>
+    <text transform="translate(-258,149)   rotate(30)">1</text>
+    <text transform="translate(-172,149)   rotate(30)">2</text>
+    <text transform="translate(-129,223.5) rotate(30)">3</text>
+
+    <text transform="translate(-215,223.5) rotate(30)">,</text>
+
+    <text transform="translate(-172,312)   rotate(30)">0</text>
+    <text transform="translate(-86,312)    rotate(30)">←</text>
+    <text transform="translate(-0,312)     rotate(30)">_</text>
+    <text transform="translate(-43,386.5)  rotate(30)">=</text>
+  </g>
+  <g transform="translate(72,25)" style="fill:purple" id="right-sticky">
+    <text transform="translate(0,149)     rotate(-30)">☼</text>
+    <text transform="translate(43,74.5)   rotate(-30)">◉</text>
+    <text transform="translate(86,0)      rotate(-30)">◓</text>
+    <text transform="translate(172,0)     rotate(-30)">☀</text>
+    <text transform="translate(258,0)     rotate(-30)">›››</text>
+    <text transform="translate(344,0)     rotate(-30)">◎</text>
+
+    <text transform="translate(43,223.5)  rotate(-30)">⇱</text>
+    <text transform="translate(86,149)    rotate(-30)">⬅</text>
+    <text transform="translate(129,74.5)  rotate(-30)">⬆</text>
+    <text transform="translate(215,74.5)  rotate(-30)">➡</text>
+    <text transform="translate(301,74.5)  rotate(-30)">⇲</text>
+
+    <text transform="translate(129,223.5) rotate(-30)">⎗</text>
+    <text transform="translate(172,149)   rotate(-30)">⬇</text>
+    <text transform="translate(258,149)   rotate(-30)">⎘</text>
+    <text transform="translate(344,149)   rotate(60)" font-size="18"><!--⇳-->Scrl</text>
+
+    <text transform="translate(215,223.5) rotate(-30)">±=</text>
+
+    <text transform="translate(0,312)     rotate(-30)"><!--↵-->⏎</text>
+    <text transform="translate(86,312)    rotate(-30)">⎵</text>
+    <text transform="translate(43,386.5)  rotate(-30)">↹</text>
+    <text transform="translate(172,312)   rotate(60)" font-size="18">Del</text>
   </g>
 
   <g transform="translate(-72,25)" style="fill:green" id="left-sym">
