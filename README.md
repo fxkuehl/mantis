@@ -11,7 +11,7 @@ This repository contains Ergogen, KiCad and OpenSCAD files for the PCBs, case an
 
 Mantis is approaching the end of the prototyping phase, currently at version v0.3.3. You can check the git history for older prototype versions.
 
-Mantis v0.3.3 consists of three PCBs. Two identical [bottom PCBs](https://github.com/fxkuehl/mantis/raw/main/pcb/gerber/mantis-v0.3-bottom.zip) are reversible. The [central PCB](https://github.com/fxkuehl/mantis/raw/main/pcb/gerber/mantis-v0.3.3-top.zip) is stacked on top with M2 standoffs and headers to create an approximation of two tented, shallow key wells together with the [sculpted 3D printed keycaps](https://github.com/fxkuehl/mantis/tree/main/keycap) and the rotation of switches.
+Mantis v0.3.3 consists of three PCBs. Two identical [bottom PCBs](https://github.com/fxkuehl/mantis/raw/main/pcb/gerber/mantis-v0.3-bottom.zip) are reversible. The [central PCB](https://github.com/fxkuehl/mantis/raw/main/pcb/gerber/mantis-v0.3.3-top.zip) is stacked on top with M2 standoffs and headers to create an approximation of two tented, shallow key wells together with the [sculpted 3D printed keycaps](https://github.com/fxkuehl/mantis/tree/main/scad) and the rotation of switches.
 
 v0.3.3 also includes [DXF files](https://github.com/fxkuehl/mantis/tree/main/plates/v0.3.3) for laser-cut plates. I have built keyboards with 3mm thick acrylic and birch plywood plates, manufactured at Hot Pop Factory in Toronto.
 

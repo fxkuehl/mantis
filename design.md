@@ -74,7 +74,7 @@ For this version I created and over time refined a unique keymap loosely based o
 
 <img align="right" src="./assets/640/v0.3-mantis_exploded.jpg">
 
-The original flat Hex key caps from FK Keycaps were designed for [music keyboards](https://fabacademy.org/2020/labs/opendot/students/sol-bekic/projects/keyboard/) and [macro pads](https://fkcaps.com/keyboards/0xC.pad). While v0.3 is still compatible with the flat Hex key caps, fixing the problems with accidental key presses and finger travel distance called for the design of 3D-printable [sculpted key caps](https://github.com/fxkuehl/mantis/blob/main/keycap/keycap.stl) with features optimized for ergonomic touch typing:
+The original flat Hex key caps from FK Keycaps were designed for [music keyboards](https://fabacademy.org/2020/labs/opendot/students/sol-bekic/projects/keyboard/) and [macro pads](https://fkcaps.com/keyboards/0xC.pad). While v0.3 is still compatible with the flat Hex key caps, fixing the problems with accidental key presses and finger travel distance called for the design of 3D-printable [sculpted key caps](https://github.com/fxkuehl/mantis/blob/main/scad/keycap.stl) with features optimized for ergonomic touch typing:
 
 - Smaller target area with a spherical dish and defined edge
 - Tilted, excentric dish oriented toward the direction of finger movement to reduce finger travel and ensure smooth key actuation by directing force towards the center of the switch stem
