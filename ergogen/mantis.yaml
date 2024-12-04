@@ -6,7 +6,7 @@ units:
   mx: 3
   my: 1.1547mx
   # Distance between key clusters
-  dx: 3
+  dx: 3.27
   dy: 1.1547dx
   # Space around keys and fillet radius
   kx: 0.54/2
@@ -16,7 +16,7 @@ units:
   rx: kx
   ry: 1.1547rx
   # Trackball diameter
-  d_ball: 25.4
+  d_ball: 34
   # MCU vertical offset
   mcu_top: hy/3 + dy/2
 
@@ -148,7 +148,7 @@ points:
             column_net: C4
             mirror.column_net: M_C4
         c5:
-          rows.r2.rotate: 180
+          #rows.r2.rotate: 180
           key:
             spread: hx/2
             stagger: -hy
@@ -299,10 +299,10 @@ outlines:
   _main_internal:
     $extends: outlines._main_template
     $args: [-kx, -ky]
-  _main_padded:
+  main_padded:
     $extends: outlines._main_template
     $args: [kx, ky]
-  _main_external:
+  main_external:
     $extends: outlines._main_template
     $args: [mx, my]
   _raised_template:
@@ -355,7 +355,7 @@ outlines:
   _raised:
     $extends: outlines._raised_template
     $args: [kx, ky]
-  _raised_padded:
+  raised_padded:
     $extends: outlines._raised_template
     $args: [-kx, -ky]
 
@@ -426,13 +426,13 @@ outlines:
     - what: circle
       where:
         ref: t_c2_r1
-        shift: [1.5hx + dx/2, dy/2]
+        shift: [1.5hx + dx/2, -dy/2]
       radius: d_ball/2
   _trackball_cutout:
     - what: circle
       where:
         ref: t_c2_r1
-        shift: [1.5hx + dx/2, dy/2]
+        shift: [1.5hx + dx/2, -dy/2]
       radius: d_ball/2 + 2kx
 
   raised_external:
@@ -470,6 +470,15 @@ outlines:
       asym: both
       operation: subtract
       fillet: my/2
+  main_key_slots:
+    - what: outline
+      name: _nibble_hexagon
+      where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
+              z2_c1_r2, z2_c2_r2, z2_c3_r2,
+              z1_c1_r1, z1_c2_r1, z1_c3_r1,
+              z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
+      asym: both
+      fillet: fk+2kx
   _deck_holes:
     - what: outline
       name: _hole_hexagon
@@ -488,10 +497,7 @@ outlines:
       fillet: 2
       operation: add
 
-  base:
-    - what: outline
-      name: _main_external
-  main:
+  main_pcb:
     - what: outline
       name: _main_internal
     - what: outline
@@ -517,15 +523,9 @@ outlines:
               z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
       asym: both
       operation: subtract
-  main_frame:
+  _main_deck:
     - what: outline
-      name: _main_external
-    - what: outline
-      name: _main_padded
-      operation: subtract
-  main_deck:
-    - what: outline
-      name: _main_external
+      name: main_external
     - what: outline
       name: _nibble_hexagon
       where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
@@ -536,7 +536,7 @@ outlines:
       fillet: fk+2kx
       operation: subtract
     - what: outline
-      name: _raised_padded
+      name: raised_padded
       operation: subtract
     #- what: outline
     #  name: _deck_holes
@@ -567,7 +567,7 @@ outlines:
     - what: outline
       name: _trackball_cutout
       operation: subtract
-  raised:
+  raised_pcb:
     - what: outline
       name: _raised
     - what: rectangle
@@ -598,7 +598,7 @@ outlines:
     - what: outline
       name: _trackball_cutout
       operation: subtract
-  _raised_key_slots:
+  raised_key_slots:
     - what: outline
       name: _nibble_hexagon
       where: [z3_c3_r3, z3_c4_r3, z3_c5_r3,
@@ -607,11 +607,11 @@ outlines:
               z0_c3_r0, z0_c4_r0, z0_c5_r0]
       asym: both
       fillet: fk+2kx
-  raised_deck:
+  _raised_deck:
     - what: outline
       name: raised_external
     - what: outline
-      name: _raised_key_slots
+      name: raised_key_slots
       operation: subtract
     - what: outline
       name: _trackball_cutout
@@ -637,9 +637,12 @@ outlines:
 
   composite_plates:
     - what: outline
-      name: main_frame
+      name: main_external
     - what: outline
-      name: main
+      name: main_padded
+      operation: stack
+    - what: outline
+      name: main_pcb
       operation: stack
     - what: outline
       name: main_plate
@@ -647,7 +650,7 @@ outlines:
         shift: [0, 0.05]
       operation: stack
     - what: outline
-      name: raised
+      name: raised_pcb
       adjust:
         shift: [0, 0.07]
       operation: stack
@@ -658,20 +661,20 @@ outlines:
       operation: stack
   composite_shell:
     - what: outline
-      name: main_deck
+      name: _main_deck
     - what: outline
-      name: raised_deck
+      name: _raised_deck
       operation: stack
       adjust:
         shift: [0, 0.05]
   composite_keys:
     - what: outline
-      name: main_deck
+      name: _main_deck
     - what: outline
       name: _raised
       operation: add
     - what: outline
-      name: raised_deck
+      name: _raised_deck
       operation: stack
       adjust:
         shift: [0, 0.05]
@@ -693,17 +696,17 @@ pcbs:
   plate_main:
     outlines:
       main:
-        outline: plate_main
+        outline: main_plate
 
   plate_raised:
     outlines:
       main:
-        outline: plate_raised
+        outline: raised_plate
 
   mantis_main:
     outlines:
       main:
-        outline: main
+        outline: main_pcb
       raised:
         outline: _raised
         layer: Dwgs.User
@@ -751,7 +754,7 @@ pcbs:
   mantis_raised:
     outlines:
       raised:
-        outline: raised
+        outline: raised_pcb
     footprints:
       keys:
         what: choc
