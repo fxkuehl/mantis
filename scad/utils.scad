@@ -44,6 +44,10 @@ function part_sums(seq) = [for (a = 0, i = 0; i <= len(seq);
 // shrinking numbers of points per ring towards the center
 function concentric_faces(n, n_points, offset = 0) = let (
     offsets = part_sums(n_points),
+    faces0 = [if (n_points[0] == 1 && n > 1)
+        for (i = [0 : n_points[1] - 1])
+            [0, i + 1, (i + 1) % n_points[1] + 1]
+    ],
     faces1 = [for (i = [0 : n - 1]) each let (
             o = offsets[i] + offset,
             ni = n_points[i],
@@ -57,14 +61,16 @@ function concentric_faces(n, n_points, offset = 0) = let (
     ],
     faces2 = [for (i = [0 : n - 2]) each let (
             o = offsets[i],
-            ni = n_points[i]
+            o_1 = offsets[i + 1],
+            ni = n_points[i],
+            ni_1 = n_points[i + 1]
         )
         [for (i = 0; i < ni; i = i + 1)
-            if (faces1[i + o][2] != faces1[(i + 1) % ni + o][2])
-                [faces1[i + o][2], faces1[(i + 1) % ni + o][2],
-                 faces1[i + o][0]]
-        ]
-    ]) concat(faces1, faces2);
+            for (j = faces1[i + o][2]; j != faces1[(i + 1) % ni + o][2];
+                 j = (j - o_1 + 1) % ni_1 + o_1)
+                [j, (j - o_1 + 1) % ni_1 + o_1, faces1[i + o][0]]
+        ],
+    ]) concat(faces0, faces1, faces2);
 
 // Half sphere with optimized number of faces for faster minkowski sums
 module half_sphere(r) {
@@ -81,8 +87,26 @@ module half_sphere(r) {
 
     face_top = [for (i = [0 : n_points[0] - 1]) i];
     faces = concat([face_top], concentric_faces(n, n_points));
-        
+
     polyhedron(points, faces);
 }
 
-half_sphere(3, $fa = 360 / 16);
+// Full sphere with optimized number of faces for faster minkowski sums
+module full_sphere(r) {
+    n = max(2, ceil(180 / $fa));
+    da = 180 / n;
+    n_points = concat([1], [for (a = [-90+da : da : 89.9])
+            max(3, ceil(cos(a) * 360 / $fa))
+        ], [1]);
+    points = [for (i = [0 : n]) each let (a = -90 + da * i, q = r * cos(a))
+        [for (j = [0 : n_points[i] - 1]) let (b = 360 / n_points[i] * j)
+            [q * sin(b), q * cos(b), -r * sin(a)]/*[i, j, a, b]*/
+        ]
+    ];
+
+    faces = concentric_faces(n, n_points);
+
+    polyhedron(points, faces);
+}
+
+full_sphere(3, $fa = 360 / 12);
