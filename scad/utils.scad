@@ -59,7 +59,7 @@ function concentric_faces(n, n_points, offset = 0) = let (
              ni + round((j + 0.5) * ratio) % ni_1 + o]
         ]
     ],
-    faces2 = [for (i = [0 : n - 2]) each let (
+    faces2 = [for (i = [0 : n - 1]) each let (
             o = offsets[i],
             o_1 = offsets[i + 1],
             ni = n_points[i],
@@ -70,7 +70,16 @@ function concentric_faces(n, n_points, offset = 0) = let (
                  j = (j - o_1 + 1) % ni_1 + o_1)
                 [j, (j - o_1 + 1) % ni_1 + o_1, faces1[i + o][0]]
         ],
-    ]) concat(faces0, faces1, faces2);
+    ],
+    faces1_ = [for (f = faces1)
+                   if (f[0] != f[1] && f[1] != f[2] && f[2] != f[0]) f]/*,
+    total = len(faces0)+len(faces1_)+len(faces2),
+    reduction = (n_points[0] == 1 ? 1 : 0) +
+                (n_points[n] == 1 ? 1 : 0),
+    dumb = max(n_points) * (n*2 - reduction),
+    dummy = echo("Reduced faces from ", dumb, "to", total,
+                 " saving ", 100 * (dumb - total) / dumb, "%")*/
+) concat(faces0, faces1_, faces2);
 
 // Half sphere with optimized number of faces for faster minkowski sums
 module half_sphere(r) {

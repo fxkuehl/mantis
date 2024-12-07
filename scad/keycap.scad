@@ -151,9 +151,13 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, offset, da=$fa) 
     qfmax = offset > 0 ? 0.8 : 1;
 
     steps_cone = max(3, floor(steps / 15));
-    n_points_cone = [for (b = [0 : 1/steps_cone : 1]) steps];
-    points_cone = [for (b = [0 : 1/steps_cone : 1]) each
-        let (qf = b * qfmax,
+    n_points_cone = [for (i = [0 : steps_cone])
+        round(interpolate(1, sin(slope), i/steps_cone)*steps)];
+    points_cone = [for (i = [0 : steps_cone]) each
+        let (b = i / steps_cone,
+             steps = n_points_cone[i],
+             da = 360 / steps,
+             qf = b * qfmax,
              qb = b * qbmax,
              b2f = qf * (af*qf + bf),
              b2b = qb * (ab*qb + bb),
@@ -193,9 +197,10 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, offset, da=$fa) 
     offset_radius = dish_radius + offset;
 
     steps_dish = max(2, floor(slope / da));
+    steps_rim = n_points_cone[steps_cone];
     da_dish = slope / steps_dish;
     n_points_dish = [for (b = [slope-da_dish : -da_dish : 0])
-        max(1, ceil(steps * sin(b) / sin(slope)))];
+        max(1, ceil(steps_rim * sin(b) / sin(slope)))];
     points_dish = [for (i = [0 : 1 : steps_dish - 1]) each
         let (b = (steps_dish - i - 1) * da_dish, n = n_points_dish[i], da = 360 / n)
         [for (j = [0 : 1 : n-1]) let (a = j * da)
@@ -425,7 +430,7 @@ module minkey(detail = 32) {
     }
 }
 
-module key(detail = 32) {
+module key(detail = 16) {
     render(convexity=8) difference () {
         if ($minkowski)
             minkey(detail);

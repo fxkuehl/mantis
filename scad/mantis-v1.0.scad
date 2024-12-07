@@ -5,7 +5,7 @@ include <keycap.scad>
 
 /* [Quality] */
 // Angular resolution of trackball and keycap surfaces
-$fa = 6;
+$fa = 3;
 // Segment size in mm of curves on the case
 $fs = 1.5;
 
