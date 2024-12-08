@@ -18,7 +18,7 @@ sizes="1920 960 640"
 
 images="mantis.png mantis_bare.png mantis_naked.png mantis_top.png mantis_bottom.png mantis_exploded.png"
 
-params="--colorscheme=DeepOcean -D \$fa=1 -D \$fs=0.5 -D render_pcbs=true -D bottom_color=\"purple\" -D top_color=\"white\" -D case_alpha=1.0"
+params="--colorscheme=DeepOcean -D \$fa=1 -D render_pcbs=true -D bottom_color=\"purple\" -D top_color=\"white\" -D case_alpha=1.0"
 
 trap 'echo "Killing background processes ..."; kill $jobs' INT
 

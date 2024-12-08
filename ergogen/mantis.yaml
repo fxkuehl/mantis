@@ -311,9 +311,10 @@ outlines:
       what: polygon
       points:
         - ref: t_c3_r1
-          shift: [hx+dx/2, -dy/4+ry]
-        - shift: [-hx-dx/2, 2hy/3+dy/4]
-        - shift: [-hx, -2hy/3]
+          shift: [hx+dx/2, -dy/4+ry+my]
+        - shift: [-hx-dx/2-rx, 2hy/3+dy/4-ry/2]
+        - shift: [0, -my]
+        - shift: [-hx+rx, -2hy/3+ry/2]
         - shift: [-hx+rx, 2hy/3-ry/2]
         - shift: [0, 2hy/3-ry]
         - shift: [hx/2, hy/3]
@@ -350,14 +351,12 @@ outlines:
         - shift: [hx/2, -hy/3]
         - shift: [0, -2hy/3+ry]
         - shift: [-hx+rx, -2hy/3+ry/2]
-        - shift: [-hx, 2hy/3]
+        - shift: [-hx+rx, 2hy/3-ry/2]
+        - shift: [0, my]
       fillet: fk+kx-rx
   _raised:
     $extends: outlines._raised_template
     $args: [kx, ky]
-  raised_padded:
-    $extends: outlines._raised_template
-    $args: [-kx, -ky]
 
   _hexagon_template:
     $params: [kx, ky]
@@ -434,13 +433,43 @@ outlines:
         ref: t_c2_r1
         shift: [1.5hx + dx/2, -dy/2]
       radius: d_ball/2 + 2kx
-
+  _trackball_holder_cutout:
+    - what: polygon
+      points:
+      - ref: t_c3_r1
+        shift: [hx/2 - kx, -2hy/3 + ky]
+      - shift: [0, hy]
+      - shift: [-hx/2, hy/3]
+      - shift: [0, 2hy/3 + dy]
+      - shift: [hx/2, hy/3]
+      - shift: [0, 2hy/3]
+      - shift: [hx/2 + dx/2 + kx, hy/3 + dy/4 + ky/2]
+      - shift: [hx/2 + dx/2 + kx, -hy/3 - dy/4 - ky/2]
+      - shift: [0, -2hy/3]
+      - shift: [hx/2, -hy/3]
+      - shift: [0, -2hy/3 - dy]
+      - shift: [-hx/2, -hy/3]
+      - shift: [0, -hy]
+  _trackball_main_cutout:
+    - what: outline
+      name: _trackball_holder_cutout
+    - what: polygon
+      points:
+      - ref: t_c2_r1
+        shift: [hx/2 - kx, dy + ky]
+      - shift: [0, hy]
+      - shift: [hx + dx/2 + kx, 2hy/3 + dy/4 + ky/2]
+      - shift: [hx + dx/2 + kx, -2hy/3 - dy/4 - ky/2]
+      - shift: [0, -hy]
+      operation: add
+  raised_padded:
+    $extends: outlines._raised_template
+    $args: [-kx, -ky]
   raised_external:
     - what: polygon
       points:
         - ref: t_c3_r1
-          shift: [hx+dx/2, -dy/4-my]
-        - shift: [-hx-dx/2, 2hy/3+dy/4]
+          shift: [0, 2hy/3-my]
         - shift: [-hx, -2hy/3]
         - shift: [-hx-mx, 2hy/3+my/2]
         - shift: [0, 2hy/3+my]
@@ -452,6 +481,11 @@ outlines:
         - shift: [0, -2hy/3-my]
         - shift: [-hx-mx, -2hy/3-my/2]
         - shift: [-hx, 2hy/3]
+    - what: rectangle
+      size: [3hx + dx, 4hy/3]
+      where:
+        ref: t_c2_r1
+        shift: [3hx/2 + dx/2, 0]
       operation: add
     - what: rectangle
       size: [2hx+dx+2mx, 2(mx+kx)+hy]
@@ -500,6 +534,9 @@ outlines:
   main_pcb:
     - what: outline
       name: _main_internal
+    - what: outline
+      name: _trackball_main_cutout
+      operation: subtract
     - what: outline
       name: _nibble_hexagon
       where: [f_c1_r3, f_c3_r3, f_c0_r2]
@@ -551,6 +588,10 @@ outlines:
     - what: outline
       name: _main_internal
     - what: outline
+      name: _trackball_main_cutout
+      operation: subtract
+      fillet: fk
+    - what: outline
       name: _switch_cutout1
       where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
               z2_c1_r2, z2_c2_r2, z2_c3_r2,
@@ -558,18 +599,18 @@ outlines:
               z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
       asym: both
       operation: subtract
-    - what: outline
-      name: _deck_holes
-      operation: subtract
+#    - what: outline
+#      name: _deck_holes
+#      operation: subtract
     - what: outline
       name: _mcu_cutout
-      operation: subtract
-    - what: outline
-      name: _trackball_cutout
       operation: subtract
   raised_pcb:
     - what: outline
       name: _raised
+    - what: outline
+      name: _trackball_holder_cutout
+      operation: subtract
     - what: rectangle
       size: [3hx, 4hy/3+kx]
       where:
@@ -595,9 +636,6 @@ outlines:
     - what: outline
       name: _mcu_cutout
       operation: subtract
-    - what: outline
-      name: _trackball_cutout
-      operation: subtract
   raised_key_slots:
     - what: outline
       name: _nibble_hexagon
@@ -621,6 +659,10 @@ outlines:
     - what: outline
       name: _raised
     - what: outline
+      name: _trackball_holder_cutout
+      operation: subtract
+      fillet: fk
+    - what: outline
       name: _switch_cutout1
       where: [z3_c4_r3, z3_c5_r3,
               z2_c4_r2, z2_c5_r2,
@@ -630,9 +672,6 @@ outlines:
       operation: subtract
     - what: outline
       name: _mcu_cutout
-      operation: subtract
-    - what: outline
-      name: _trackball_cutout
       operation: subtract
 
   composite_plates:
