@@ -18,7 +18,7 @@ sizes="1920 960 640"
 
 images="mantis.png mantis_bare.png mantis_naked.png mantis_top.png mantis_bottom.png mantis_exploded.png"
 
-params="--colorscheme=DeepOcean -D \$fa=1 -D render_pcbs=true -D bottom_color=\"purple\" -D top_color=\"white\" -D case_alpha=1.0"
+params="--colorscheme=DeepOcean -D \$fa=1 -D render_pcbs=true -D bottom_color=\"purple\" -D top_color=\"white\""
 
 trap 'echo "Killing background processes ..."; kill $jobs' INT
 
@@ -36,7 +36,7 @@ jobs="$jobs $!"
 echo "Naked view ..."
 openscad $params --camera=15,12,10,50,0,22,450 --imgsize=$sizeW \
 	-D show_trackball=false -D show_key=false -D show_switch=false \
-	-o "$dir/mantis_naked.png" $scad &
+	-D case_alpha=0.4 -o "$dir/mantis_naked.png" $scad &
 jobs="$jobs $!"
 
 echo "Top-down view ..."
@@ -46,7 +46,7 @@ jobs="$jobs $!"
 
 echo "Bottom-up view ..."
 openscad $params --camera=0,8,0,180,0,180,400 --imgsize=$sizeW \
-	-D show_desk=false -o "$dir/mantis_bottom.png" $scad &
+	-D case_alpha=0.2 -D show_desk=false -o "$dir/mantis_bottom.png" $scad &
 jobs="$jobs $!"
 
 echo "Exploded view ..."
