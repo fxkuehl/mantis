@@ -42,7 +42,7 @@ function part_sums(seq) = [for (a = 0, i = 0; i <= len(seq);
 
 // Faces filling the space between concentric rings of points with
 // shrinking numbers of points per ring towards the center
-function concentric_faces(n, n_points, offset = 0) = let (
+function concentric_faces(n, n_points, offset = 0, staggered = false) = let (
     offsets = part_sums(n_points),
     faces0 = [if (n_points[0] == 1 && n > 1)
         for (i = [0 : n_points[1] - 1])
@@ -52,11 +52,12 @@ function concentric_faces(n, n_points, offset = 0) = let (
             o = offsets[i] + offset,
             ni = n_points[i],
             ni_1 = n_points[i + 1],
-            ratio = ni_1 / ni
+            ratio = ni_1 / ni,
+            s = staggered ? (i % 2) : 0.5
         )
         [for (j = [0 : ni - 1])
             [(j + 1) % ni + o, j + o,
-             ni + round((j + 0.5) * ratio) % ni_1 + o]
+             ni + round((j + s) * ratio) % ni_1 + o]
         ]
     ],
     faces2 = [for (i = [0 : n - 1]) each let (
@@ -81,41 +82,70 @@ function concentric_faces(n, n_points, offset = 0) = let (
                  " saving ", 100 * (dumb - total) / dumb, "%")*/
 ) concat(faces0, faces1_, faces2);
 
+function fa_from_fs(radius) = 360 / max(3, ceil(6.2832 * radius / $fs));
+
 // Half sphere with optimized number of faces for faster minkowski sums
-module half_sphere(r) {
+module half_sphere(r, staggered = true) {
     n = max(2, ceil(90 / $fa));
     da = 90 / n;
     n_points = concat([for (a = [0 : da : 89.9])
             max(3, ceil(cos(a) * 360 / $fa))
         ], [1]);
-    points = [for (i = [0 : n]) each let (a = da * i, q = r * cos(a))
-        [for (j = [0 : n_points[i] - 1]) let (b = 360 / n_points[i] * j)
+    points = [for (i = [0 : n]) each let (
+            a = da * i,
+            q = r * cos(a),
+            s = staggered ? (i % 2) / 2 : 0
+        )
+        [for (j = [0 : n_points[i] - 1]) let (b = 360 / n_points[i] * (j + s))
             [q * sin(b), q * cos(b), -r * sin(a)]/*[i, j, a, b]*/
         ]
     ];
 
     face_top = [for (i = [0 : n_points[0] - 1]) i];
-    faces = concat([face_top], concentric_faces(n, n_points));
+    faces = concat([face_top], concentric_faces(n, n_points, 0, staggered));
 
     polyhedron(points, faces);
 }
 
 // Full sphere with optimized number of faces for faster minkowski sums
-module full_sphere(r) {
+module full_sphere(r, staggered = true) {
     n = max(2, ceil(180 / $fa));
     da = 180 / n;
     n_points = concat([1], [for (a = [-90+da : da : 89.9])
             max(3, ceil(cos(a) * 360 / $fa))
         ], [1]);
-    points = [for (i = [0 : n]) each let (a = -90 + da * i, q = r * cos(a))
-        [for (j = [0 : n_points[i] - 1]) let (b = 360 / n_points[i] * j)
+    points = [for (i = [0 : n]) each let (
+            a = -90 + da * i,
+            q = r * cos(a),
+            s = staggered ? (i % 2) / 2 : 0
+        )
+        [for (j = [0 : n_points[i] - 1]) let (b = 360 / n_points[i] * (j + s))
             [q * sin(b), q * cos(b), -r * sin(a)]/*[i, j, a, b]*/
         ]
     ];
 
-    faces = concentric_faces(n, n_points);
+    faces = concentric_faces(n, n_points, 0, staggered);
 
     polyhedron(points, faces);
 }
 
-full_sphere(3, $fa = 360 / 12);
+// Sphere that takes its resolution from $fs and corrects its size to
+// make low resolution spheres look about the correct
+module corr_sphere(r, override_fa = 0) {
+    fa = override_fa ? override_fa : fa_from_fs(r);
+    n = ceil(360 / fa);
+    // Correct the size to balance the error of being outside and inside
+    // of the circle by making the area of the circle section equal to the
+    // area of the triangle with corrected radius.
+    a_section = 3.1415927 / n;
+    half_angle = 360 / (2*n);
+    a_triangle = sin(half_angle) * cos(half_angle);
+    corr = sqrt(a_section / a_triangle);
+    full_sphere(r * corr, true, $fa=fa);
+}
+
+//full_sphere(3, true, $fa = 360 / 8);
+color("red") corr_sphere(2.5/2, $fs=1.8);
+color("white", alpha=0.5) corr_sphere(2.5/2, $fs=0.1);
+
+translate([0, 0, -1.5]) color("red") half_sphere(2.5/2, $fa=360/20);

@@ -87,7 +87,6 @@ trackball_position = [0, -hy - 3*dy/2, trackball_radius + 4];
 
 // Segment size in mm of curves on the case
 $fs = $fa/2;
-function fa_from_fs(radius) = 360 / ceil(6.2832 * radius / $fs);
 
 use <utils.scad>
 
@@ -101,7 +100,7 @@ module rounded_extrusion(outline, height, radius) {
     translate([-254, 127, radius]) minkowski() {
         linear_extrude(height=height - 2*radius, convexity=10)
             offset(delta = -min(3, radius)) import(outline);
-        full_sphere(radius, $fa = fa);
+        full_sphere(radius, false, $fa = fa);
     }
 }
 
@@ -133,8 +132,7 @@ module case() difference() {
                            raised_height+deck_thickness+0.2);
 
         translate(trackball_position)
-            full_sphere(trackball_radius + spacing,
-                        $fa = fa_from_fs(trackball_radius + spacing));
+            corr_sphere(trackball_radius + spacing);
     }
 }
 
@@ -204,8 +202,7 @@ module bearings(size, offset, cylinder=false) {
                 if (cylinder)
                     cylinder(size/2, size/2+offset, size/2+offset);
                 else
-                    full_sphere(size/2 + offset,
-                                $fa = fa_from_fs(size/2 + offset));
+                    corr_sphere(size/2 + offset);
     }
 }
 
@@ -216,8 +213,7 @@ module trackball_holder() {
             difference() {
                 color(mezzanine_color) union() {
                     translate(trackball_position)
-                        full_sphere(trackball_radius + spacing + wall,
-                            $fa = fa_from_fs(trackball_radius + spacing + wall));
+                        corr_sphere(trackball_radius + spacing + wall);
                     mezzanine(0.1);
                     translate(trackball_position) rotate([60, 0, 0])
                         translate([0, 0, -trackball_radius-wall*2])
@@ -225,8 +221,7 @@ module trackball_holder() {
                         bearings(bearing_size, 4);
                 }
                 translate(trackball_position)
-                    full_sphere(trackball_radius + spacing,
-                        $fa = fa_from_fs(trackball_radius + spacing));
+                    corr_sphere(trackball_radius + spacing);
             }
             case_inside(0.1);
         }
@@ -276,8 +271,8 @@ if (show_desk) {
 }
 
 if (show_trackball) {
-    color(trackball_color) translate(trackball_position) rotate([-30, 0, 0])
-        full_sphere(trackball_radius, $fa = fa_from_fs(trackball_radius));
+    color(trackball_color) translate(trackball_position) rotate([30, 0, 180])
+        corr_sphere(trackball_radius);
 }
 
 if (show_pcb) {
