@@ -38,6 +38,7 @@ main_switch_z = main_pcb_z + pcb_thickness;
 raised_plate_z = 17.4;
 raised_pcb_z = 15.2;
 raised_switch_z = raised_pcb_z + pcb_thickness;
+bump_height = 1;
 bearing_size = 2.5;
 // Edge radius
 r_edge = 2.73;
@@ -59,6 +60,7 @@ tilt3 = 15;
 rise3 = -0.5;
 
 /* [Colors] */
+key_color = "linen";
 trackball_color = "deepskyblue";
 plate_color = "#404040";
 pcb_color = "green";
@@ -196,9 +198,9 @@ module mezzanine(offset) {
 }
 
 module bearings(size, offset, cylinder=false) {
-    color("ghostwhite") translate(trackball_position) rotate([20, 0, 0]) {
+    color("ghostwhite") translate(trackball_position) rotate([12, 0, 0]) {
         for (phi = [0:120:240])
-            rotate([-60, 0, phi]) translate([0, 0, -trackball_radius - size/2])
+            rotate([-50, 0, phi]) translate([0, 0, -trackball_radius - size/2])
                 if (cylinder)
                     cylinder(size/2, size/2+offset, size/2+offset);
                 else
@@ -238,32 +240,34 @@ module trackball_holder() {
 }
 
 if (show_desk) {
-    color(desk_color) translate([-300, -100, -22]) cube([600, 350, 20]);
+    color(desk_color) rotate([0, 0, -5]) translate([-300, -100, -20 - bump_height])
+        cube([600, 350, 20]);
     // Approximate shadow to give a sense of the distance from the desk surface:
     // 1. Core shadow slightly smaller than the outline
     if (show_case) {
-        color("black", alpha=0.5) translate([0, 0, -2.99])
-            flat_extrusion("outlines/main_external.dxf", 1, -2);
+        color("black", alpha=0.5) translate([0, 0, -bump_height - 0.99])
+            flat_extrusion("outlines/main_external.dxf", 1, -bump_height);
     } else if (show_pcb || show_plate) {
-        color("black", alpha=0.3) translate([0, 0, -2.99])
-            flat_extrusion("outlines/main_padded.dxf", 1, -4);
+        color("black", alpha=0.3) translate([0, 0, -bump_height - 0.99])
+            flat_extrusion("outlines/main_padded.dxf", 1, -main_pcb_z - bump_height);
     }
     // 2. Partial shadow of the main body, raised part and trackball
-    shadow_width = 3;
-    color("black", alpha=0.2) render(convexity=10) union() {
+    shadow_width = 2.5 + bump_height/4;
+    color("black", alpha=0.2) translate([0, 0, -bump_height - 0.98])
+            render(convexity=10) union() {
         if (show_case) {
-            translate([shadow_width, -shadow_width, - 2.98])
+            translate([shadow_width, -shadow_width, 0])
                 flat_extrusion("outlines/main_external.dxf", 1, shadow_width);
-            translate([shadow_width*1.67, -shadow_width*1.67, -2.98])
+            translate([shadow_width*1.67, -shadow_width*1.67, 0])
                 flat_extrusion("outlines/raised_external.dxf", 1, shadow_width);
         } else if (show_pcb || show_plate) {
-            translate([shadow_width, -shadow_width, - 2.98])
+            translate([shadow_width, -shadow_width, 0])
                 flat_extrusion("outlines/main_padded.dxf", 1, shadow_width);
-            translate([shadow_width*1.67, -shadow_width*1.67, -2.98])
+            translate([shadow_width*1.67, -shadow_width*1.67, 0])
                 flat_extrusion("outlines/raised_padded.dxf", 1, shadow_width);
         }
         if (show_trackball) {
-            translate([shadow_width*3, -shadow_width*3, -2.98])
+            translate([shadow_width*3, -shadow_width*3, 0])
                 linear_extrude(1) translate(trackball_position)
                 circle(trackball_radius + shadow_width);
         }

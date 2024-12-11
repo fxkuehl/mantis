@@ -48,6 +48,8 @@ show_sliced_key = false;
 // Print some key stats
 $print_stats = false;
 
+key_color = "";
+
 use <utils.scad>
 
 cos30 = cos(30);
@@ -431,7 +433,7 @@ module minkey(detail = 32) {
 }
 
 module key(detail = 16) {
-    render(convexity=8) difference () {
+    color(key_color ? key_color : undef) render(convexity=8) difference () {
         if ($minkowski)
             minkey(detail);
         else
