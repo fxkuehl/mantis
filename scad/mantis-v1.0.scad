@@ -4,8 +4,8 @@
 include <keycap.scad>
 
 /* [Render] */
-// Angular resolution in degrees
-$fa = 4; // [1:8]
+// Resolution in mm
+$fs = 2; // [0.5:0.5:3]
 $explode = 0;
 show_trackball = true;
 show_switch = true;
@@ -25,27 +25,28 @@ case_alpha = 1.0; // [0.1:0.1:1.0]
 show_desk = true;
 
 /* [Design sizes in mm] */
-main_height = 13;
-raised_height = 10;
-base_thickness = 2.5;
-deck_thickness = 3;
-pcb_thickness = 1.2;
-sensor_pcb_thickness = 1.6;
-plate_thickness = 1.2;
-main_plate_z = 7.4;
-main_pcb_z = 5.2;
+main_height = 13;       // [5:0.1:15]
+raised_height = 10;     // [5:0.1:15]
+base_thickness = 2.5;   // [0.5:0.1:5]
+deck_thickness = 3;     // [0.5:0.1:5]
+wall_thickness = 2;     // [0.5:0.1:5]
+// Edge fillet radius
+r_edge = 2;             // [0.5:0.1:5]
+pcb_thickness = 1.2;    // [0.5:0.1:2]
+sensor_pcb_thickness = 1.6;// [0.5:0.1:2]
+plate_thickness = 1.2;  // [0.5:0.1:2]
+main_plate_z = 7.4;     // [1:0.1:15]
+main_pcb_z = 5.2;       // [1:0.1:15]
 main_switch_z = main_pcb_z + pcb_thickness;
-raised_plate_z = 17.4;
-raised_pcb_z = 15.2;
+raised_plate_z = 17.4;  // [1:0.1:30]
+raised_pcb_z = 15.2;    // [1:0.1:30]
 raised_switch_z = raised_pcb_z + pcb_thickness;
-bump_height = 1;
-bearing_size = 2.5;
-// Edge radius
-r_edge = 2.73;
+bump_height = 1;        // [0.5:0.1:5]
+bearing_size = 2.5;     // [1:0.1:5]
 
 /* [Keycaps] */
 // RGB LED cutouts
-$rgb = false;
+rgb = false;
 // Tilt angle for home keys
 tilt1 = 15;
 // Rise of the home keys
@@ -75,9 +76,19 @@ hy = 18.62;
 dx = 3.27;
 dy = 1.1547 * dx;
 
-mcu_y = 10*hy/3 + dy/2 - 33.02/2;
+kx = 0.27;
+ky = 1.1547 * kx;
 
+mcu_top = 10*hy/3 + dy/2;
+mcu_y = mcu_top - 33.02/2;
+forehead_x = (mcu_top - 8*hy/3 + dy/4) * hx / (2*hy/3);
+
+// Fillets and Spacing
+f_key = 3.0;
+s_key = 0.54;
+s_pcb = 0.27;
 spacing = 0.54;
+
 // Prevent rendering key in keycap.scad
 no_key = true;
 
@@ -86,9 +97,6 @@ trackball_radius = trackball_diameter / 2;
 trackball_position = [0, -hy - 3*dy/2, trackball_radius + 4];
 //trackball_diameter = 24;
 //trackball_position = [0, -hy - 2*dy/2, trackball_diameter/2 + 10];
-
-// Segment size in mm of curves on the case
-$fs = $fa/2;
 
 use <utils.scad>
 
@@ -106,32 +114,149 @@ module rounded_extrusion(outline, height, radius) {
     }
 }
 
-module case_inside(offset) {
-    render(convexity=10) {
-        translate([0, 0, base_thickness + offset/2])
-            flat_extrusion("outlines/main_padded.dxf",
-                           main_height-base_thickness-deck_thickness - offset,
-                           -offset);
-        translate([0, 0, main_height-deck_thickness-0.1 + offset/2])
-            flat_extrusion("outlines/raised_padded.dxf",
-                           raised_height+0.1 - offset, -offset);
+module main_outline() {
+    polygon([
+    [             0, -6*hy/3 - dy + dy/4],  // mouth
+    [    -hx - dx/2, -8*hy/3 - dy],         // left mandible
+    [-3.0*hx - dx/2, -4*hy/3 - dy],
+    [-3.0*hx - dx/2, -2*hy/3],
+    [-5.5*hx - dx/2,  3*hy/3],              // left temple
+    [-5.5*hx - dx/2,  9*hy/3],
+    [-4.0*hx - dx/2, 12*hy/3],              // left ear
+    [-3.0*hx - dx/2, 10*hy/3],
+    [-2.0*hx - dx/2, 12*hy/3],              // left horn
+    [-forehead_x, mcu_top],                 // forehead
+    [ forehead_x, mcu_top],
+    [ 2.0*hx + dx/2, 12*hy/3],              // right horn
+    [ 3.0*hx + dx/2, 10*hy/3],
+    [ 4.0*hx + dx/2, 12*hy/3],              // right ear
+    [ 5.5*hx + dx/2,  9*hy/3],              // right temple
+    [ 5.5*hx + dx/2,  3*hy/3],
+    [ 3.0*hx + dx/2, -2*hy/3],              // right mandible
+    [ 3.0*hx + dx/2, -4*hy/3 - dy],
+    [     hx + dx/2, -8*hy/3 - dy]
+    ]);
+}
+
+module raised_outline() {
+    wx = wall_thickness;
+    wy = 1.1547*wx;
+    polygon([
+    [-0.5*hx - dx/2 + kx, -5*hy/3 - dy + ky + wy+ky/2],
+  //[-1.0*hx - dx/2 + wx + kx, -4*hy/3 - dy + ky + wy/2+ky/2],
+  [-1.0*hx - dx/2 + kx, -4*hy/3 - dy + ky + wy+ky/2],
+  [-1.0*hx - dx/2 + kx, -4*hy/3 - dy + ky + ky/2],
+    [-1.5*hx - dx/2     , -5*hy/3 - dy + ky],
+    [-1.5*hx - dx/2     , -5*hy/3 - dy],
+    [-2.0*hx - dx/2     , -6*hy/3 - dy],
+    [-3.0*hx - dx/2     , -4*hy/3 - dy],
+    [-3.0*hx - dx/2     , -2*hy/3 - dy],
+    [-2.5*hx - dx/2 + kx,   -hy/3 - dy + ky],
+    [-2.5*hx - dx/2 + kx,    hy/3 - ky/2],
+    [-2.0*hx - dx/2 + kx,  2*hy/3 - ky/2],
+    [-2.0*hx - dx/2 + kx,  4*hy/3 - ky/2],
+    [-1.5*hx - dx/2 + kx,  5*hy/3 - ky/2],
+    [-1.5*hx - dx/2 + kx,  7*hy/3 - ky/2],
+    [-1.0*hx - dx/2 + kx,  8*hy/3 - ky/2],
+    [-1.0*hx - dx/2 + kx, mcu_top],
+    [ 1.0*hx + dx/2 - kx, mcu_top],
+    [ 1.0*hx + dx/2 - kx,  8*hy/3 - ky/2],
+    [ 1.5*hx + dx/2 - kx,  7*hy/3 - ky/2],
+    [ 1.5*hx + dx/2 - kx,  5*hy/3 - ky/2],
+    [ 2.0*hx + dx/2 - kx,  4*hy/3 - ky/2],
+    [ 2.0*hx + dx/2 - kx,  2*hy/3 - ky/2],
+    [ 2.5*hx + dx/2 - kx,    hy/3 - ky/2],
+    [ 2.5*hx + dx/2 - kx,   -hy/3 - dy + ky],
+    [ 3.0*hx + dx/2     , -2*hy/3 - dy],
+    [ 3.0*hx + dx/2     , -4*hy/3 - dy],
+    [ 2.0*hx + dx/2     , -6*hy/3 - dy],
+    [ 1.5*hx + dx/2     , -5*hy/3 - dy],
+    [ 1.5*hx + dx/2     , -5*hy/3 - dy + ky],
+  [ 1.0*hx + dx/2 - kx, -4*hy/3 - dy + ky + ky/2],
+  [ 1.0*hx + dx/2 - kx, -4*hy/3 - dy + ky + wy+ky/2],
+  //[ 1.0*hx + dx/2 - wx - kx, -4*hy/3 - dy + ky + wy/2+ky/2],
+    [ 0.5*hx + dx/2 - kx, -5*hy/3 - dy + ky + wy+ky/2]
+    ]);
+}
+
+module main_offset_fillet(o, fo, fi)
+    offset(r     =   -fi, $fa = fa_from_fs(fi))
+    offset(r     = fo+fi, $fa = fa_from_fs(fo))
+    offset(delta = o-fo) main_outline();
+module main_extrusion(h, o, fxy, fz) {
+    if (fz) {
+        fa = 90 / round(fz * 1.5708 / $fs);
+        translate([0, 0, fz]) minkowski() {
+            linear_extrude(h - 2*fz, convexity=10)
+                main_offset_fillet(o - fz, fxy - fz, fxy + fz);
+            full_sphere(fz, false, $fa = fa);
+        }
+    } else {
+        linear_extrude(h, convexity=10)
+            main_offset_fillet(o, fxy, fxy);
     }
 }
 
-module case() difference() {
-    color(case_color, alpha=case_alpha) render(convexity=10) union() {
-        rounded_extrusion("outlines/main_external.dxf",
-                          main_height, r_edge);
-            rounded_extrusion("outlines/raised_external.dxf",
-                              main_height+raised_height, r_edge);
+module raised_offset_fillet(o, fo, fi) difference() {
+    offset(r     =   -fi, $fa = fa_from_fs(fi))
+    offset(r     = fo+fi, $fa = fa_from_fs(fo))
+    offset(delta = o-fo) raised_outline();
+}
+module raised_extrusion(h, o, fxy, fz) {
+    if (fz) {
+        fa = 90 / round(fz * 1.5708 / $fs);
+        minkowski() {
+            linear_extrude(h - fz, convexity=10)
+                raised_offset_fillet(o - fz, fxy - fz, fxy + fz);
+            rotate([0, 180, 0]) half_sphere(fz, false, $fa = fa);
+        }
+    } else {
+        linear_extrude(h, convexity=10)
+            raised_offset_fillet(o, fxy, fxy);
     }
-    render(convexity=10) {
+}
+/*
+color("red") translate([0, 0, main_height]) main_offset_fillet(0, 3.27, 3.27);
+color("lime") translate([0, 0, main_height+raised_height])
+    raised_offset_fillet(0, 0, 0);
+*/
+module case_inside(offset) {
+    union() {
+        translate([0, 0, base_thickness + offset/2])
+            main_extrusion(main_height-base_thickness-deck_thickness - offset,
+                           s_pcb - offset, f_key + s_key - offset, 0);
+        translate([0, 0, main_height - deck_thickness - offset/2 - 0.01])
+                difference() {
+            raised_extrusion(raised_height + 0.01,
+                             s_pcb - offset, f_key + s_key - offset, 0);
+            translate([-hx - dx/2 + kx - offset, -5*hy/3 - dy, -0.01])
+                cube([wall_thickness + 2*offset, hy + offset, raised_height + 0.03]);
+            translate([hx + dx/2 - kx - wall_thickness - offset, -5*hy/3 - dy, -0.01])
+                cube([wall_thickness + 2*offset, hy + offset, raised_height + 0.03]);
+        }
+    }
+}
+module case_outside() {
+    union() {
+        main_extrusion(main_height,
+                       s_pcb + wall_thickness,
+                       f_key + s_key + wall_thickness, r_edge);
+        translate([0, 0, main_height - r_edge])
+            raised_extrusion(raised_height + r_edge,
+                             s_pcb + wall_thickness,
+                             f_key + s_key + wall_thickness, r_edge);
+    }
+}
+module case() difference() {
+    color(case_color, alpha=case_alpha) case_outside();
+    render(convexity=10) union() {
         case_inside(0);
-        translate([0, 0, base_thickness])
-            flat_extrusion("outlines/main_key_slots.dxf", main_height);
-        translate([0, 0, main_height-deck_thickness-0.1])
+        translate([0, 0, main_height - deck_thickness - 0.01])
+            flat_extrusion("outlines/main_key_slots.dxf",
+                           deck_thickness + 0.02, -0.01);
+        translate([0, 0, main_height - deck_thickness - 0.01])
             flat_extrusion("outlines/raised_key_slots.dxf",
-                           raised_height+deck_thickness+0.2);
+                           raised_height + deck_thickness + 0.02, -0.01);
 
         translate(trackball_position)
             corr_sphere(trackball_radius + spacing);
@@ -188,12 +313,12 @@ module sensor() {
 module mezzanine(offset) {
     difference() {
         translate([0, 0, main_height - deck_thickness])
-            flat_extrusion("outlines/raised_padded.dxf",
-                           base_thickness, -offset);
-        translate([0, 0, base_thickness])
-            flat_extrusion("outlines/main_key_slots.dxf", main_height);
-        translate([0, 0, main_height - deck_thickness - 0.1])
-            mcu(base_thickness + 0.2, spacing);
+            raised_extrusion(base_thickness,
+                             s_pcb - offset, f_key + s_key - offset, 0);
+        translate([0, 0, main_height - deck_thickness - 0.01])
+            flat_extrusion("outlines/main_key_slots.dxf", base_thickness + 0.02);
+        translate([0, 0, main_height - deck_thickness - 0.01])
+            mcu(base_thickness + 0.02, spacing);
     }
 }
 
@@ -212,20 +337,16 @@ module trackball_holder() {
     wall = 2.0;
     difference() {
         intersection() {
-            difference() {
-                color(mezzanine_color) union() {
-                    translate(trackball_position)
-                        corr_sphere(trackball_radius + spacing + wall);
-                    mezzanine(0.1);
-                    translate(trackball_position) rotate([60, 0, 0])
-                        translate([0, 0, -trackball_radius-wall*2])
-                        cylinder(wall*2, 5, 5);
-                        bearings(bearing_size, 4);
-                }
+            color(mezzanine_color) union() {
                 translate(trackball_position)
-                    corr_sphere(trackball_radius + spacing);
+                    corr_sphere(trackball_radius + spacing + wall);
+                mezzanine(0.1);
+                translate(trackball_position) rotate([60, 0, 0])
+                    translate([0, 0, -trackball_radius-wall*2])
+                    cylinder(wall*2, 5, 5);
+                    bearings(bearing_size, 4);
             }
-            case_inside(0.1);
+            render(convexity=10) case_inside(0.1);
         }
         translate(trackball_position) rotate([60, 0, 0])
             translate([0, 0, -trackball_radius]) union() {
@@ -234,8 +355,12 @@ module trackball_holder() {
                 cube([w, 20, 10 - 2.4 + 0.05], center=false);
             translate([0, 0, -2.5]) cylinder(2.5, 2.5, 1.5, center=false);
         }
-        bearings(bearing_size, 0.1);
-        bearings(bearing_size, -0.05, cylinder=true);
+        union() {
+            translate(trackball_position)
+                corr_sphere(trackball_radius + spacing);
+            bearings(bearing_size, 0.1);
+            bearings(bearing_size, -0.05, cylinder=true);
+        }
     }
 }
 
@@ -244,31 +369,34 @@ if (show_desk) {
         cube([600, 350, 20]);
     // Approximate shadow to give a sense of the distance from the desk surface:
     // 1. Core shadow slightly smaller than the outline
+    o = (show_case ? s_pcb + wall_thickness : 0) - bump_height;
+    f = (show_case ? f_key + s_key + wall_thickness : f_key + s_pcb) - bump_height;
     if (show_case) {
-        color("black", alpha=0.5) translate([0, 0, -bump_height - 0.99])
-            flat_extrusion("outlines/main_external.dxf", 1, -bump_height);
+        color("black", alpha=0.5) translate([0, 0, -bump_height - 0.49])
+            main_offset_fillet(s_pcb + wall_thickness - bump_height,
+                               f_key + s_key + wall_thickness + bump_height,
+                               f_key + s_key + wall_thickness + bump_height);
     } else if (show_pcb || show_plate) {
-        color("black", alpha=0.3) translate([0, 0, -bump_height - 0.99])
-            flat_extrusion("outlines/main_padded.dxf", 1, -main_pcb_z - bump_height);
+        color("black", alpha=0.3) translate([0, 0, -bump_height - 0.49])
+            main_offset_fillet(-main_pcb_z - bump_height,
+                               f_key + s_pcb + main_pcb_z + bump_height,
+                               f_key + s_pcb + main_pcb_z + bump_height);
     }
     // 2. Partial shadow of the main body, raised part and trackball
     shadow_width = 2.5 + bump_height/4;
-    color("black", alpha=0.2) translate([0, 0, -bump_height - 0.98])
+    color("black", alpha=0.2) translate([0, 0, -bump_height - 0.48])
             render(convexity=10) union() {
-        if (show_case) {
+        o = (show_case ? s_pcb + wall_thickness : 0) + shadow_width;
+        f = (show_case ? f_key + s_key + wall_thickness : f_key + s_pcb) + shadow_width;
+        if (show_case || show_pcb || show_plate) {
             translate([shadow_width, -shadow_width, 0])
-                flat_extrusion("outlines/main_external.dxf", 1, shadow_width);
-            translate([shadow_width*1.67, -shadow_width*1.67, 0])
-                flat_extrusion("outlines/raised_external.dxf", 1, shadow_width);
-        } else if (show_pcb || show_plate) {
-            translate([shadow_width, -shadow_width, 0])
-                flat_extrusion("outlines/main_padded.dxf", 1, shadow_width);
-            translate([shadow_width*1.67, -shadow_width*1.67, 0])
-                flat_extrusion("outlines/raised_padded.dxf", 1, shadow_width);
+                main_offset_fillet(o, f, f);
+            translate([shadow_width * 1.67, -shadow_width * 1.67, 0])
+                raised_offset_fillet(o, f, f);
         }
         if (show_trackball) {
             translate([shadow_width*3, -shadow_width*3, 0])
-                linear_extrude(1) translate(trackball_position)
+                translate(trackball_position)
                 circle(trackball_radius + shadow_width);
         }
     }
@@ -295,6 +423,9 @@ if (show_sensor) {
 }
 
 module key_profile(x) {
+    $fa = $fs*2;
+    $rgb = rgb;
+
     if (x == 0) {
         switch_key($tilt=tilt1, $rise=rise1);
     } else if (x == 1) {
