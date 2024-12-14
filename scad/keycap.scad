@@ -53,17 +53,12 @@ key_color = "";
 use <utils.scad>
 
 cos30 = cos(30);
-function fillet_unit_hex_segment(r, a) = a < r*30 ?
-    // arc segment
-    [-r*sin(a/r), r*cos(a/r) + (1 - r)/cos30, 0] :
-    // linear segment
-    let (xr30 = -r/2, yr30 = (1 - r)/cos30 + r*cos30,
-         dx = -(1 - r) / ((1 - r)*60),
-         dy = -(1 - r)/(2*cos30) / ((1 - r)*60))
-        [xr30 + dx * (a - r*30), yr30 + dy * (a - r*30), 0];
-
-function fillet_unit_hex_point(r, a) = let (b = (a + r*30) % 60 - r*30)
-    rotate_z(fillet_unit_hex_segment(r, b), a-b);
+function fillet_unit_hex_point(r, a) = let (
+    circle = [-sin(a), cos(a), 0],
+    a_corner = round(a / 60) * 60,
+    hex = [-sin(a_corner), cos(a_corner), 0],
+    r_hex = (1-r) / cos30
+) r * circle + r_hex * hex;
 
 module fillet_hexagon(R, r, h, da=$fa) {
     steps = floor(360/da);
@@ -153,8 +148,10 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, offset, da=$fa) 
     qfmax = offset > 0 ? 0.8 : 1;
 
     steps_cone = max(3, floor(steps / 15));
+    // Ensure an equal and odd number of points per corner, at least 3
+    round_points = function(x) max(18, (round(x / 12) * 2 + 1) * 6);
     n_points_cone = [for (i = [0 : steps_cone])
-        round(interpolate(1, sin(slope), i/steps_cone)*steps)];
+        round_points(interpolate(r1 / r2, 1, i/steps_cone) * steps * sin(slope))];
     points_cone = [for (i = [0 : steps_cone]) each
         let (b = i / steps_cone,
              steps = n_points_cone[i],
@@ -215,7 +212,7 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, offset, da=$fa) 
     points = clamp_z_exp(concat(points_cone, points_dish), $clamp_z1 - offset, $clamp_z2 - offset);
     n_points = concat(n_points_cone, n_points_dish);
 
-    face_bot = [for (i = [0 : 1 : steps-1]) i];
+    face_bot = [for (i = [0 : 1 : n_points_cone[0]-1]) i];
     faces_cone = concentric_faces(steps_cone + steps_dish, n_points);
     faces = concat([face_bot], faces_cone);
 
@@ -608,8 +605,8 @@ if (no_key) {
     r2 = R2;
     exc = min($max_exc, $tilt/7.5);
     slope = $slope;
-    height = $height;
+    height = $droop + $rise + $thickness;
     fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                        $tilt, slope, height);
+                        $tilt, slope, height, 0);
 */
 //translate([0, 0, -2]) fillet_hexagon(21/2, 3, 2);
