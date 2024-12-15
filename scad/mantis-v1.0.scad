@@ -19,6 +19,7 @@ show_sensor = true;
 show_bearing = true;
 show_mezzanine = true;
 show_case = true;
+show_base = true;
 // Pre-render the case
 render_case = true;
 case_alpha = 1.0; // [0.1:0.1:1.0]
@@ -63,10 +64,11 @@ rise3 = -0.5;
 /* [Colors] */
 key_color = "linen";
 trackball_color = "deepskyblue";
-plate_color = "#404040";
+plate_color = "darkgreen";
 pcb_color = "green";
 mezzanine_color = "orange";
 case_color = "chocolate";
+base_color = "saddlebrown";
 desk_color = "tan";
 
 /* [Hidden] */
@@ -247,9 +249,15 @@ module case_outside() {
                              f_key + s_key + wall_thickness, r_edge);
     }
 }
+module base_plate(offset)
+    translate([0, 0, -offset])
+        main_extrusion(base_thickness + 2*offset,
+                       s_pcb + wall_thickness/2 + offset,
+                       f_key + s_key + wall_thickness/2 + offset, 0);
 module case() difference() {
     color(case_color, alpha=case_alpha) case_outside();
     render(convexity=10) union() {
+        base_plate(0.1);
         case_inside(0);
         translate([0, 0, main_height - deck_thickness - 0.01])
             flat_extrusion("outlines/main_key_slots.dxf",
@@ -364,6 +372,111 @@ module trackball_holder() {
     }
 }
 
+module key_profile(x) {
+    $fa = $fs*2;
+    $rgb = rgb;
+
+    if (x == 0) {
+        switch_key($tilt=tilt1, $rise=rise1);
+    } else if (x == 1) {
+        switch_key($tilt=tilt2, $rise=rise2);
+    } else if (x == 2) {
+        switch_key($tilt=tilt3, $rise=rise3);
+    }
+}
+
+module keyboard() {
+    ex = $explode;
+
+    if (show_pcb) {
+        translate([0, 0, main_pcb_z + 1*ex]) main_pcb();
+        translate([0, 0, raised_pcb_z + 4*ex]) raised_pcb();
+    }
+
+    if (show_plate) {
+        translate([0, 0, main_plate_z + 2*ex]) main_plate();
+        translate([0, 0, raised_plate_z + 4.8*ex]) raised_plate();
+    }
+
+    if (show_sensor) {
+        translate(trackball_position + [0, 0, 2*ex]) rotate([60, 0, 0])
+            translate([0, 0, -trackball_radius]) sensor();
+    }
+
+    if (show_trackball) {
+        color(trackball_color) translate(trackball_position + [0, 0, 7*ex])
+            rotate([30, 0, 180]) corr_sphere(trackball_radius);
+    }
+
+    if (show_key || show_switch) {
+        main_fingers = [
+        [0.5, 3,   0, 0], [1.5, 3, -60, 1], [2.5, 3, -60, 1], [3.5, 3, -60, 1],
+        [0.0, 2, 120, 0], [1.0, 2,-120, 0], [2.0, 2,-120, 0], [3.0, 2,-120, 0],
+                          [0.5, 1, 180, 2], [1.5, 1, 180, 2], [2.5, 1, 180, 2],
+                                                              [2.0, 0, 180, 1]
+        ];
+        raised_fingers = [
+        [4.0, 2, -60, 1], [4.5, 1, -60, 1],
+        [3.5, 1,-120, 0], [4.0, 0,-120, 0],
+        [3.0, 0, 180, 2]
+        ];
+        raised_thumbs =   [[2.5, -1, 60, 0], [3.5, -1, 0, 0]];
+        main_thumbs =     [[4.0, -2,  0, 1]];
+        union() {
+            main_z = main_switch_z + 4*ex;
+            raised_z = raised_switch_z + 7*ex;
+            hx = hx + ex/5;
+            hy = hy + ex/5;
+            for (k = main_fingers) {
+                translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy, main_z])
+                    rotate([0, 0, k[2]]) key_profile(k[3]);
+                translate([5*hx + dx/2 - k[0]*hx, k[1]*hy, main_z])
+                    rotate([0, 0, -k[2]]) key_profile(k[3]);
+            }
+            for (k = main_thumbs) {
+                translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy - dy, main_z])
+                    rotate([0, 0, k[2]]) key_profile(k[3]);
+                translate([5*hx + dx/2 - k[0]*hx, k[1]*hy - dy, main_z])
+                    rotate([0, 0, -k[2]]) key_profile(k[3]);
+            }
+            for (k = raised_fingers) {
+                translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy, raised_z])
+                    rotate([0, 0, k[2]]) key_profile(k[3]);
+                translate([5*hx + dx/2 - k[0]*hx, k[1]*hy, raised_z])
+                    rotate([0, 0, -k[2]]) key_profile(k[3]);
+            }
+            for (k = raised_thumbs) {
+                translate([-5*hx -dx/2 + k[0]*hx, k[1]*hy - dy, raised_z])
+                    rotate([0, 0, k[2]]) key_profile(k[3]);
+                translate([5*hx + dx/2 - k[0]*hx, k[1]*hy - dy, raised_z])
+                    rotate([0, 0, -k[2]]) key_profile(k[3]);
+            }
+        }
+    }
+
+    if (show_bearing) translate([0, 0,  6.8*ex]) bearings(bearing_size, 0);
+
+    if (show_mezzanine) {
+        if (render_case)
+            translate([0, 0, 3*ex]) color(mezzanine_color, alpha=case_alpha)
+                render(convexity=8) trackball_holder();
+        else
+            translate([0, 0, 3*ex]) trackball_holder();
+    }
+
+    if (show_base) {
+        color(base_color, alpha=case_alpha) base_plate(0);
+    }
+
+    if (show_case) {
+        if (render_case)
+            translate([0, 0, 6*ex]) color(case_color, alpha=case_alpha)
+                render(convexity=10) case();
+        else
+            translate([0, 0, 6*ex]) color(alpha=case_alpha) case();
+    }
+}
+
 if (show_desk) {
     color(desk_color) rotate([0, 0, -5]) translate([-300, -100, -20 - bump_height])
         cube([600, 350, 20]);
@@ -402,94 +515,4 @@ if (show_desk) {
     }
 }
 
-if (show_trackball) {
-    color(trackball_color) translate(trackball_position) rotate([30, 0, 180])
-        corr_sphere(trackball_radius);
-}
-
-if (show_pcb) {
-    translate([0, 0, main_pcb_z]) main_pcb();
-    translate([0, 0, raised_pcb_z]) raised_pcb();
-}
-
-if (show_plate) {
-    translate([0, 0, main_plate_z]) main_plate();
-    translate([0, 0, raised_plate_z]) raised_plate();
-}
-
-if (show_sensor) {
-    translate(trackball_position) rotate([60, 0, 0])
-        translate([0, 0, -trackball_radius]) sensor();
-}
-
-module key_profile(x) {
-    $fa = $fs*2;
-    $rgb = rgb;
-
-    if (x == 0) {
-        switch_key($tilt=tilt1, $rise=rise1);
-    } else if (x == 1) {
-        switch_key($tilt=tilt2, $rise=rise2);
-    } else if (x == 2) {
-        switch_key($tilt=tilt3, $rise=rise3);
-    }
-}
-
-if (show_key || show_switch) {
-    main_fingers = [
-        [0.5, 3,   0, 0], [1.5, 3, -60, 1], [2.5, 3, -60, 1], [3.5, 3, -60, 1],
-        [0.0, 2, 120, 0], [1.0, 2,-120, 0], [2.0, 2,-120, 0], [3.0, 2,-120, 0],
-                          [0.5, 1, 180, 2], [1.5, 1, 180, 2], [2.5, 1, 180, 2],
-                                                              [2.0, 0, 180, 1]
-    ];
-    raised_fingers = [
-        [4.0, 2, -60, 1], [4.5, 1, -60, 1],
-        [3.5, 1,-120, 0], [4.0, 0,-120, 0],
-        [3.0, 0, 180, 2]
-    ];
-    raised_thumbs =   [[2.5, -1, 60, 0], [3.5, -1, 0, 0]];
-    main_thumbs =     [[4.0, -2,  0, 1]];
-    union() {
-        for (k = main_fingers) {
-            translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy, main_switch_z])
-                rotate([0, 0, k[2]]) key_profile(k[3]);
-            translate([5*hx + dx/2 - k[0]*hx, k[1]*hy, main_switch_z])
-                rotate([0, 0, -k[2]]) key_profile(k[3]);
-        }
-        for (k = main_thumbs) {
-            translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy - dy, main_switch_z])
-                rotate([0, 0, k[2]]) key_profile(k[3]);
-            translate([5*hx + dx/2 - k[0]*hx, k[1]*hy - dy, main_switch_z])
-                rotate([0, 0, -k[2]]) key_profile(k[3]);
-        }
-        for (k = raised_fingers) {
-            translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy, raised_switch_z])
-                rotate([0, 0, k[2]]) key_profile(k[3]);
-            translate([5*hx + dx/2 - k[0]*hx, k[1]*hy, raised_switch_z])
-                rotate([0, 0, -k[2]]) key_profile(k[3]);
-        }
-        for (k = raised_thumbs) {
-            translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy - dy, raised_switch_z])
-                rotate([0, 0, k[2]]) key_profile(k[3]);
-            translate([5*hx + dx/2 - k[0]*hx, k[1]*hy - dy, raised_switch_z])
-                rotate([0, 0, -k[2]]) key_profile(k[3]);
-        }
-    }
-}
-
-if (show_bearing) bearings(bearing_size, 0);
-
-if (show_mezzanine) {
-    if (render_case)
-        color(mezzanine_color, alpha=case_alpha) render(convexity=8)
-            trackball_holder();
-    else
-        trackball_holder();
-}
-
-if (show_case) {
-    if (render_case)
-        color(case_color, alpha=case_alpha) render(convexity=10) case();
-    else
-        color(alpha=case_alpha) case();
-}
+keyboard();

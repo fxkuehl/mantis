@@ -50,7 +50,7 @@ openscad $params --camera=0,8,0,180,0,180,400 --imgsize=$sizeW \
 jobs="$jobs $!"
 
 echo "Exploded view ..."
-openscad $params --camera=0,30,220,65,0,15,1200 --imgsize=$sizeP \
+openscad $params --camera=5,30,220,65,0,15,1250 --imgsize=$sizeP \
 	-D show_desk=false -D \$explode=60 --projection=ortho \
 	-o "$dir/mantis_exploded.png" $scad &
 jobs="$jobs $!"
