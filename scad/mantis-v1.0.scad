@@ -139,6 +139,23 @@ module main_outline() {
     [     hx + dx/2, -8*hy/3 - dy]
     ]);
 }
+module main_offset_fillet(o, fo, fi)
+    offset(r     =     fo, $fa = fa_from_fs(fo))
+    offset(r     = -fo-fi, $fa = fa_from_fs(fi))
+    offset(delta =   o+fi) main_outline();
+module main_extrusion(h, o, fxy, fz) {
+    if (fz) {
+        fa = 90 / round(fz * 1.5708 / $fs);
+        translate([0, 0, fz]) minkowski() {
+            linear_extrude(h - 2*fz, convexity=10)
+                main_offset_fillet(o - fz, fxy - fz, fxy + fz);
+            full_sphere(fz, false, $fa = fa);
+        }
+    } else {
+        linear_extrude(h, convexity=10)
+            main_offset_fillet(o, fxy, fxy);
+    }
+}
 
 module raised_outline() {
     wx = wall_thickness;
@@ -180,30 +197,10 @@ module raised_outline() {
     [ 0.5*hx + dx/2 - kx, -5*hy/3 - dy + ky + wy+ky/2]
     ]);
 }
-
-module main_offset_fillet(o, fo, fi)
-    offset(r     =   -fi, $fa = fa_from_fs(fi))
-    offset(r     = fo+fi, $fa = fa_from_fs(fo))
-    offset(delta = o-fo) main_outline();
-module main_extrusion(h, o, fxy, fz) {
-    if (fz) {
-        fa = 90 / round(fz * 1.5708 / $fs);
-        translate([0, 0, fz]) minkowski() {
-            linear_extrude(h - 2*fz, convexity=10)
-                main_offset_fillet(o - fz, fxy - fz, fxy + fz);
-            full_sphere(fz, false, $fa = fa);
-        }
-    } else {
-        linear_extrude(h, convexity=10)
-            main_offset_fillet(o, fxy, fxy);
-    }
-}
-
-module raised_offset_fillet(o, fo, fi) difference() {
-    offset(r     =   -fi, $fa = fa_from_fs(fi))
-    offset(r     = fo+fi, $fa = fa_from_fs(fo))
-    offset(delta = o-fo) raised_outline();
-}
+module raised_offset_fillet(o, fo, fi)
+    offset(r     =     fo, $fa = fa_from_fs(fo))
+    offset(r     = -fo-fi, $fa = fa_from_fs(fi))
+    offset(delta =   o+fi) raised_outline();
 module raised_extrusion(h, o, fxy, fz) {
     if (fz) {
         fa = 90 / round(fz * 1.5708 / $fs);
@@ -215,6 +212,77 @@ module raised_extrusion(h, o, fxy, fz) {
     } else {
         linear_extrude(h, convexity=10)
             raised_offset_fillet(o, fxy, fxy);
+    }
+}
+
+module hex_outline() {
+    polygon([
+    [    0,  2 * hy/3],
+    [ hx/2,  1 * hy/3],
+    [ hx/2, -1 * hy/3],
+    [    0, -2 * hy/3],
+    [-hx/2, -1 * hy/3],
+    [-hx/2,  1 * hy/3]
+    ]);
+}
+module hex_offset_fillet(o, f)
+    offset(r = fo, $fa = fa_from_fs(f)) offset(delta = o-f) key_outline();
+module main_key_slots(h) {
+    o = s_key/2 - 0.01;
+
+    module left() translate([-dx/2, 0]) union() {
+        for(i = [-4.5 : 1: -1.5])
+            translate([i*hx, 3*hy]) offset(delta = o) hex_outline();
+        for(i = [-5.0 : 1: -2.0])
+            translate([i*hx, 2*hy]) offset(delta = o) hex_outline();
+        for(i = [-4.5 : 1: -2.5])
+            translate([i*hx,   hy]) offset(delta = o) hex_outline();
+        translate([-3*hx,          0]) offset(delta = o) hex_outline();
+        translate([  -hx, -2*hy - dy]) offset(delta = o) hex_outline();
+    }
+
+    linear_extrude(h, convexity=10) {
+        f = f_key + s_key;
+        offset(r =    f, $fa = fa_from_fs(f))
+        offset(r = -2*f, $fa = fa_from_fs(f)) offset(delta = f) {
+            left();
+            scale([-1, 1]) left();
+        }
+    }
+}
+module raised_key_slots(h) {
+    o = s_key/2 - 0.01;
+
+    module left_fingers() translate([-dx/2, 0]) union() {
+        translate([-1.5*hx, 3*hy]) offset(delta = o) hex_outline();
+        for(i = [-2.0 : 1: -1.0])
+            translate([i*hx, 2*hy]) offset(delta = o) hex_outline();
+        for(i = [-2.5 : 1: -0.5])
+            translate([i*hx,   hy]) offset(delta = o) hex_outline();
+        for(i = [-3.0 : 1: -1.0])
+            translate([i*hx,    0]) offset(delta = o) hex_outline();
+    }
+    module left_thumb() translate([-dx/2, -dy]) union() {
+        for(i = [-2.5 : 1: -1.5])
+            translate([i*hx,  -hy]) offset(delta = o) hex_outline();
+        translate([  -hx, -2*hy]) offset(delta = o) hex_outline();
+    }
+
+    linear_extrude(h, convexity=10) {
+        f = f_key + s_key;
+
+        // offset different key clusters separately to prevent them from merging
+        offset(r =    f, $fa = fa_from_fs(f))
+        offset(r = -2*f, $fa = fa_from_fs(f)) offset(delta = f) left_fingers();
+        offset(r =    f, $fa = fa_from_fs(f))
+        offset(r = -2*f, $fa = fa_from_fs(f)) offset(delta = f) left_thumb();
+
+        offset(r =    f, $fa = fa_from_fs(f))
+        offset(r = -2*f, $fa = fa_from_fs(f)) offset(delta = f)
+            scale([-1, 1]) left_fingers();
+        offset(r =    f, $fa = fa_from_fs(f))
+        offset(r = -2*f, $fa = fa_from_fs(f)) offset(delta = f)
+            scale([-1, 1]) left_thumb();
     }
 }
 /*
@@ -260,11 +328,9 @@ module case() difference() {
         base_plate(0.1);
         case_inside(0);
         translate([0, 0, main_height - deck_thickness - 0.01])
-            flat_extrusion("outlines/main_key_slots.dxf",
-                           deck_thickness + 0.02, -0.01);
+            main_key_slots(deck_thickness + 0.02);
         translate([0, 0, main_height - deck_thickness - 0.01])
-            flat_extrusion("outlines/raised_key_slots.dxf",
-                           raised_height + deck_thickness + 0.02, -0.01);
+            raised_key_slots(raised_height + deck_thickness + 0.02);
 
         translate(trackball_position)
             corr_sphere(trackball_radius + spacing);
@@ -324,7 +390,7 @@ module mezzanine(offset) {
             raised_extrusion(base_thickness,
                              s_pcb - offset, f_key + s_key - offset, 0);
         translate([0, 0, main_height - deck_thickness - 0.01])
-            flat_extrusion("outlines/main_key_slots.dxf", base_thickness + 0.02);
+            main_key_slots(base_thickness + 0.02);
         translate([0, 0, main_height - deck_thickness - 0.01])
             mcu(base_thickness + 0.02, spacing);
     }
