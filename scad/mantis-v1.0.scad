@@ -25,7 +25,7 @@ render_case = true;
 case_alpha = 1.0; // [0.1:0.1:1.0]
 show_desk = true;
 
-/* [Design sizes in mm] */
+/* [Design dimensions in mm] */
 main_height = 13;       // [5:0.1:15]
 raised_height = 10;     // [5:0.1:15]
 base_thickness = 2.5;   // [0.5:0.1:5]
@@ -44,6 +44,13 @@ raised_pcb_z = 15.2;    // [1:0.1:30]
 raised_switch_z = raised_pcb_z + pcb_thickness;
 bump_height = 1;        // [0.5:0.1:5]
 bearing_size = 2.5;     // [1:0.1:5]
+
+/* [Mounting points dimensions in mm] */
+// Default for M2 threaded insert
+bore_diameter = 2.7; // [1.5:0.1:6]
+post_diameter = 5.7; // [4:0.1:8]
+bolt_diameter = 2.0; // [1:0.1:4]
+head_diameter = 4.0; // [2:0.1:8]
 
 /* [Keycaps] */
 // RGB LED cutouts
@@ -75,14 +82,15 @@ desk_color = "tan";
 hx = 21.5;
 hy = 18.62;
 
-dx = 3.27;
+dx = 2.54;
 dy = 1.1547 * dx;
 
 kx = 0.27;
 ky = 1.1547 * kx;
 
+mcu_size = [17.78, 33.02];
 mcu_top = 10*hy/3 + dy/2;
-mcu_y = mcu_top - 33.02/2;
+mcu_y = mcu_top - mcu_size.y/2;
 forehead_x = (mcu_top - 8*hy/3 + dy/4) * hx / (2*hy/3);
 
 // Fillets and Spacing
@@ -226,7 +234,7 @@ module hex_outline() {
     ]);
 }
 module hex_offset_fillet(o, f)
-    offset(r = fo, $fa = fa_from_fs(f)) offset(delta = o-f) key_outline();
+    offset(r = f, $fa = fa_from_fs(f)) offset(delta = o-f) hex_outline();
 module main_key_slots(h) {
     o = s_key/2 - 0.01;
 
@@ -290,22 +298,113 @@ color("red") translate([0, 0, main_height]) main_offset_fillet(0, 3.27, 3.27);
 color("lime") translate([0, 0, main_height+raised_height])
     raised_offset_fillet(0, 0, 0);
 */
-module case_inside(offset) {
+
+module gasket_pads(height) {
+}
+
+module mounting_post(height) difference() {
+    cylinder(height, d = post_diameter);
+    translate([0, 0, -0.01]) cylinder(height + 0.02, d = bore_diameter);
+}
+
+module countersunk_screw(length, offset) {
+    head_radius = head_diameter/2 + 2*offset*sqrt(2);
+    bolt_radius = bolt_diameter/2 + offset;
+    $fn = round(360/fa_from_fs(head_radius));
+    union() {
+        translate([0, 0, -offset])
+            cylinder(h = head_radius, r1 = head_radius, r2 = 0);
+        translate([0, 0, 0.01])
+            cylinder(h = length + offset - 0.01, r = bolt_radius);
+        if (offset)
+            translate([0, 0, -length])
+                cylinder(h = length - offset + 0.01, r = head_radius);
+    }
+}
+
+mounting_points_main = [
+    [-5.33*hx - dx/2, 8.67*hy/3],
+    [ 5.33*hx + dx/2, 8.67*hy/3],
+    [-3.67*hx - dx/2,   0*hy/3],
+    [ 3.67*hx + dx/2,   0*hy/3],
+    [-1.67*hx - dx/2,  -6*hy/3 - dy],
+    [ 1.67*hx + dx/2,  -6*hy/3 - dy]
+];
+
+mounting_points_raised = [
+    [-hx - dx/2 + s_key/2 + post_diameter/2, -2*hy/3 - dy/2],
+    [ hx + dx/2 - s_key/2 - post_diameter/2, -2*hy/3 - dy/2]
+];
+
+mounting_posts_rear = [
+    [-mcu_size.x/2 - post_diameter/2 - spacing,
+     mcu_top + s_pcb - post_diameter/2,
+     main_pcb_z + pcb_thickness + 0.1],
+    [mcu_size.x/2 + post_diameter/2 + spacing,
+     mcu_top + s_pcb - post_diameter/2,
+     main_pcb_z + pcb_thickness + 0.1],
+
+    [-hx - dx/2 + post_diameter/2, mcu_top + s_pcb - post_diameter/2,
+     main_height - deck_thickness + base_thickness + 0.1],
+    [ hx + dx/2 - post_diameter/2, mcu_top + s_pcb - post_diameter/2,
+     main_height - deck_thickness + base_thickness + 0.1]
+];
+
+module hex_pad(h, o) {
+    linear_extrude(h) hex_offset_fillet(o - s_key/2, o + f_key + s_key);
+}
+module tri_pad(h, o) {
+    linear_extrude(h) difference() {
+        hex_offset_fillet(o - s_key/2, o + f_key + s_key);
+        translate([0, 2*hy/3 - 0.01]) hex_offset_fillet(o + s_key/2, 0);
+    }
+}
+module trackball_frame(h, oo, oi, f) difference() {
+    linear_extrude(h) offset(r = f) offset(delta = oo - f) polygon([
+        [  -hx/2 - dx/2, -5 * hy/3 - dy],
+        [  -hx   - dx/2, -4 * hy/3 - dy],
+        [  -hx   - dx/2, -2 * hy/3],
+        [-3*hx/4 - dx/2, -1.5*hy/3],
+        [ 3*hx/4 + dx/2, -1.5*hy/3],
+        [   hx/2 + dx/2, -1 * hy/3],
+        [   hx   + dx/2, -2 * hy/3],
+        [   hx   + dx/2, -4 * hy/3 - dy],
+        [   hx/2 + dx/2, -5 * hy/3 - dy]
+    ]);
+    translate([trackball_position.x, trackball_position.y, -0.01]) {
+        cylinder(h + 0.02,
+                 r = trackball_radius + s_key + wall_thickness + 0.1 - oi);
+        translate([0, 0, h/2 + 0.01])
+            cube([2*hx + dx + 2*oo - 2*oi - 2*post_diameter,
+                  trackball_diameter, h + 0.02], center = true);
+    }
+}
+module case_inside(offset) difference() {
     union() {
         translate([0, 0, base_thickness + offset/2])
             main_extrusion(main_height-base_thickness-deck_thickness - offset,
                            s_pcb - offset, f_key + s_key - offset, 0);
         translate([0, 0, main_height - deck_thickness - offset/2 - 0.01])
-                difference() {
             raised_extrusion(raised_height + 0.01,
                              s_pcb - offset, f_key + s_key - offset, 0);
-            translate([-hx - dx/2 + kx - offset, -5*hy/3 - dy, -0.01])
-                cube([wall_thickness + 2*offset, hy + offset, raised_height + 0.03]);
-            translate([hx + dx/2 - kx - wall_thickness - offset, -5*hy/3 - dy, -0.01])
-                cube([wall_thickness + 2*offset, hy + offset, raised_height + 0.03]);
-        }
+    }
+    translate([0, 0,
+               main_height - deck_thickness + base_thickness + 0.11 - offset])
+        trackball_frame(raised_height, -s_key/2, offset, f_key + s_key);
+
+    // Base plate mounting points
+    // TODO: Integrate them into a separate outline to get nicer fillets
+    mh = main_height - deck_thickness - base_thickness + 0.02;
+    translate([0, 0, base_thickness - 0.01]) {
+        translate([-5.5*hx - dx/2, 3*hy     ]) hex_pad(mh, offset);
+        translate([ 5.5*hx + dx/2, 3*hy     ]) hex_pad(mh, offset);
+        translate([-4.0*hx - dx/2,         0]) tri_pad(mh, offset);
+        translate([ 4.0*hx + dx/2,         0]) tri_pad(mh, offset);
+        translate([-2.0*hx - dx/2,-2*hy - dy]) tri_pad(mh, offset);
+        translate([ 2.0*hx + dx/2,-2*hy - dy]) tri_pad(mh, offset);
     }
 }
+//translate([0, 0, 50]) case_inside(0);
 module case_outside() {
     union() {
         main_extrusion(main_height,
@@ -317,24 +416,64 @@ module case_outside() {
                              f_key + s_key + wall_thickness, r_edge);
     }
 }
-module base_plate(offset)
+module base_plate_base(offset)
     translate([0, 0, -offset])
         main_extrusion(base_thickness + 2*offset,
                        s_pcb + wall_thickness/2 + offset,
                        f_key + s_key + wall_thickness/2 + offset, 0);
-module case() difference() {
-    color(case_color, alpha=case_alpha) case_outside();
-    render(convexity=10) union() {
-        base_plate(0.1);
-        case_inside(0);
-        translate([0, 0, main_height - deck_thickness - 0.01])
-            main_key_slots(deck_thickness + 0.02);
-        translate([0, 0, main_height - deck_thickness - 0.01])
-            raised_key_slots(raised_height + deck_thickness + 0.02);
 
-        translate(trackball_position)
-            corr_sphere(trackball_radius + spacing);
+module base_plate() difference() {
+    union() {
+        color(base_color, alpha=case_alpha) base_plate_base(0);
+        intersection() {
+            color(base_color, alpha=case_alpha) union() {
+                for(i = [0:1])
+                    translate([mounting_posts_rear[i].x,
+                               mounting_posts_rear[i].y, 0.01])
+                        cylinder(h = main_pcb_z - 0.1,
+                                 d = post_diameter);
+            }
+            translate([0, 0, -0.01])
+                main_extrusion(main_height, s_pcb - 0.1, f_key + s_key - 0.1, 0);
+        }
     }
+    for(i = [0:1])
+        translate([mounting_posts_rear[i].x, mounting_posts_rear[i].y,
+                   main_pcb_z - base_thickness])
+            countersunk_screw(2*base_thickness + 0.1, 0.1);
+    for (p = mounting_points_main)
+        translate([p.x, p.y, 0])
+            countersunk_screw(base_thickness + 0.1, 0.1);
+}
+module case() union() {
+    difference() {
+        color(case_color, alpha=case_alpha) case_outside();
+        render(convexity=10) union() {
+            base_plate_base(0.1);
+            case_inside(0);
+            translate([0, 0, main_height - deck_thickness - 0.01])
+                main_key_slots(deck_thickness + 0.02);
+            translate([0, 0, main_height - deck_thickness - 0.01])
+                raised_key_slots(raised_height + deck_thickness + 0.02);
+
+            translate(trackball_position)
+                corr_sphere(trackball_radius + spacing);
+
+            /* Mounting holes */
+            h_main = main_height - base_thickness - deck_thickness;
+            for (p = mounting_points_main)
+                translate([p.x, p.y, base_thickness - 0.1])
+                    cylinder(h = h_main, d = bore_diameter);
+            h_raised = raised_height - base_thickness;
+            for (p = mounting_points_raised)
+                translate([p.x, p.y,
+                           main_height - deck_thickness + base_thickness - 0.1])
+                    cylinder(h = h_raised, d = bore_diameter);
+        }
+    }
+    for (p = mounting_posts_rear)
+        translate([p.x, p.y, p.z])
+           mounting_post(main_height + raised_height - deck_thickness - p.z + 0.01);
 }
 
 module main_pcb() color(pcb_color)
@@ -348,7 +487,7 @@ module raised_plate() color(plate_color)
 
 module mcu(height, offset)
     translate([0, mcu_y, 0]) linear_extrude(height) offset(r=offset)
-        square([17.78, 33.02], center=true);
+        square(mcu_size, center=true);
 
 module lens(offset) {
     translate([-8.25/2 - offset, -5.48 - offset, -5.95 - 2.4])
@@ -386,13 +525,25 @@ module sensor() {
 
 module mezzanine(offset) {
     difference() {
-        translate([0, 0, main_height - deck_thickness])
+        color(mezzanine_color, alpha=case_alpha)
+            translate([0, 0, main_height - deck_thickness])
             raised_extrusion(base_thickness,
                              s_pcb - offset, f_key + s_key - offset, 0);
         translate([0, 0, main_height - deck_thickness - 0.01])
             main_key_slots(base_thickness + 0.02);
         translate([0, 0, main_height - deck_thickness - 0.01])
             mcu(base_thickness + 0.02, spacing);
+
+        for(i = [0:1]) translate(mounting_posts_rear[i])
+            cube([post_diameter + 2*s_pcb, post_diameter + 2*s_pcb,
+                  main_height + raised_height], center = true);
+        for(i = [2:3])
+            translate([mounting_posts_rear[i].x, mounting_posts_rear[i].y,
+                       main_height - deck_thickness - 0.01])
+                countersunk_screw(base_thickness + 0.1, 0.1);
+        for(p = mounting_points_raised)
+            translate([p.x, p.y, main_height - deck_thickness])
+                countersunk_screw(base_thickness + 0.1, 0.1);
     }
 }
 
@@ -411,16 +562,19 @@ module trackball_holder() {
     wall = 2.0;
     difference() {
         intersection() {
-            color(mezzanine_color) union() {
-                translate(trackball_position)
+            union() {
+                color(mezzanine_color, alpha=case_alpha)
+                    translate(trackball_position)
                     corr_sphere(trackball_radius + spacing + wall);
                 mezzanine(0.1);
-                translate(trackball_position) rotate([60, 0, 0])
+                color(mezzanine_color, alpha=case_alpha)
+                    translate(trackball_position) rotate([60, 0, 0])
                     translate([0, 0, -trackball_radius-wall*2])
                     cylinder(wall*2, 5, 5);
-                    bearings(bearing_size, 4);
+                color(mezzanine_color, alpha=case_alpha)
+                    bearings(bearing_size, 3.5);
             }
-            render(convexity=10) case_inside(0.1);
+            render(convexity=10) case_inside(0.09);
         }
         translate(trackball_position) rotate([60, 0, 0])
             translate([0, 0, -trackball_radius]) union() {
@@ -531,7 +685,11 @@ module keyboard() {
     }
 
     if (show_base) {
-        color(base_color, alpha=case_alpha) base_plate(0);
+        if (render_case)
+            color(base_color, alpha=case_alpha) render(convexity=8)
+                base_plate();
+        else
+            base_plate();
     }
 
     if (show_case) {
