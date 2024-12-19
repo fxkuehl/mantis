@@ -3,10 +3,10 @@ units:
   hx: 21.5
   hy: 18.62
   # Margin around the PCB
-  mx: 3
+  mx: 2.27
   my: 1.1547mx
   # Distance between key clusters
-  dx: 3.27
+  dx: 2.54
   dy: 1.1547dx
   # Space around keys and fillet radius
   kx: 0.54/2
@@ -17,8 +17,10 @@ units:
   ry: 1.1547rx
   # Trackball diameter
   d_ball: 34
-  # MCU vertical offset
+  # MCU vertical offset from top row key center
   mcu_top: hy/3 + dy/2
+  # Space for mounting HW near main PCB rear
+  mount_width: 6
 
 points:
   zones:
@@ -292,17 +294,49 @@ outlines:
       what: rectangle
       where:
         ref: f_c0_r3
-        shift: [9hx/2+dx/2, mcu_top-4hy/3 + mx+kx]
+        shift: [9hx/2+dx/2, mcu_top-4hy/3 + mx]
       size: [4hx+dx, 8hy/3]
       operation: add
       fillet: mx+kx+fk
+  _main_split_template:
+    $params: [mx, my]
+    poly:
+      what: polygon
+      points:
+        - ref: t_c3_r1
+          shift: [0, -2hy/3-my]
+        - ref: t_c3_r1
+          shift: [-2hx-mx, 2hy/3-my/2]
+        - ref: t_c3_r1
+          shift: [-2hx-mx, 4hy/3+dy-my/2]
+        - ref: f_c0_r2
+          shift: [-hx/2-mx, -hy-my/2]
+        - ref: f_c0_r2
+          shift: [-hx/2-mx, hy+my/2]
+        - ref: f_c0_r3
+          shift: [hx/2, hy+my]
+        - ref: f_c0_r3
+          shift: [3hx/2, hy/3+my]
+        - ref: f_c0_r3
+          shift: [5hx/2, hy+my]
+
+        - ref: f_c0_r3
+          shift: [7hx/2+mx, hy/3+my/2]
+        - shift: [0, -4hy/3-my]
+        - shift: [-2hx/2, -2hy/3]
+        - shift: [0, -6hy/3-dy+my]
+        - shift: [3hx/2, -3hy/3]
+        - shift: [0, -2hy/3-my]
+  _main_split:
+    $extends: outlines._main_split_template
+    $args: [0, 0]
   _main_internal:
     $extends: outlines._main_template
-    $args: [-kx, -ky]
-  main_padded:
+    $args: [0, 0]
+  _main_padded:
     $extends: outlines._main_template
     $args: [kx, ky]
-  main_external:
+  _main_external:
     $extends: outlines._main_template
     $args: [mx, my]
   _raised_template:
@@ -311,14 +345,16 @@ outlines:
       what: polygon
       points:
         - ref: t_c3_r1
-          shift: [hx+dx/2, -dy/4+ry+my]
-        - shift: [-hx-dx/2-rx, 2hy/3+dy/4-ry/2]
+          shift: [hx+dx/2, -dy/4-(ry)+my]
+        - shift: [-hx-dx/2-kx, 2hy/3+dy/4+ky/2]
         - shift: [0, -my]
-        - shift: [-hx+rx, -2hy/3+ry/2]
-        - shift: [-hx+rx, 2hy/3-ry/2]
-        - shift: [0, 2hy/3-ry]
-        - shift: [hx/2, hy/3]
-        - shift: [0, 2hy/3+dy]
+        - shift: [-hx/2, -hy/3]
+        - shift: [0, -ky]
+        - shift: [-hx/2+kx, -hy/3+ky/2]
+        - shift: [-hx-(rx), 2hy/3+(ry)/2]
+        - shift: [0, 2hy/3+(ry)]
+        - shift: [hx/2+kx, hy/3+ky/2]
+        - shift: [0, 2hy/3+dy-ky]
         - shift: [hx/2, hy/3]
         - shift: [0, 2hy/3]
         - shift: [hx/2, hy/3]
@@ -326,37 +362,39 @@ outlines:
 
         # Extended center to mount controller
         - shift: [hx/2, hy/3]
-        - shift: [0, hy/3+ry/2-rx+mcu_top]
-        - shift: [2hx+dx-2(rx), 0]
-        - shift: [0, -hy/3-ry/2+rx-mcu_top]
+        - shift: [0, hy/3-(ry)/2+ky/2+(rx)+mcu_top]
+        - shift: [2hx+dx+2(rx)-2kx, 0]
+        - shift: [0, -hy/3+(ry)/2-ky/2-(rx)-mcu_top]
         - shift: [hx/2, -hy/3]
 
         # Fitted center for controller on the main PCB
-        #- shift: [hx/2-rx, hy/3-ry/2]
-        #- shift: [hx/2-rx, -hy/3+ry/2]
+        #- shift: [hx/2+rx, hy/3+ry/2]
+        #- shift: [hx/2+rx, -hy/3-ry/2]
         #- shift: [0, -2hy/3]
-        #- shift: [hx/2+dx/2+rx, -hy/3-dy/4-ry/2]
+        #- shift: [hx/2+dx/2-rx, -hy/3-dy/4+ry/2]
 
-        #- shift: [hx/2+dx/2+rx, hy/3+dy/4+ry/2]
+        #- shift: [hx/2+dx/2-rx, hy/3+dy/4-ry/2]
         #- shift: [0, 2hy/3]
-        #- shift: [hx/2-rx, hy/3-ry/2]
-        #- shift: [hx/2-rx, -hy/3+ry/2]
+        #- shift: [hx/2+rx, hy/3+ry/2]
+        #- shift: [hx/2+rx, -hy/3-ry/2]
         # End center
 
         - shift: [0, -2hy/3]
         - shift: [hx/2, -hy/3]
         - shift: [0, -2hy/3]
         - shift: [hx/2, -hy/3]
-        - shift: [0, -2hy/3-dy]
-        - shift: [hx/2, -hy/3]
-        - shift: [0, -2hy/3+ry]
-        - shift: [-hx+rx, -2hy/3+ry/2]
-        - shift: [-hx+rx, 2hy/3-ry/2]
+        - shift: [0, -2hy/3-dy+ky]
+        - shift: [hx/2+kx, -hy/3-ky/2]
+        - shift: [0, -2hy/3-(ry)]
+        - shift: [-hx-(rx), -2hy/3-(ry)/2]
+        - shift: [-hx/2+kx, hy/3-ky/2]
+        - shift: [0, ky]
+        - shift: [-hx/2, hy/3]
         - shift: [0, my]
-      fillet: fk+kx-rx
+      fillet: fk+(rx)
   _raised:
     $extends: outlines._raised_template
-    $args: [kx, ky]
+    $args: [0, 0]
 
   _hexagon_template:
     $params: [kx, ky]
@@ -369,19 +407,33 @@ outlines:
         - shift: [hx/2-(kx), -hy/3+(ky)/2]
         - shift: [0, -2.0hy/3+(ky)]
         - shift: [-hx/2+(kx), -hy/3+(ky)/2]
+  _half_hex_template:
+    $params: [kx, ky]
+    poly:
+      what: polygon
+      points:
+        - shift: [-hx/2+(kx), -hy/3+(ky)/2]
+        - shift: [0, 2.0hy/3-(ky)]
+        - shift: [(hx-(kx))/2, -hy/3+(ky)/2]
+        - shift: [(hx-(kx))/2,  hy/3-(ky)/2]
+        - shift: [0, -2.0hy/3+(ky)]
+        - shift: [-hx/2+(kx), -hy/3+(ky)/2]
   _key_hexagon:
     $extends: outlines._hexagon_template
     $args: [kx, ky]
   _nibble_hexagon:
     $extends: outlines._hexagon_template
-    $args: [-kx, -ky]
-  _hole_hexagon:
+    $args: [0, 0]
+  _nibble_half_hex:
+    $extends: outlines._half_hex_template
+    $args: [0, 0]
+  _key_slot_hexagon:
     $extends: outlines._hexagon_template
-    $args: [mx, my]
+    $args: [-kx, -ky]
   _rounded_nibble:
     - what: outline
       name: _nibble_hexagon
-      fillet: fk+2kx
+      fillet: fk+kx
   _hexkey:
     - what: outline
       name: _key_hexagon
@@ -413,12 +465,28 @@ outlines:
       fillet: 0.6
   _mcu_cutout:
     - what: rectangle
-      size: [17.78 + 1, 33.02 + 1]
+      size: [17.78 + 4kx, 33.02 + 4kx]
       where:
         ref: f_c0_r3
         shift: [9hx/2+dx/2, mcu_top-16.51]
-      fillet: 0.5
+      fillet: 2kx
+  _mounting_cutout:
+    - what: rectangle
+      size: [2hx + dx + 2kx, 2mount_width]
+      where:
+        ref: f_c0_r3
+        shift: [9hx/2+dx/2, mcu_top]
+    - what: outline
+      name: _mcu_cutout
+      operation: subtract
+      fillet: mount_width/2
   _main_cutouts:
+    - what: rectangle
+      size: [2hx + dx + 2kx, 2mount_width]
+      where:
+        ref: f_c0_r3
+        shift: [9hx/2+dx/2, mcu_top]
+      fillet: mount_width/2
     - what: outline
       name: _mcu_cutout
   _trackball:
@@ -427,13 +495,13 @@ outlines:
         ref: t_c2_r1
         shift: [1.5hx + dx/2, -dy/2]
       radius: d_ball/2
-  _trackball_cutout:
+  _trackball_deck_cutout:
     - what: circle
       where:
         ref: t_c2_r1
         shift: [1.5hx + dx/2, -dy/2]
       radius: d_ball/2 + 2kx
-  _trackball_holder_cutout:
+  _trackball_raised_cutout:
     - what: polygon
       points:
       - ref: t_c3_r1
@@ -451,21 +519,23 @@ outlines:
       - shift: [-hx/2, -hy/3]
       - shift: [0, -hy]
   _trackball_main_cutout:
-    - what: outline
-      name: _trackball_holder_cutout
     - what: polygon
       points:
-      - ref: t_c2_r1
-        shift: [hx/2 - kx, dy + ky]
+      - ref: t_c3_r1
+        shift: [hx/2 - kx, -2hy/3 + ky]
       - shift: [0, hy]
+      - shift: [-hx/2, hy/3]
+      - shift: [0, 4hy/3 + dy]
       - shift: [hx + dx/2 + kx, 2hy/3 + dy/4 + ky/2]
       - shift: [hx + dx/2 + kx, -2hy/3 - dy/4 - ky/2]
+      - shift: [0, -4hy/3 - dy]
+      - shift: [-hx/2, -hy/3]
       - shift: [0, -hy]
       operation: add
-  raised_padded:
+  _raised_padded:
     $extends: outlines._raised_template
-    $args: [-kx, -ky]
-  raised_external:
+    $args: [kx, ky]
+  _raised_external:
     - what: polygon
       points:
         - ref: t_c3_r1
@@ -504,32 +574,6 @@ outlines:
       asym: both
       operation: subtract
       fillet: my/2
-  main_key_slots:
-    - what: outline
-      name: _nibble_hexagon
-      where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
-              z2_c1_r2, z2_c2_r2, z2_c3_r2,
-              z1_c1_r1, z1_c2_r1, z1_c3_r1,
-              z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
-      asym: both
-      fillet: fk+2kx
-  _deck_holes:
-    - what: outline
-      name: _hole_hexagon
-      where: [f_c4_r3, f_c5_r3,
-              f_c4_r2, f_c5_r2,
-              f_c4_r1]
-      adjust:
-        shift: [dx/2, -dy/2]
-      asym: both
-    - what: outline
-      name: _hole_hexagon
-      where: [t_c2_r1, t_c1_r1]
-      adjust:
-        shift: [dx/2, dy/2]
-      asym: both
-      fillet: 2
-      operation: add
 
   main_pcb:
     - what: outline
@@ -560,11 +604,14 @@ outlines:
               z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
       asym: both
       operation: subtract
+    - what: outline
+      name: _mounting_cutout
+      operation: subtract
   _main_deck:
     - what: outline
-      name: main_external
+      name: _main_external
     - what: outline
-      name: _nibble_hexagon
+      name: _key_slot_hexagon
       where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
               z2_c1_r2, z2_c2_r2, z2_c3_r2,
               z1_c1_r1, z1_c2_r1, z1_c3_r1,
@@ -573,20 +620,32 @@ outlines:
       fillet: fk+2kx
       operation: subtract
     - what: outline
-      name: raised_padded
+      name: _raised_padded
       operation: subtract
-    #- what: outline
-    #  name: _deck_holes
-    #  operation: subtract
-    #- what: outline
-    #  name: _trackball_cutout
-    #  operation: subtract
+    - what: outline
+      name: _trackball_deck_cutout
+      operation: subtract
     - what: outline
       name: _mcu_cutout
       operation: subtract
   main_plate:
     - what: outline
       name: _main_internal
+    - what: outline
+      name: _nibble_hexagon
+      where: [f_c0_r3]
+      asym: both
+      adjust:
+        shift: [-hx, 0]
+      operation: subtract
+      fillet: fk+kx
+    - what: outline
+      name: _nibble_half_hex
+      where: [f_c3_r0, t_c3_r1]
+      asym: both
+      adjust:
+        shift: [-hx, 0]
+      operation: subtract
     - what: outline
       name: _trackball_main_cutout
       operation: subtract
@@ -599,18 +658,42 @@ outlines:
               z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
       asym: both
       operation: subtract
-#    - what: outline
-#      name: _deck_holes
-#      operation: subtract
     - what: outline
-      name: _mcu_cutout
+      name: _main_cutouts
+      operation: subtract
+  main_split_plate:
+    - what: outline
+      name: _main_split
+    - what: outline
+      name: _nibble_hexagon
+      where: [f_c0_r3]
+      asym: left
+      adjust:
+        shift: [-hx, 0]
+      operation: subtract
+    - what: outline
+      name: _nibble_half_hex
+      where: [f_c3_r0, t_c3_r1]
+      asym: left
+      adjust:
+        shift: [-hx, 0]
+      operation: subtract
+      fillet: fk+kx
+    - what: outline
+      name: _switch_cutout1
+      where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
+              z2_c1_r2, z2_c2_r2, z2_c3_r2,
+              z1_c1_r1, z1_c2_r1, z1_c3_r1,
+              z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
+      asym: left
       operation: subtract
   raised_pcb:
     - what: outline
       name: _raised
     - what: outline
-      name: _trackball_holder_cutout
+      name: _trackball_raised_cutout
       operation: subtract
+      fillet: fk
     - what: rectangle
       size: [3hx, 4hy/3+kx]
       where:
@@ -624,7 +707,7 @@ outlines:
       adjust:
         shift: [-hx, 0]
       operation: subtract
-      fillet: fk
+      fillet: fk+kx
     - what: outline
       name: _rgb_cutout
       where: [z3_c4_r3, z3_c5_r3,
@@ -636,9 +719,9 @@ outlines:
     - what: outline
       name: _mcu_cutout
       operation: subtract
-  raised_key_slots:
+  _raised_key_slots:
     - what: outline
-      name: _nibble_hexagon
+      name: _key_slot_hexagon
       where: [z3_c3_r3, z3_c4_r3, z3_c5_r3,
               z2_c3_r2, z2_c4_r2, z2_c5_r2,
               z1_c3_r1, z1_c4_r1, z1_c5_r1,
@@ -647,19 +730,19 @@ outlines:
       fillet: fk+2kx
   _raised_deck:
     - what: outline
-      name: raised_external
+      name: _raised_external
     - what: outline
-      name: raised_key_slots
+      name: _raised_key_slots
       operation: subtract
     - what: outline
-      name: _trackball_cutout
+      name: _trackball_deck_cutout
       operation: subtract
 
   raised_plate:
     - what: outline
       name: _raised
     - what: outline
-      name: _trackball_holder_cutout
+      name: _trackball_raised_cutout
       operation: subtract
       fillet: fk
     - what: outline
@@ -676,9 +759,9 @@ outlines:
 
   composite_plates:
     - what: outline
-      name: main_external
+      name: _main_external
     - what: outline
-      name: main_padded
+      name: _main_padded
       operation: stack
     - what: outline
       name: main_pcb
@@ -710,10 +793,12 @@ outlines:
     - what: outline
       name: _main_deck
     - what: outline
-      name: _raised
-      operation: add
-    - what: outline
       name: _raised_deck
+      operation: stack
+      adjust:
+        shift: [0, 0.05]
+    - what: outline
+      name: _raised_padded
       operation: stack
       adjust:
         shift: [0, 0.05]
@@ -725,8 +810,6 @@ outlines:
               z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c4_r0, z0_c5_r0]
       asym: both
       operation: stack
-      adjust:
-        shift: [0, 0.05]
     - what: outline
       name: _trackball
       operation: stack
