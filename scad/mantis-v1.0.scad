@@ -42,7 +42,9 @@ main_switch_z = main_pcb_z + pcb_thickness;
 raised_plate_z = 17.4;  // [1:0.1:30]
 raised_pcb_z = 15.2;    // [1:0.1:30]
 raised_switch_z = raised_pcb_z + pcb_thickness;
-bump_height = 1;        // [0.5:0.1:5]
+bump_recess = 1.0;      // [0:0.1:2]
+bump_diameter = 7.0;    // [1:0.1:12]
+bump_height = 1.5;      // [0:0.1:5]
 bearing_size = 2.5;     // [1:0.1:5]
 
 // Some derived dimensions for the gaskets
@@ -459,6 +461,14 @@ module main_gasket_pads() intersection() {
     }
     main_extrusion(main_height, s_pcb - 0.1, f_key + s_key - 0.1, 0, variant=1);
 }
+bump_positions = [
+    [-4.00*hx - dx/2, 11*hy/3     ],
+    [ 4.00*hx + dx/2, 11*hy/3     ],
+    [-5.25*hx - dx/2,  7*hy/6     ],
+    [ 5.25*hx + dx/2,  7*hy/6     ],
+    [-2.00*hx - dx/2, -5*hy/3 - dy],
+    [ 2.00*hx + dx/2, -5*hy/3 - dy]
+];
 module base_plate() difference() {
     ca = render_case ? 0 : case_alpha;
     color(base_color, alpha=ca) union() {
@@ -468,6 +478,9 @@ module base_plate() difference() {
     for (p = mounting_points_main)
         translate([p.x, p.y, 0])
             countersunk_screw(base_thickness + 0.1, 0.1);
+    for (p = bump_positions)
+        translate(p)
+            cylinder(h = bump_recess*2, d = bump_diameter, center = true);
 }
 module case() union() {
     ca = render_case ? 0 : case_alpha;
@@ -496,6 +509,15 @@ module case() union() {
                     cylinder(h = h_raised, d = bore_diameter);
         }
     }
+}
+module bump() union() {
+    diameter = bump_diameter - 1.0;
+    $fa = fa_from_fs(diameter/2);
+    translate([0, 0, -bump_height/2 - 0.01])
+        cylinder(h = bump_height/2, d = diameter);
+    translate([0, 0, -bump_height/2])
+        scale([1, 1, bump_height/diameter])
+        rotate([0, 0, 90 + $fa/2]) half_sphere(diameter/2);
 }
 
 module main_pcb() color(pcb_color)
@@ -735,6 +757,10 @@ module keyboard() {
                 base_plate();
         else
             base_plate();
+
+        for (p = bump_positions)
+            color("white", alpha=0.2)
+                translate([p.x, p.y, bump_recess - 0.5*ex]) bump();
     }
 
     if (show_case) {
@@ -747,26 +773,27 @@ module keyboard() {
 }
 
 if (show_desk) {
-    color(desk_color) rotate([0, 0, -5]) translate([-300, -100, -20 - bump_height])
+    elevation = max(0, bump_height - bump_recess);
+    color(desk_color) rotate([0, 0, -5]) translate([-300, -100, -20 - elevation])
         cube([600, 350, 20]);
     // Approximate shadow to give a sense of the distance from the desk surface:
     // 1. Core shadow slightly smaller than the outline
-    o = (show_case ? s_pcb + wall_thickness : 0) - bump_height;
-    f = (show_case ? f_key + s_key + wall_thickness : f_key + s_pcb) - bump_height;
+    o = (show_case ? s_pcb + wall_thickness : 0) - elevation;
+    f = (show_case ? f_key + s_key + wall_thickness : f_key + s_pcb) - elevation;
     if (show_case) {
-        color("black", alpha=0.5) translate([0, 0, -bump_height - 0.49])
-            main_offset_fillet(s_pcb + wall_thickness - bump_height,
-                               f_key + s_key + wall_thickness + bump_height,
-                               f_key + s_key + wall_thickness + bump_height);
+        color("black", alpha=0.5) translate([0, 0, -elevation - 0.49])
+            main_offset_fillet(s_pcb + wall_thickness - elevation,
+                               f_key + s_key + wall_thickness + elevation,
+                               f_key + s_key + wall_thickness + elevation);
     } else if (show_pcb || show_plate) {
-        color("black", alpha=0.3) translate([0, 0, -bump_height - 0.49])
-            main_offset_fillet(-main_pcb_z - bump_height,
-                               f_key + s_pcb + main_pcb_z + bump_height,
-                               f_key + s_pcb + main_pcb_z + bump_height);
+        color("black", alpha=0.3) translate([0, 0, -elevation - 0.49])
+            main_offset_fillet(-main_pcb_z - elevation,
+                               f_key + s_pcb + main_pcb_z + elevation,
+                               f_key + s_pcb + main_pcb_z + elevation);
     }
     // 2. Partial shadow of the main body, raised part and trackball
-    shadow_width = 2.5 + bump_height/4;
-    color("black", alpha=0.2) translate([0, 0, -bump_height - 0.48])
+    shadow_width = 2.5 + elevation/4;
+    color("black", alpha=0.2) translate([0, 0, -elevation - 0.48])
             render(convexity=10) union() {
         o = (show_case ? s_pcb + wall_thickness : 0) + shadow_width;
         f = (show_case ? f_key + s_key + wall_thickness : f_key + s_pcb) + shadow_width;
@@ -784,4 +811,4 @@ if (show_desk) {
     }
 }
 
-keyboard();
+translate([0, 0, $explode]) keyboard();

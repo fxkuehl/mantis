@@ -46,12 +46,13 @@ jobs="$jobs $!"
 
 echo "Bottom-up view ..."
 openscad $params --camera=0,8,0,180,0,180,400 --imgsize=$sizeW \
-	-D case_alpha=0.2 -D show_desk=false -o "$dir/mantis_bottom.png" $scad &
+	-D case_alpha=0.2 -D show_desk=false --projection=ortho \
+	-o "$dir/mantis_bottom.png" $scad &
 jobs="$jobs $!"
 
 echo "Exploded view ..."
-openscad $params --camera=5,30,220,65,0,15,1250 --imgsize=$sizeP \
-	-D show_desk=false -D \$explode=60 --projection=ortho \
+openscad $params --camera=5,30,270,65,0,15,1300 --imgsize=$sizeP \
+	-D \$explode=60 --projection=ortho \
 	-o "$dir/mantis_exploded.png" $scad &
 jobs="$jobs $!"
 
