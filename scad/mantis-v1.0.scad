@@ -45,6 +45,11 @@ raised_switch_z = raised_pcb_z + pcb_thickness;
 bump_height = 1;        // [0.5:0.1:5]
 bearing_size = 2.5;     // [1:0.1:5]
 
+// Some derived dimensions for the gaskets
+gasket_thickness = main_height - deck_thickness -
+                  (main_plate_z + plate_thickness);
+gasket_pad_thickness = main_plate_z - gasket_thickness - base_thickness;
+
 /* [Mounting points dimensions in mm] */
 // Default for M2 threaded insert
 bore_diameter = 2.7; // [1.5:0.1:6]
@@ -327,9 +332,6 @@ color("lime") translate([0, 0, main_height+raised_height])
     raised_offset_fillet(0, 0, 0);
 */
 
-module gasket_pads(height) {
-}
-
 module countersunk_screw(length, offset) {
     head_radius = head_diameter/2 + 2*offset*sqrt(2);
     bolt_radius = bolt_diameter/2 + offset;
@@ -427,10 +429,30 @@ module base_plate_base(offset)
         main_extrusion(base_thickness + 2*offset,
                        s_pcb + wall_thickness/2 + offset,
                        f_key + s_key + wall_thickness/2 + offset, 0);
-
+module main_gasket_pads() intersection() {
+    translate([0, 0, base_thickness - 0.01])
+        linear_extrude(gasket_pad_thickness, convexity=10)
+        offset(r = f_key + s_key) offset(delta = -f_key - s_key - s_pcb)
+        union() {
+        translate([-4.0*hx -  dx/2, 4*hy      ]) hex_outline();
+        translate([ 4.0*hx +  dx/2, 4*hy      ]) hex_outline();
+        translate([-2.0*hx -  dx/2, 4*hy      ]) hex_outline();
+        translate([ 2.0*hx +  dx/2, 4*hy      ]) hex_outline();
+        translate([-5.5*hx -  dx/2, 1*hy      ]) hex_outline();
+        translate([ 5.5*hx +  dx/2, 1*hy      ]) hex_outline();
+        translate([-4.0*hx -  dx/2,          0]) hex_outline();
+        translate([ 4.0*hx +  dx/2,          0]) hex_outline();
+        translate([-2.0*hx -  dx/2, -2*hy - dy]) hex_outline();
+        translate([ 2.0*hx +  dx/2, -2*hy - dy]) hex_outline();
+    }
+    main_extrusion(main_height, s_pcb - 0.1, f_key + s_key - 0.1, 0, variant=1);
+}
 module base_plate() difference() {
     ca = render_case ? 0 : case_alpha;
-    color(base_color, alpha=ca) base_plate_base(0);
+    color(base_color, alpha=ca) union() {
+        base_plate_base(0);
+        main_gasket_pads();
+    }
     for (p = mounting_points_main)
         translate([p.x, p.y, 0])
             countersunk_screw(base_thickness + 0.1, 0.1);
@@ -514,17 +536,28 @@ module sensor() {
     color("#ffffff", 0.3) lens(0);
 }
 
+module raised_gasket_pads()
+    translate([0, 0, main_height - deck_thickness + base_thickness - 0.01])
+        linear_extrude(gasket_pad_thickness, convexity=10)
+        offset(r = f_key + s_key) offset(delta = -f_key - s_key - s_pcb)
+        union() {
+        translate([-2*hx -  dx/2, -2*hy - dy]) hex_outline();
+        translate([ 2*hx +  dx/2, -2*hy - dy]) hex_outline();
+        translate([0, 3*hy + hy/6]) square([2*hx + dx, hy], center=true);
+    }
 module mezzanine(offset) {
     ca = render_case ? 0 : case_alpha;
     difference() {
-        color(mezzanine_color, alpha=ca)
+        color(mezzanine_color, alpha=ca) union() {
             translate([0, 0, main_height - deck_thickness])
-            raised_extrusion(base_thickness,
-                             s_pcb - offset, f_key + s_key - offset, 0);
+                raised_extrusion(base_thickness,
+                                 s_pcb - offset, f_key + s_key - offset, 0);
+            raised_gasket_pads();
+        }
         translate([0, 0, main_height - deck_thickness - 0.01])
-            main_key_slots(base_thickness + 0.02);
+            main_key_slots(base_thickness + gasket_pad_thickness + 0.02);
         translate([0, 0, main_height - deck_thickness - 0.01])
-            mcu(base_thickness + 0.02, spacing);
+            mcu(base_thickness + gasket_pad_thickness + 0.02, spacing);
 
         for(p = mounting_points_raised)
             translate([p.x, p.y, main_height - deck_thickness])
