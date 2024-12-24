@@ -380,25 +380,35 @@ module trackball_frame(h, oo, oi, f) difference() {
         [   hx   + dx/2, -4 * hy/3 - dy],
         [   hx/2 + dx/2, -5 * hy/3 - dy]
     ]);
-    intersection() {
-        translate([trackball_position.x, trackball_position.y, -0.01]) union() {
-            cylinder(h + 0.02,
-                     r = trackball_radius + s_key + wall_thickness + 0.1 - oi);
-            translate([0, 0, h/2 + 0.01])
-                cube([2*hx + dx + 2*oo - 2*oi - 2*post_diameter,
-                     trackball_diameter, h + 0.02], center = true);
-        }
-        translate([0, mcu_top - 6, -base_thickness]) rotate([-90, 0, 90])
-            rotate_extrude(angle=12, convexity=10) rotate([0, 0, -90])
-            translate([0, -mcu_top + 6])
-            offset(r = f) offset(delta = s_pcb - oi - f) intersection() {
-                raised_outline();
-                translate([0, -3*hy - dy])
-                    square([3*hx + dx, 6*hy + dy], center = true);
-            }
+    translate([trackball_position.x, trackball_position.y, -0.01]) union() {
+        cylinder(h + 0.02,
+                 r = trackball_radius + s_key + wall_thickness + 0.1 - oi);
+        translate([0, 0, h/2 + 0.01])
+            cube([2*hx + dx + 2*oo - 2*oi - 2*post_diameter,
+                 trackball_diameter, h + 0.02], center = true);
     }
 }
 //translate([0, 0, 100]) trackball_frame(raised_height, -s_key/2, 0, f_key + s_key);
+// Circular cut of the front of the top case-inside to allow pivoting
+// installation of the mezzanine and trackball holder with the pivot being
+// the rear mounting point for the base plate that the mezzanine ends up
+// resting upon. This is created from a rotate-extrusion of the raised
+// outline.
+module pivot_installation_cut(width, o, fxy) difference() {
+    height = raised_height + deck_thickness;
+    translate([0, -5*hy/3 - dy, main_height - deck_thickness + height/2 - 0.01])
+        cube([width, hy, height], center=true);
+
+    translate([0, mcu_top - 6, main_height - deck_thickness - 0.02])
+        rotate([-90, 0, 90]) rotate_extrude(angle=12, convexity=10)
+        rotate([0, 0, -90]) translate([0, -mcu_top + 6])
+        intersection() {
+            raised_offset_fillet(o, fxy, fxy);
+            translate([0, -3*hy - dy])
+                square([7*hx + dx, 6*hy + dy], center = true);
+        }
+}
+//translate([0, 0, 0]) pivot_installation_cut(7*hx + dx, s_pcb, f_key + s_key);
 module case_inside(offset) difference() {
     union() {
         translate([0, 0, base_thickness + offset/2])
@@ -411,8 +421,10 @@ module case_inside(offset) difference() {
     translate([0, 0,
                main_height - deck_thickness + base_thickness + 0.11 - offset])
         trackball_frame(raised_height, -s_key/2, offset, f_key + s_key);
+    width = offset ? 7*hx + dx : 2*hx + dx;
+    pivot_installation_cut(width, s_pcb - offset, f_key + s_key - offset);
 }
-//translate([0, 0, 50]) case_inside(0);
+//translate([0, 0, 50]) case_inside(0.1);
 module case_outside() {
     union() {
         main_extrusion(main_height,
