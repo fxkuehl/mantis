@@ -442,11 +442,14 @@ module case_outside() {
                              f_key + s_key + wall_thickness, r_edge);
     }
 }
-module base_plate_base(oh, ov)
-    translate([0, 0, -ov])
-        main_extrusion(base_thickness + 2*ov,
+module base_plate_base(oh, ov) intersection() {
+    translate([0, 0, -ov - 0.01])
+        main_extrusion(base_thickness + 2*ov + 0.01,
                        s_pcb + wall_thickness/2 + oh,
-                       f_key + s_key + wall_thickness/2 + oh, 0);
+                       f_key + s_key + wall_thickness + oh, 0);
+    if (!ov)
+        case_outside();
+}
 module main_gasket_pads() intersection() {
     translate([0, 0, base_thickness - vfit])
         linear_extrude(gasket_pad_thickness, convexity=10)
