@@ -635,9 +635,10 @@ module trackball_holder() intersection() {
                     }
                 }
                 w = 2*hx + dx;
+                h = 12;
                 translate(trackball_position) rotate([60, 0, 0])
-                    translate([-w/2, -10, -trackball_radius - 10])
-                    cube([w, 20, 10 - 2.4 + vfit], center=false);
+                    translate([-w/2, -h, -trackball_radius - h])
+                    cube([w, 20, h - 2.4 + vfit], center=false);
             }
             color(mezzanine_color, alpha=ca)
                 translate(trackball_position) rotate([60, 0, 0])
