@@ -353,6 +353,11 @@ module countersunk_screw(length, offset) {
     }
 }
 
+module usb_port_template(o, depth, height=0.6) {
+    rotate([90, 0, 0]) linear_extrude(depth) offset(r = o)
+        square([6.69, height], center = true);
+}
+
 mounting_points_main = [
     [-5.33*hx - dx/2, 8.67*hy/3],
     [ 5.33*hx + dx/2, 8.67*hy/3],
@@ -505,6 +510,13 @@ module case() union() {
             translate(trackball_position)
                 corr_sphere(trackball_radius + spacing);
 
+            usb_height = 0.6 + 1.5;
+            usb_offset = 1.255 + 2.5;
+            translate([0, mcu_top + s_pcb + wall_thickness + 0.1,
+                       main_height + raised_height - deck_thickness
+                       - usb_height/2 - usb_offset])
+                usb_port_template(usb_offset, wall_thickness + 0.2, usb_height);
+
             /* Mounting holes */
             h_main = main_height - base_thickness - deck_thickness;
             for (p = mounting_points_main)
@@ -538,9 +550,63 @@ module main_plate() color(plate_color)
 module raised_plate() color(plate_color)
     flat_extrusion("outlines/raised_plate.dxf", plate_thickness);
 
+module female_header(height, pin_l, n) {
+    pitch = 2.54;
+    pin_w = 0.4;
+    w = 2.5;
+    pad = 0.25;
+    color("#303030") difference() {
+        translate([-w/2, -pitch/2 - pad, 0])
+            cube([w, pitch*n + 2*pad, height]);
+        for (i = [0:n-1])
+            translate([-0.5, i*pitch - 0.5, 1]) cube([1, 1, height]);
+    }
+    for (i = [0:n-1])
+        translate([-pin_w/2, i*pitch - pin_w/2, -pin_l]) color("gold")
+            cube([pin_w, pin_w, pin_l + 0.5]);
+}
+module male_header(height, pin_l1, pin_l2, n) {
+    pitch = 2.54;
+    pin_w = 0.64;
+    w = 2.5;
+    color("#303030") difference() {
+        translate([-w/2, -pitch/2, 0]) cube([w, pitch*n, height]);
+        for (i = [0:n]) {
+            translate([-w, (i-0.5)*pitch, 0])
+                rotate([0, 0, 45]) translate([-w/2, -w/2, -0.1])
+                cube([w, w, height+0.2]);
+            translate([w, (i-0.5)*pitch, 0])
+                rotate([0, 0, 45]) translate([-w/2, -w/2, -0.1])
+                cube([w, w, height+0.2]);
+        }
+    }
+    for (i = [0:n-1])
+        translate([-pin_w/2, i*pitch - pin_w/2, -pin_l1]) color("gold")
+            cube([pin_w, pin_w, pin_l1 + height + pin_l2]);
+}
+module usb_port(depth) union() {
+    difference() {
+        color("lightgrey") usb_port_template(1.255, 10.5);
+        translate([0, 0.1, 0]) usb_port_template(1.155, 10.5);
+    }
+    color("#303030") translate([0, 0.05, 0]) usb_port_template(0, 10.4);
+}
+
 module mcu(height, offset)
     translate([0, mcu_y, 0]) linear_extrude(height) offset(r=offset)
         square(mcu_size, center=true);
+
+module controller() {
+    ex = $explode;
+    y0 = -2.54*6;
+    translate([-7.62, y0, 0]) female_header(8.39, 3.2, 12);
+    translate([ 7.62, y0, 0]) female_header(8.39, 3.2, 12);
+    translate([-7.62, y0, 8.4 + 1*ex]) male_header(2.49, 6, 3, 12);
+    translate([ 7.62, y0, 8.4 + 1*ex]) male_header(2.49, 6, 3, 12);
+    color(pcb_color) translate([-mcu_size.x/2, -mcu_size.y/2, 10.9 + ex])
+        cube([mcu_size.x, mcu_size.y, 1.6]);
+    translate([0, mcu_size.y/2, 10.9 + ex - 1.6]) usb_port(10.5);
+}
 
 module lens(offset) {
     translate([-8.25/2 - offset, -5.48 - offset, -5.95 - 2.4])
@@ -688,6 +754,7 @@ module keyboard() {
     if (show_pcb) {
         translate([0, 0, main_pcb_z + 1*ex]) main_pcb();
         translate([0, 0, raised_pcb_z + 4*ex]) raised_pcb();
+        translate([0, mcu_y, main_pcb_z + pcb_thickness +1*ex]) controller();
     }
 
     if (show_plate) {
