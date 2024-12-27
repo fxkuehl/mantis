@@ -46,6 +46,10 @@ bump_recess = 1.0;      // [0:0.1:2]
 bump_diameter = 7.0;    // [1:0.1:12]
 bump_height = 1.5;      // [0:0.1:5]
 bearing_size = 2.5;     // [1:0.1:5]
+// Horizontal fit tolerance
+hfit = 0.1; // [0.01:0.01:0.2]
+// Vertical fit tolerance
+vfit = 0.01; // [0.01:0.01:0.2]
 
 // Some derived dimensions for the gaskets
 gasket_thickness = main_height - deck_thickness -
@@ -411,22 +415,22 @@ module pivot_installation_cut(width, o, fxy) difference() {
         }
 }
 //translate([0, 0, 0]) pivot_installation_cut(7*hx + dx, s_pcb, f_key + s_key);
-module case_inside(offset) difference() {
+module case_inside(oh, ov) difference() {
     union() {
-        translate([0, 0, base_thickness + offset/2])
-            main_extrusion(main_height-base_thickness-deck_thickness - offset,
-                           s_pcb - offset, f_key + s_key - offset, 0, 1);
-        translate([0, 0, main_height - deck_thickness - offset/2 - 0.01])
+        translate([0, 0, base_thickness + ov])
+            main_extrusion(main_height-base_thickness-deck_thickness - 2*ov,
+                           s_pcb - oh, f_key + s_key - oh, 0, 1);
+        translate([0, 0, main_height - deck_thickness - ov - 0.01])
             raised_extrusion(raised_height + 0.01,
-                             s_pcb - offset, f_key + s_key - offset, 0);
+                             s_pcb - oh, f_key + s_key - oh, 0);
     }
     translate([0, 0,
-               main_height - deck_thickness + base_thickness + 0.11 - offset])
-        trackball_frame(raised_height, -s_key/2, offset, f_key + s_key);
-    width = offset ? 7*hx + dx : 2*hx + dx;
-    pivot_installation_cut(width, s_pcb - offset, f_key + s_key - offset);
+               main_height - deck_thickness + base_thickness + vfit])
+        trackball_frame(raised_height, -s_key/2, oh, f_key + s_key);
+    width = oh ? 7*hx + dx : 2*hx + dx;
+    pivot_installation_cut(width, s_pcb - oh, f_key + s_key - oh);
 }
-//translate([0, 0, 50]) case_inside(0.1);
+//translate([0, 0, 50]) case_inside(hfit, vfit);
 module case_outside() {
     union() {
         main_extrusion(main_height,
@@ -438,13 +442,13 @@ module case_outside() {
                              f_key + s_key + wall_thickness, r_edge);
     }
 }
-module base_plate_base(offset)
-    translate([0, 0, -offset])
-        main_extrusion(base_thickness + 2*offset,
-                       s_pcb + wall_thickness/2 + offset,
-                       f_key + s_key + wall_thickness/2 + offset, 0);
+module base_plate_base(oh, ov)
+    translate([0, 0, -ov])
+        main_extrusion(base_thickness + 2*ov,
+                       s_pcb + wall_thickness/2 + oh,
+                       f_key + s_key + wall_thickness/2 + oh, 0);
 module main_gasket_pads() intersection() {
-    translate([0, 0, base_thickness - 0.01])
+    translate([0, 0, base_thickness - vfit])
         linear_extrude(gasket_pad_thickness, convexity=10)
         offset(r = f_key + s_key) offset(delta = -f_key - s_key - s_pcb)
         union() {
@@ -459,7 +463,8 @@ module main_gasket_pads() intersection() {
         translate([-2.0*hx -  dx/2, -2*hy - dy]) hex_outline();
         translate([ 2.0*hx +  dx/2, -2*hy - dy]) hex_outline();
     }
-    main_extrusion(main_height, s_pcb - 0.1, f_key + s_key - 0.1, 0, variant=1);
+    main_extrusion(main_height, s_pcb - hfit, f_key + s_key - hfit, 0,
+                   variant=1);
 }
 bump_positions = [
     [-4.00*hx - dx/2, 11*hy/3     ],
@@ -472,12 +477,12 @@ bump_positions = [
 module base_plate() difference() {
     ca = render_case ? 0 : case_alpha;
     color(base_color, alpha=ca) union() {
-        base_plate_base(0);
+        base_plate_base(0, 0);
         main_gasket_pads();
     }
     for (p = mounting_points_main)
         translate([p.x, p.y, 0])
-            countersunk_screw(base_thickness + 0.1, 0.1);
+            countersunk_screw(base_thickness, hfit);
     for (p = bump_positions)
         translate(p)
             cylinder(h = bump_recess*2, d = bump_diameter, center = true);
@@ -487,8 +492,8 @@ module case() union() {
     difference() {
         color(case_color, alpha=ca) case_outside();
         render(convexity=10) union() {
-            base_plate_base(0.1);
-            case_inside(0);
+            base_plate_base(hfit, vfit);
+            case_inside(0, 0);
             translate([0, 0, main_height - deck_thickness - 0.01])
                 main_key_slots(deck_thickness + 0.02);
             translate([0, 0, main_height - deck_thickness - 0.01])
@@ -505,7 +510,8 @@ module case() union() {
             h_raised = raised_height - base_thickness;
             for (p = mounting_points_raised)
                 translate([p.x, p.y,
-                           main_height - deck_thickness + base_thickness - 0.1])
+                           main_height - deck_thickness + base_thickness
+                           + vfit - 0.1])
                     cylinder(h = h_raised, d = bore_diameter);
         }
     }
@@ -571,7 +577,7 @@ module sensor() {
 }
 
 module raised_gasket_pads()
-    translate([0, 0, main_height - deck_thickness + base_thickness - 0.01])
+    translate([0, 0, main_height - deck_thickness + base_thickness - vfit])
         linear_extrude(gasket_pad_thickness, convexity=10)
         offset(r = f_key + s_key) offset(delta = -f_key - s_key - s_pcb)
         union() {
@@ -579,13 +585,13 @@ module raised_gasket_pads()
         translate([ 2*hx +  dx/2, -2*hy - dy]) hex_outline();
         translate([0, 3*hy + hy/6]) square([2*hx + dx, hy], center=true);
     }
-module mezzanine(offset) {
+module mezzanine() {
     ca = render_case ? 0 : case_alpha;
     difference() {
         color(mezzanine_color, alpha=ca) union() {
             translate([0, 0, main_height - deck_thickness])
                 raised_extrusion(base_thickness,
-                                 s_pcb - offset, f_key + s_key - offset, 0);
+                                 s_pcb, f_key + s_key, 0);
             raised_gasket_pads();
         }
         translate([0, 0, main_height - deck_thickness - 0.01])
@@ -595,7 +601,7 @@ module mezzanine(offset) {
 
         for(p = mounting_points_raised)
             translate([p.x, p.y, main_height - deck_thickness])
-                countersunk_screw(base_thickness + 0.1, 0.1);
+                countersunk_screw(base_thickness, hfit);
     }
 }
 
@@ -620,10 +626,10 @@ module trackball_holder() intersection() {
                     color(mezzanine_color, alpha=ca)
                         translate(trackball_position)
                         corr_sphere(trackball_radius + spacing + wall);
-                    mezzanine(0.1);
+                    mezzanine();
                     color(mezzanine_color, alpha=ca) {
                         translate(trackball_position) rotate([60, 0, 0])
-                            translate([0, 0, -trackball_radius - 2.5])
+                            translate([0, 0, -trackball_radius - 2.4 + vfit])
                             cylinder(2.5, 5, 5);
                         bearings(bearing_size, 3.5);
                     }
@@ -631,13 +637,13 @@ module trackball_holder() intersection() {
                 w = 2*hx + dx;
                 translate(trackball_position) rotate([60, 0, 0])
                     translate([-w/2, -10, -trackball_radius - 10])
-                    cube([w, 20, 10 - 2.4 + 0.05], center=false);
+                    cube([w, 20, 10 - 2.4 + vfit], center=false);
             }
             color(mezzanine_color, alpha=ca)
                 translate(trackball_position) rotate([60, 0, 0])
                     for (p = mounting_points_sensor)
                         translate([p.x, p.y,
-                                   -trackball_radius - 9.05+1.65 + 1.6 + 0.05])
+                                   -trackball_radius - 9.05+1.65 + 1.6 + vfit])
                             cylinder(trackball_radius/2 + 9.05-1.65 - 1.6,
                                      d = post_diameter);
         }
@@ -656,7 +662,7 @@ module trackball_holder() intersection() {
             }
         }
     }
-    render(convexity=10) case_inside(0.09);
+    render(convexity=10) case_inside(hfit, vfit);
 }
 
 module key_profile(x) {
