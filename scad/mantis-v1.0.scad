@@ -677,14 +677,28 @@ module mezzanine() {
     }
 }
 
-module bearings(size, offset, cylinder=false) {
-    color("ghostwhite") translate(trackball_position) rotate([12, 0, 0]) {
+module bearings(size, offset, what=0) {
+    translate(trackball_position) rotate([12, 0, 0]) {
         for (phi = [0:120:240])
             rotate([-50, 0, phi]) translate([0, 0, -trackball_radius - size/2])
-                if (cylinder)
-                    cylinder(size/2, size/2+offset, size/2+offset);
-                else
-                    corr_sphere(size/2 + offset);
+                if (what == 0)
+                    color("ghostwhite") corr_sphere(size/2 + offset);
+                else if (what == 1)
+                    cylinder(h = size/2, r = size/2 + offset);
+                else if (what == 2)
+                    translate([0, 0, -10]) cylinder(h = 10, r = size/2 + offset);
+                else if (what == 3)
+                    translate([0, 0, -0.01])
+                        cylinder(h = size/2 - spacing + 0.01,
+                                 r1 = size/2 + offset + (size/2 - spacing),
+                                 r2 = size/2 + offset);
+                else if (what == 4)
+                    cylinder(h = size/2,
+                             r1 = size/2 + offset,
+                             r2 = size/2 + offset + size/2);
+                else if (what == 5)
+                    translate([-size/4, -size/2 - offset, 0])
+                        cube([size/2, size + 2*offset, size/2]);
     }
 }
 
@@ -703,7 +717,7 @@ module trackball_holder() intersection() {
                         translate(trackball_position) rotate([60, 0, 0])
                             translate([0, 0, -trackball_radius - 2.4 + vfit])
                             cylinder(2.5, 5, 5);
-                        bearings(bearing_size, 3.5);
+                        bearings(bearing_size, 4.5 - bearing_size/2);
                     }
                 }
                 w = 2*hx + dx;
@@ -723,8 +737,14 @@ module trackball_holder() intersection() {
         union() {
             translate(trackball_position)
                 corr_sphere(trackball_radius + spacing);
-            bearings(bearing_size, 0.1);
-            bearings(bearing_size, -0.05, cylinder=true);
+            difference() {
+                bearings(bearing_size, 1.5, what=4);
+                bearings(bearing_size, 0.25, what=3);
+            }
+            bearings(bearing_size, 0.01);
+            bearings(bearing_size, -0.05, what=1);
+            bearings(bearing_size, -0.5, what=2);
+            bearings(bearing_size, 1.4, what=5);
 
             translate(trackball_position) rotate([60, 0, 0]) {
                 translate([0, 0, -trackball_radius-2.5])
