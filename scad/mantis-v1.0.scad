@@ -650,13 +650,22 @@ module sensor() {
 
 module raised_gasket_pads()
     translate([0, 0, main_height - deck_thickness + base_thickness - vfit])
-        linear_extrude(gasket_pad_thickness, convexity=10)
-        offset(r = f_key + s_key) offset(delta = -f_key - s_key - s_pcb)
-        union() {
-        translate([-2*hx -  dx/2, -2*hy - dy]) hex_outline();
-        translate([ 2*hx +  dx/2, -2*hy - dy]) hex_outline();
-        translate([0, 3*hy + hy/6]) square([2*hx + dx, hy], center=true);
-    }
+        intersection() {
+            linear_extrude(gasket_pad_thickness, convexity=10)
+                offset(r = f_key + s_key) offset(delta = -f_key - s_key - s_pcb)
+                union() {
+                    translate([-2*hx -  dx/2, -2*hy - dy]) hex_outline();
+                    translate([ 2*hx +  dx/2, -2*hy - dy]) hex_outline();
+                    translate([0, 3*hy + hy/6])
+                        square([2*hx + dx, hy], center=true);
+                }
+            pivot = [0, mcu_top - post_diameter, -deck_thickness];
+            radius = deck_thickness + gasket_pad_thickness;
+            angle = 12;
+            translate(pivot) rotate([0, 90, 0])
+                linear_extrude(3*hx, center=true) offset(r = radius)
+                polygon([[0, -hy], [0, 0], hy*[sin(angle), cos(angle)]]);
+        }
 module mezzanine() {
     ca = render_case ? 0 : case_alpha;
     difference() {
