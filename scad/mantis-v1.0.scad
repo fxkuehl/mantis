@@ -488,7 +488,8 @@ bump_positions = [
 ];
 module base_plate() difference() {
     ca = render_case ? 0 : case_alpha;
-    color(base_color, alpha=ca) union() {
+    bc = render_case ? undef : base_color;
+    color(bc, alpha=ca) union() {
         base_plate_base(0, 0);
         main_gasket_pads();
     }
@@ -501,8 +502,9 @@ module base_plate() difference() {
 }
 module case() union() {
     ca = render_case ? 0 : case_alpha;
+    cc = render_case ? undef : case_color;
     difference() {
-        color(case_color, alpha=ca) case_outside();
+        color(cc, alpha=ca) case_outside();
         render(convexity=10) union() {
             base_plate_base(hfit, vfit);
             case_inside(0, 0);
@@ -668,8 +670,9 @@ module raised_gasket_pads()
         }
 module mezzanine() {
     ca = render_case ? 0 : case_alpha;
+    mc = render_case ? undef : mezzanine_color;
     difference() {
-        color(mezzanine_color, alpha=ca) union() {
+        color(mc, alpha=ca) union() {
             translate([0, 0, main_height - deck_thickness])
                 raised_extrusion(base_thickness,
                                  s_pcb, f_key + s_key, 0);
@@ -713,16 +716,17 @@ module bearings(size, offset, what=0) {
 
 module trackball_holder() intersection() {
     ca = render_case ? 0 : case_alpha;
+    mc = render_case ? undef : mezzanine_color;
     wall = 2.0;
     difference() {
         union() {
             difference() {
                 union() {
-                    color(mezzanine_color, alpha=ca)
+                    color(mc, alpha=ca)
                         translate(trackball_position)
                         corr_sphere(trackball_radius + spacing + wall);
                     mezzanine();
-                    color(mezzanine_color, alpha=ca) {
+                    color(mc, alpha=ca) {
                         translate(trackball_position) rotate([60, 0, 0])
                             translate([0, 0, -trackball_radius - 2.4 + vfit])
                             cylinder(2.5, 5, 5);
@@ -735,7 +739,7 @@ module trackball_holder() intersection() {
                     translate([-w/2, -h, -trackball_radius - h])
                     cube([w, 20, h - 2.4 + vfit], center=false);
             }
-            color(mezzanine_color, alpha=ca)
+            color(mc, alpha=ca)
                 translate(trackball_position) rotate([60, 0, 0])
                     for (p = mounting_points_sensor)
                         translate([p.x, p.y,
@@ -860,7 +864,7 @@ module keyboard() {
                 color(mezzanine_color, alpha=case_alpha)
                     render(convexity=8) trackball_holder();
             else
-                trackball_holder();
+                color(alpha=case_alpha) trackball_holder();
         }
     }
 
@@ -869,7 +873,7 @@ module keyboard() {
             color(base_color, alpha=case_alpha) render(convexity=8)
                 base_plate();
         else
-            base_plate();
+            color(alpha=case_alpha) base_plate();
 
         for (p = bump_positions)
             color("white", alpha=0.2)
