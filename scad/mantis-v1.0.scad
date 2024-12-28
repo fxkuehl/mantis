@@ -414,7 +414,7 @@ module pivot_installation_cut(width, o, fxy) difference() {
     translate([0, -5*hy/3 - dy, main_height - deck_thickness + height/2 - 0.01])
         cube([width, hy, height], center=true);
 
-    translate([0, mcu_top - 6, main_height - deck_thickness - 0.02])
+    translate([0, mcu_top - post_diameter, main_height - deck_thickness - 0.02])
         rotate([-90, 0, 90]) rotate_extrude(angle=12, convexity=10)
         rotate([0, 0, -90]) translate([0, -mcu_top + 6])
         intersection() {
@@ -844,11 +844,15 @@ module keyboard() {
     if (show_bearing) translate([0, 0,  6.8*ex]) bearings(bearing_size, 0);
 
     if (show_mezzanine) {
-        if (render_case)
-            translate([0, 0, 3*ex]) color(mezzanine_color, alpha=case_alpha)
-                render(convexity=8) trackball_holder();
-        else
-            translate([0, 0, 3*ex]) trackball_holder();
+        pivot = [0, mcu_top - post_diameter, main_height - deck_thickness];
+        angle = [12 - abs($t-0.5)*24, 0, 0];
+        translate([0, 0, 3*ex] + pivot) rotate(angle) translate(-pivot) {
+            if (render_case)
+                color(mezzanine_color, alpha=case_alpha)
+                    render(convexity=8) trackball_holder();
+            else
+                trackball_holder();
+        }
     }
 
     if (show_base) {
