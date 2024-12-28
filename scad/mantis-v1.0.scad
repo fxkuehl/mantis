@@ -353,6 +353,10 @@ module countersunk_screw(length, offset) {
     }
 }
 
+module mcu(height, offset)
+    translate([0, mcu_y, 0]) linear_extrude(height) offset(r=offset)
+        square(mcu_size, center=true);
+
 module usb_port_template(o, depth, height=0.6) {
     rotate([90, 0, 0]) linear_extrude(depth) offset(r = o)
         square([6.69, height], center = true);
@@ -509,6 +513,9 @@ module case() union() {
 
             translate(trackball_position)
                 corr_sphere(trackball_radius + spacing);
+            translate([0, 0,
+                       main_height + raised_height - deck_thickness - 1])
+                mcu(2, 0);
 
             usb_height = 0.6 + 1.5;
             usb_offset = 1.255 + 2.5;
@@ -591,10 +598,6 @@ module usb_port(depth) union() {
     }
     color("#303030") translate([0, 0.05, 0]) usb_port_template(0, 10.4);
 }
-
-module mcu(height, offset)
-    translate([0, mcu_y, 0]) linear_extrude(height) offset(r=offset)
-        square(mcu_size, center=true);
 
 module controller() {
     ex = $explode;
