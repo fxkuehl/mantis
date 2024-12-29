@@ -613,6 +613,25 @@ module controller() {
     translate([0, mcu_size.y/2, 10.9 + ex - 1.6]) usb_port(10.5);
 }
 
+module ffc_connector() {
+    color("beige") translate([-4, 0, 0]) cube([8, 2.2, 1.19]);
+    color("dimgrey") translate([-6.57/2, -0.5, 0.6]) cube([6.57, 1.5, 0.6]);
+    for (i = [0:11])
+        color("gold") translate([i*0.5 - 2.75, 0.1, 0]) cube([0.15, 2.4, 0.35]);
+}
+
+module main_pcb_assembly() {
+    main_pcb();
+    translate([0, hy, 0]) rotate([0, 180, 0]) ffc_connector();
+    translate([-17, 2*hy/3, 0]) rotate([0, 180, 0]) ffc_connector();
+    translate([0, mcu_y, pcb_thickness]) controller();
+}
+
+module raised_pcb_assembly() {
+    raised_pcb();
+    translate([0, hy, 0]) rotate([0, 180, 0]) ffc_connector();
+}
+
 module lens(offset) {
     translate([-8.25/2 - offset, -5.48 - offset, -5.95 - 2.4])
         cube([8.25 + 2*offset, 12.9 + 2*offset, 5.95 + offset], center=false);
@@ -645,6 +664,9 @@ module sensor() {
         for(p = mounting_points_sensor)
             translate([p.x, p.y, -9.05]) cylinder(5, d=bolt_diameter + 0.2);
     }
+
+    // Connector
+    translate([-17, -3, -9.05 + 1.65]) rotate([0, 180, 0]) ffc_connector();
 
     // Lens
     color("#ffffff", 0.3) lens(0);
@@ -788,9 +810,8 @@ module keyboard() {
     ex = $explode;
 
     if (show_pcb) {
-        translate([0, 0, main_pcb_z + 1*ex]) main_pcb();
-        translate([0, 0, raised_pcb_z + 4*ex]) raised_pcb();
-        translate([0, mcu_y, main_pcb_z + pcb_thickness +1*ex]) controller();
+        translate([0, 0, main_pcb_z + 1*ex]) main_pcb_assembly();
+        translate([0, 0, raised_pcb_z + 4*ex]) raised_pcb_assembly();
     }
 
     if (show_plate) {
