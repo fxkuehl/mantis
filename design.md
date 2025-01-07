@@ -54,7 +54,7 @@ v0.1 also revealed a few problems in use:
 
 > _v0.1 was actually usable and comfortable. The pinky splay worked, but the outer home row pinky keys were a bit uncomfortable to reach, so v0.2 rearranges the pinky keys. Also the thumb keys were a bit close together and the optional 4th thumb key wasn't usable. Raising the center keys can fix those thumb cluster issues while adding some tenting and an approximation of a key well all at once. There are more things I want to try, but this is enough change for another prototype. Stacking two PCBs allows playing with some fun color schemes! Not all mantises are green ..._
 
-v0.2 takes some inspiration from the [Thumbs Up!](https://www.thumbsup.shop/) keyboard. By raising the center keys, an approximation of a key well is created. Going into the 3rd dimension also offers a neat solution to the thumb cluster issues without compromising on the hexagonal key layout: By lowering the front-most thumb key, it creates a larger separation of the three keys in the arc and it makes the fourth thumb key above it usable. Other benefits:
+v0.2 takes some inspiration from the [Thumbs Up!](https://www.reddit.com/r/ErgoMechKeyboards/comments/z4qdgr/thumbs_up_v2_keyboard/) keyboard. By raising the center keys, an approximation of a key well is created. Going into the 3rd dimension also offers a neat solution to the thumb cluster issues without compromising on the hexagonal key layout: By lowering the front-most thumb key, it creates a larger separation of the three keys in the arc and it makes the fourth thumb key above it usable. Other benefits:
 
 - Index fingers can reach their keys more easily
 - 10mm rise results in about 15° tenting angle to make the wrists more comfortable
