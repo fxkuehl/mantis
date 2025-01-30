@@ -347,14 +347,14 @@ module offsetkey(detail = 32) {
                 translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                 fillet_hexagon_cone(R1, R2, r1, r2, exc,
                                     $tilt, $slope, height, $thickness, da=5,
-                                    dish=false, $print_stats=false);
+                                    dish=true, $print_stats=false);
                 rgb_holes();
             }
             translate([0, 0, $droop]) choc_stem($fn = detail);
         }
         union() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
-                                $tilt, $slope, height, 0, dish=false);
+                                $tilt, $slope, height, 0, dish=true);
             translate([0, 0, -4.99]) cube(10, center = true);
         }
     }
@@ -382,7 +382,7 @@ module saddlekey(detail = 32) {
     module shell(offset, da=$fa) {
         dish_size = $key_width * 2 / sqrt(3) + exc;
         dish_res = ceil(180 / (3.14 * da));
-        double = ($tilt >= 15);
+        double = ($tilt > 15);
         intersection() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
                                 $tilt, $slope, height, offset, da=da,
