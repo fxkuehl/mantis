@@ -23,6 +23,8 @@ See the [complete build guide](./buildguide.md) for detailed instructions and al
 
 Firmware is available in my [QMK fork](https://github.com/fxkuehl/qmk_firmware/tree/mantis-vial-v0.3/keyboards/mantis). It is now based on the Vial version of QMK, so you can use the [Vial](https://get.vial.today/) GUI to customize the keymap more easily.
 
+There is also a [ZMK shield](https://github.com/Silcantar/zmk-mantis). Thanks to Github user [Silcantar](https://github.com/Silcantar/) for creating it and [bringing](https://github.com/fxkuehl/mantis/issues/3) it to my attention.
+
 # Concept
 
 Mantis is a compact unibody ergo keyboard approximating 15° tented, shallow key wells using two layers of flat PCBs and custom sculpted hexagonal key caps. The hex grid naturally results in 30° hand rotation and aggressive column stagger. Hexagonal keys can rotate in 60° increments, which enables a decent approximation of key wells with only one or two unique keycap shapes. Existing 3x5+3 split layouts with 36 keys should be adaptable for this keyboard.
