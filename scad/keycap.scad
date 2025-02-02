@@ -303,8 +303,9 @@ module choc_stem() {
 }
 
 module rgb_holes() {
-    exc = min($max_exc, $tilt/7.5);
-    dy_tilt = $dish_diam * (1 - cos($tilt)) + exc;
+    tilt = $saddle ? min($tilt, 15) : $tilt;
+    exc = min($max_exc, tilt/7.5);
+    dy_tilt = $dish_diam * (1 - cos(tilt)) + exc;
     y0 = 8.0 - dy_tilt + (dy_tilt > 4 ? 0.1 : 0);
     dx = 2.3;
     dy = dx * sqrt(3)/2;
@@ -320,7 +321,7 @@ module rgb_holes() {
     if ($rgb) for (p = hole_pos)
         translate([dx * p.x, y0 + dy * p.y, 0]) rotate([0, 0, 30])
             cylinder($fn=6, h=15, d=1.6);
-    if ($rgb && !$saddle) for (p = hole_pos_sphere)
+    if ($rgb && (!$saddle || $tilt >= 20)) for (p = hole_pos_sphere)
         translate([dx * p.x, y0 + dy * p.y, 0]) rotate([0, 0, 30])
             cylinder($fn=6, h=15, d=1.6);
     if ($rgb && y0 < 4) for (p = hole_pos_steep)
@@ -389,7 +390,7 @@ module saddlekey(detail = 32) {
                                 dish=false);
             translate([0, -R2 - exc, height]) rotate([$tilt, 0, 0])
                 translate([0, R2, 0]) rotate([0, 0, 90])
-                saddle_dish($dish_diam, $dish_diam / sqrt(2), $slope, dish_size,
+                saddle2_dish($dish_diam, $dish_diam / sqrt(2), $slope, dish_size,
                             dish_res, -offset, double);
         }
     }

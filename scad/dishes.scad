@@ -80,13 +80,14 @@ module spherical_dish(d, alpha, size, n, o = 0) {
                convexity = 10);
 }
 
-// Saddle_shaped dish
+// Saddle-shaped dish
 //
 // Parabolic in x-direction. 4th-order polynomial in y-direction with a
 // small parabolic dip in the middle and sloping down beyond that.
 //
 // D - major diameter of the parabolic dish in x-direction
 // d - minor diameter of the parabolic dip in y-direction
+// double - Use 4th-order polynomial for positive x
 //
 // At x = 0, y = +-d/2 the slope is 0
 module saddle_dish(D, d, alpha, size, n, o = 0, double = false) {
@@ -112,6 +113,36 @@ module saddle_dish(D, d, alpha, size, n, o = 0, double = false) {
                faces = __faces_helper(n),
                convexity = 10);
 }
+
+// Saddle-shaped dish with cubic double-saddle option
+//
+// Parabolic in x-direction. 4th-order polynomial in y-direction with a
+// small parabolic dip in the middle and sloping down beyond that.
+//
+// D - major diameter of the parabolic dish in x-direction
+// d - minor diameter of the parabolic dip in y-direction
+// double - Use cubic curve in x direction to slope down for positive x
+//
+// At x = 0, y = +-d/2 the slope is 0
+module saddle2_dish(D, d, alpha, size, n, o = 0, double = false) {
+    b = tan(alpha) / D;
+    c = -2*b / d^2;
+    p = double ? 0 : b;
+    q = double ? -tan(alpha) / (3 * (D/2)^2) : 0;
+    a = double ? q * (D/2)^3 : -b * (D/2)^2;
+    points = [for (i = [0 : n]) each let (y = i * size / n - size/2)
+        [for (j = [0 : n]) let (x = j * size / n - size/2)
+            [x, y,
+             c * y^4 + b * y^2 + a +
+             q * x^3 + p * x^2]
+        ]
+    ];
+    points_offset = o ? __offset_helper(points, n, o) : points;
+    polyhedron(points = concat(points_offset, __points_helper(size)),
+               faces = __faces_helper(n),
+               convexity = 10);
+}
+
 /*
 color(alpha=1) render(convexity = 10) intersection() {
     saddle_dish(14, 14/sqrt(2), 15, 20, 80, o=1.4);
@@ -119,11 +150,11 @@ color(alpha=1) render(convexity = 10) intersection() {
 }*/
 color(alpha=1) render(convexity = 10) difference() {
     intersection() {
-        saddle_dish(14, 14/sqrt(2), 15, 20, 40, o=0, double=true);
+        saddle2_dish(14, 14/sqrt(2), 15, 20, 40, o=0, double=true);
         translate([0, 0, -15.01]) cube([30, 30, 30], center = true);
     }
     intersection() {
-        translate([0, 0, -0.01]) saddle_dish(14, 14/sqrt(2), 15, 20, 40, o=-1.4, double=true);
+        translate([0, 0, -0.01]) saddle2_dish(14, 14/sqrt(2), 15, 20, 40, o=-1.4, double=true);
         translate([0, 0, -16.4]) cube([30, 30, 30], center = true);
     }
 }

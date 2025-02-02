@@ -71,10 +71,9 @@ tilt1 = 15;
 // Rise of the home keys
 rise1 = -0.5;
 // Tilt angle for top row keys
-tilt2 = 15;
-//tilt2 = 28;
+tilt2 = 28;
 // Rise of the top row keys
-rise2 = -0.5;
+rise2 = 1.5;
 //rise2 = 2.9;
 // Tilt angle for bottom row keys
 tilt3 = 15;
