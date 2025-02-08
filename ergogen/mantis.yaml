@@ -92,19 +92,17 @@ points:
         ref: f_c0_r3
       columns:
         base1:
-          rows.r.shift: [-hx/2+hx/8, -hy+hy/4]
-        base2:
-          rows.r.shift: [3hx/4, -3hy]
-          #rows.r.shift: [hx, -4hy/3]
+          #rows.r.shift: [-hx+hx/4, -2hy]
+          rows.r.shift: [-hx+hx/4, -3hy+hy/2]
+        #base2:
+        #  rows.r.shift: [hx+hx/8, -4hy+hy/4]
         base3:
-          rows.r.shift: [3hx/2-1, hy/3-1]
+          rows.r.shift: [hx/2, -hy/3]
         raise1:
-          #rows.r.shift: [5hx/2-3, -27hy/6-dy]
-          rows.r.shift: [5hx/2-hx/8, -5hy-dy+hy/4+my+ky]
+          rows.r.shift: [2hx-9hx/32, -5hy-dy+7hy/16]
         raise2:
           rows.r.shift: [9hx/2+dx/2-4, -11hy/3]
         raise3:
-          #rows.r.shift: [23hx/6, -hy/3]
           rows.r.shift: [4hx-hx/8, -hy/4]
         header:
           rows.r.shift: [9hx/2+dx/2, -3hy-dy/4+1.5]
@@ -254,6 +252,35 @@ points:
         rt:
           row_net: RT
           rotate: 0
+    extra:
+      anchor:
+        ref: f_c1_r2
+        shift: [-hx, 0]
+      columns:
+        c1:
+          rows.re:
+            rotate: 120
+          key:
+            column_net: C1
+            mirror.column_net: M_C1
+        c2:
+          rows.re:
+            rotate: 180
+          key:
+            column_net: C1
+            mirror.column_net: M_C1
+            stagger: -2hy
+        c3:
+          rows.re:
+            rotate: 60
+          key:
+            column_net: C1
+            mirror.column_net: M_C1
+            spread: 2hx
+            stagger: -2hy-dy
+      rows:
+        re:
+          row_net: RE
   key:
     spread: hx
     padding: hy
@@ -268,15 +295,15 @@ outlines:
     - what: polygon
       points:
         - ref: thumb_c3_rt
-          shift: [0, -2hy/3-my]
+          shift: [-hx/2, -hy-my]
         - ref: thumb_c3_rt
-          shift: [-2hx-mx, 2hy/3-my/2]
+          shift: [-2hx-mx, -my/2]
         - ref: thumb_c3_rt
-          shift: [-2hx-mx, 4hy/3+dy-my/2]
+          shift: [-2hx-mx, 2hy/3+dy-my/2]
         - ref: thumb_c1_rt
-          shift: [-hx/2-mx, -7hy/3-my/2]
+          shift: [-hx-mx, -8hy/3-my/2]
         - ref: thumb_c1_rt
-          shift: [-hx/2-mx, hy/3+my/2]
+          shift: [-hx-mx, my/2]
         - ref: thumb_c1_rt
           shift: [hx/2, hy+my]
         - ref: thumb_c1_rt
@@ -294,15 +321,15 @@ outlines:
         - ref: mirror_thumb_c1_rt
           shift: [hx/2, hy+my]
         - ref: mirror_thumb_c1_rt
-          shift: [-hx/2-mx, hy/3+my/2]
+          shift: [-hx-mx, my/2]
         - ref: mirror_thumb_c1_rt
-          shift: [-hx/2-mx, -7hy/3-my/2]
+          shift: [-hx-mx, -8hy/3-my/2]
         - ref: mirror_thumb_c3_rt
-          shift: [-2hx-mx, 4hy/3+dy-my/2]
+          shift: [-2hx-mx, 2hy/3+dy-my/2]
         - ref: mirror_thumb_c3_rt
-          shift: [-2hx-mx, 2hy/3-my/2]
+          shift: [-2hx-mx, -my/2]
         - ref: mirror_thumb_c3_rt
-          shift: [0, -2hy/3-my]
+          shift: [-hx/2, -hy-my]
 
         - ref: thumb_c3_rt
           shift: [hx+dx/2, -my+dy/4]
@@ -319,9 +346,13 @@ outlines:
         - ref: thumb_c3_rt
           shift: [hx+dx/2, -dy/4+ry]
         - shift: [-hx-dx/2, 2hy/3+dy/4]
-        - shift: [-hx, -2hy/3]
-        - shift: [-hx+rx, 2hy/3-ry/2]
-        - shift: [0, 2hy/3-ry]
+        - shift: [-hx/2, -hy/3]
+        - shift: [-hx/2,  hy/3]
+        - shift: [-hx+rx, -2hy/3+ry/2]
+        - shift: [0, 4hy/3-2ry]
+#        - shift: [-hx/2, -hy/3]
+#        - shift: [-hx/2+rx, hy/3-ry/2]
+#        - shift: [0, 2hy/3-ry]
         - shift: [hx/2, hy/3]
         - shift: [0, 2hy/3+dy]
         - shift: [hx/2, hy/3]
@@ -353,9 +384,13 @@ outlines:
         - shift: [hx/2, -hy/3]
         - shift: [0, -2hy/3-dy]
         - shift: [hx/2, -hy/3]
-        - shift: [0, -2hy/3+ry]
-        - shift: [-hx+rx, -2hy/3+ry/2]
-        - shift: [-hx, 2hy/3]
+#        - shift: [0, -2hy/3+ry]
+#        - shift: [-hx/2+rx, -hy/3+ry/2]
+#        - shift: [-hx/2,  hy/3]
+        - shift: [0, -4hy/3+2ry]
+        - shift: [-hx+rx, 2hy/3-ry/2]
+        - shift: [-hx/2, -hy/3]
+        - shift: [-hx/2,  hy/3]
       fillet: fk+kx-rx
 
   _hexagon:
@@ -516,6 +551,64 @@ outlines:
         - shift: [-2hy, hx]
         - shift: [4hy, 0]
       operation: subtract
+  _sound_channel_main_alt:
+    - what: outline
+      name: _linear_channel_3u
+      where: [f_c1_r3, f_c1_r2]
+      asym: both
+      adjust:
+        - shift: [hx/2, 0]
+    - what: outline
+      name: _linear_channel_2u
+      where: [f_c2_r1]
+      asym: both
+      adjust:
+        - shift: [0, 0]
+    - what: outline
+      name: _linear_channel_1u
+      where: [f_c3_r0]
+      asym: both
+      adjust:
+        - shift: [-hx/2, 0]
+    - what: outline
+      name: _linear_channel_1u
+      where: [t_c2_r1, t_c3_r2]
+      asym: both
+      adjust:
+        - shift: [-hx/4, -hy/2]
+        - rotate: 60
+    - what: outline
+      name: _linear_channel_1u
+      where: [f_c3_r3, f_c3_r2, f_c3_r1, f_c3_r0]
+      asym: both
+      adjust:
+        - shift: [hx/4, -hy/2]
+        - rotate: 120
+    - what: outline
+      name: _linear_channel_dy
+      where: [t_c1_r1]
+      asym: both
+    - what: outline
+      name: _arc_channel_1u
+      where: [f_c0_r3]
+      asym: both
+      adjust:
+        - shift: [0, -2hy/3]
+        - rotate: 60
+    - what: outline
+      name: _arc_channel_1u
+      where: [f_c1_r1]
+      asym: both
+      adjust:
+        - shift: [hx/2, -hy/3]
+        - rotate: 120
+    - what: outline
+      name: _arc_channel_1u
+      where: [t_c3_r1]
+      asym: both
+      adjust:
+        - shift: [-hx/2, hy/3]
+        - rotate: 180
   _sound_channel_main:
     - what: outline
       name: _arc_channel_1u
@@ -524,15 +617,29 @@ outlines:
       adjust:
         - shift: [hx/2, -hy/3]
     - what: outline
+      name: _arc_channel_1u
+      where: [f_c1_r1]
+      asym: both
+      adjust:
+        - shift: [hx/2, -hy/3]
+        - rotate: 120
+    - what: outline
+      name: _arc_channel_1u
+      where: [f_c1_r2]
+      asym: both
+      adjust:
+        - shift: [-hx/2, hy/3]
+        - rotate: 60
+    - what: outline
       name: _linear_channel_1u
-      where: [f_c0_r3, f_c3_r3]
+      where: [f_c3_r3, f_c1_r2, f_c3_r0]
       asym: both
       adjust:
         - shift: [hx/4, -hy/2]
         - rotate: -60
     - what: outline
       name: _linear_channel_2u
-      where: [f_c3_r0, f_c3_r2]
+      where: [f_c3_r2]
       asym: both
       adjust:
         - rotate: -60
@@ -544,25 +651,32 @@ outlines:
         - shift: [hx/4, -hy/2]
         - rotate: -60
     - what: outline
-      name: _arc_channel_2u
-      where: [f_c1_r2]
+      name: _linear_channel_1u
+      where: [f_c1_r2, f_c2_r1, f_c3_r0]
       asym: both
       adjust:
-        - shift: [0, -2hy/3]
-        - rotate: -60
+        - shift: [-hx/2, 0]
     - what: outline
       name: _linear_channel_dy
       where: [t_c1_r1]
       asym: both
     - what: outline
-      name: _arc_channel_2u
+      name: _linear_channel_1u
+      where: [t_c2_r1, t_c3_r2]
+      asym: both
+      adjust:
+        - shift: [-hx/4, -hy/2]
+        - rotate: 60
+    - what: outline
+      name: _arc_channel_1u
       where: [t_c3_r1]
       asym: both
       adjust:
-        - shift: [0, 2hy/3]
+        - shift: [-hx/2, hy/3]
+        - rotate: 180
     - what: circle
       radius: wc/2
-      where: [t_c2_r1, t_c3_r2]
+      where: [f_c0_r3]
       asym: both
       fillet: 1
   _sound_channel_raised_common:
@@ -645,7 +759,8 @@ outlines:
       where: [top_c1_r3, top_c2_r3, top_c3_r3,
               home_c1_r2, home_c2_r2, home_c3_r2,
               bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
-              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt,
+              extra_c1_re, extra_c2_re, extra_c3_re]
       operation: subtract
     - what: outline
       name: _main_cutouts
@@ -675,7 +790,8 @@ outlines:
       where: [top_c1_r3, top_c2_r3, top_c3_r3,
               home_c1_r2, home_c2_r2, home_c3_r2,
               bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
-              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt,
+              extra_c1_re, extra_c2_re, extra_c3_re]
       asym: both
       operation: subtract
     - what: outline
@@ -708,7 +824,8 @@ outlines:
       where: [top_c1_r3, top_c2_r3, top_c3_r3,
               home_c1_r2, home_c2_r2, home_c3_r2,
               bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
-              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt,
+              extra_c1_re, extra_c2_re, extra_c3_re]
       operation: subtract
     - what: outline
       name: _main_cutouts
@@ -835,7 +952,8 @@ outlines:
       where: [top_c1_r3, top_c2_r3, top_c3_r3, top_c4_r3, top_c5_r3,
               home_c1_r2, home_c2_r2, home_c3_r2, home_c4_r2, home_c5_r2,
               bottom_c1_r1, bottom_c2_r1, bottom_c3_r1, bottom_c4_r1, bottom_c5_r1,
-              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt, thumb_c4_rt, thumb_c5_rt]
+              thumb_c1_rt, thumb_c2_rt, thumb_c3_rt, thumb_c4_rt, thumb_c5_rt,
+              extra_c1_re, extra_c2_re, extra_c3_re]
       asym: both
       operation: stack
     - what: outline
@@ -876,63 +994,64 @@ outlines:
     - what: outline
       name: composite_sound
       where:
-        shift: [0, -6hy-2dy-2my]
+        shift: [0, -20hy/3-2dy-2my]
       operation: stack
   plates:
     - what: outline
       name: base
       adjust.shift: [-254, 127]
       where:
-        rotate: 90
-        shift: [4hy+my, -(hy/3+5hx+dx/2+mx+gap)]
+        rotate: -120
+        shift: [3hx + mx + dy+dx/4, -16hy/3 - mx - dx/2]
+      operation: stack
     - what: outline
-      name: plate_main
+      name: sound_plate_main
       adjust.shift: [-254, 127]
       where:
-        shift: [5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2, -(4hy+my)]
+        rotate: 60
+        shift: [10hx + 3mx + dy+dx/4 + gap, -21hy/3 - mx - dx/2]
       operation: stack
     - what: outline
       name: plate_raised
       adjust.shift: [-254, 127]
       where:
         rotate: 180
-        shift: [5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2, -(8hy+2dy+2my+gap/.866)]
+        shift: [13hx/2+3dx/2 + gap, -12hy-dx-2mx-gap - 12hy/6-dy]
       operation: stack
     - what: outline
-      name: sound_plate_raised_asym
+      name: sound_plate_raised
       adjust.shift: [-254, 127]
       where:
-        shift: [5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2 - (7hx/2+dx-rx+gap), -(8hy+2dy+2my+gap/.866 + 3hy+2ry+gap/.866)]
+        shift: [3hx+dx/2, -12hy-dx-2mx-gap - 5hy-dy-gap]
       operation: stack
     - what: outline
-      name: sound_plate_raised_asym
+      name: sound_plate_raised
       adjust.shift: [-254, 127]
       where:
-        shift: [5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2 + (7hx/2+dx-rx+gap), -(8hy+2dy+2my+gap/.866 + 3hy+2ry+gap/.866)]
+        shift: [3hx+dx/2 + 6hx+2dx + hx + 2gap, -12hy-dx-2mx-gap - 5hy-dy-gap]
       operation: stack
     - what: outline
-      name: sound_plate_main
+      name: plate_main
       adjust.shift: [-254, 127]
       where:
-        rotate: -90
-        shift: [2*(5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2) - (4hy+my), -(hy/3+5hx+dx/2+mx+gap)]
+        rotate: 180
+        shift: [13hx/2+3dx/2 + gap, -12hy-dx-2mx-gap - 5hy-dy-gap - 27hy/6-2dy-gap]
       operation: stack
   plates2x:
     - what: outline
       name: plates
+      where:
+        shift: [10hx+3mx+dy+dx/4+gap + 3hx+mx+dy+dx/4+gap, 0]
     - what: outline
       name: plates
-      where:
-        shift: [0, -(8hy+2dy+2my+gap/.866 + 3hy+2ry+gap/.866 + 5hy/3+dy+my+gap/.866)]
       operation: stack
-  plates4x:
-    - what: outline
-      name: plates2x
+  plates3x:
     - what: outline
       name: plates2x
       where:
-        rotate: 180
-        shift: [4*(5hx+dx/2+mx + 17hy/3+2my+dy+2gap+mx/2) - 2hy/3+2my/3+gap/.866, -2*(8hy+2dy+2my+gap/.866 + 3hy+2ry+gap/.866 + 5hy/3+dy+my+gap/.866) - my-gap]
+        shift: [10hx+3mx+dy+dx/4+gap + 3hx+mx+dy+dx/4+gap, 0]
+    - what: outline
+      name: plates
       operation: stack
 
 pcbs:
@@ -978,7 +1097,8 @@ pcbs:
         where: [top_c1_r3, top_c2_r3, top_c3_r3,
                 home_c1_r2, home_c2_r2, home_c3_r2,
                 bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
-                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt,
+                extra_c1_re, extra_c2_re, extra_c3_re]
         adjust:
           rotate: 180
         params:
@@ -992,7 +1112,8 @@ pcbs:
         where: [top_c1_r3, top_c2_r3, top_c3_r3,
                 home_c1_r2, home_c2_r2, home_c3_r2,
                 bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
-                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt,
+                extra_c1_re, extra_c2_re, extra_c3_re]
         adjust:
           shift: [0, -3.5]
         params:
@@ -1003,7 +1124,8 @@ pcbs:
         where: [top_c1_r3, top_c2_r3, top_c3_r3,
                 home_c1_r2, home_c2_r2, home_c3_r2,
                 bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
-                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt,
+                extra_c1_re, extra_c2_re, extra_c3_re]
         adjust:
           shift: [0, -3.5]
         params:
@@ -1013,7 +1135,8 @@ pcbs:
         where: [top_c1_r3, top_c2_r3, top_c3_r3,
                 home_c1_r2, home_c2_r2, home_c3_r2,
                 bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
-                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt,
+                extra_c1_re, extra_c2_re, extra_c3_re]
         adjust.shift: [0, 4.7]
         params:
           side: B
@@ -1024,7 +1147,8 @@ pcbs:
         where: [top_c1_r3, top_c2_r3, top_c3_r3,
                 home_c1_r2, home_c2_r2, home_c3_r2,
                 bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
-                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt,
+                extra_c1_re, extra_c2_re, extra_c3_re]
         adjust.shift: [4.2, 4.7]
         params:
           net: "di_{{colrow}}"
@@ -1033,7 +1157,8 @@ pcbs:
         where: [top_c1_r3, top_c2_r3, top_c3_r3,
                 home_c1_r2, home_c2_r2, home_c3_r2,
                 bottom_c1_r1, bottom_c2_r1, bottom_c3_r1,
-                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt]
+                thumb_c1_rt, thumb_c2_rt, thumb_c3_rt,
+                extra_c1_re, extra_c2_re, extra_c3_re]
         adjust.shift: [-4.2, 4.7]
         params:
           net: "do_{{colrow}}"
