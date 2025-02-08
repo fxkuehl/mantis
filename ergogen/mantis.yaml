@@ -3,17 +3,17 @@ units:
   hx: 21.5
   hy: 18.62
   # Margin around the PCB
-  mx: 2.27
+  mx: 2.75
   my: 1.1547mx
   # Distance between key clusters
-  dx: 2.54
+  dx: 3
   dy: 1.1547dx
   # Space around keys and fillet radius
   kx: 0.54/2
   ky: 1.1547kx
   fk: 3
   # Space around raised PCB and fillet radius
-  rx: kx
+  rx: 0.5
   ry: 1.1547rx
   # Trackball diameter
   d_ball: 34
@@ -579,9 +579,6 @@ outlines:
     - what: outline
       name: _main_internal
     - what: outline
-      name: _trackball_main_cutout
-      operation: subtract
-    - what: outline
       name: _nibble_hexagon
       where: [f_c1_r3, f_c3_r3, f_c0_r2]
       asym: both
@@ -595,7 +592,11 @@ outlines:
       adjust:
         shift: [-hx, 0]
       operation: subtract
-      fillet: fk
+      fillet: fk+kx
+    - what: outline
+      name: _trackball_main_cutout
+      operation: subtract
+      fillet: fk+2kx
     - what: outline
       name: _rgb_cutout
       where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
@@ -638,7 +639,6 @@ outlines:
       adjust:
         shift: [-hx, 0]
       operation: subtract
-      fillet: fk+kx
     - what: outline
       name: _nibble_half_hex
       where: [f_c3_r0, t_c3_r1]
@@ -646,10 +646,11 @@ outlines:
       adjust:
         shift: [-hx, 0]
       operation: subtract
+      fillet: fk+kx
     - what: outline
       name: _trackball_main_cutout
       operation: subtract
-      fillet: fk
+      fillet: fk+2kx
     - what: outline
       name: _switch_cutout1
       where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
@@ -741,10 +742,11 @@ outlines:
   raised_plate:
     - what: outline
       name: _raised
+      fillet: fk+kx
     - what: outline
       name: _trackball_raised_cutout
       operation: subtract
-      fillet: fk
+      fillet: fk+2kx
     - what: outline
       name: _switch_cutout1
       where: [z3_c4_r3, z3_c5_r3,
@@ -950,4 +952,3 @@ pcbs:
           side: B
           din: "di_{{colrow}}"
           dout: "do_{{colrow}}"
-

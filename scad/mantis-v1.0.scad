@@ -30,9 +30,9 @@ main_height = 13;       // [5:0.1:15]
 raised_height = 10;     // [5:0.1:15]
 base_thickness = 2.5;   // [0.5:0.1:5]
 deck_thickness = 3;     // [0.5:0.1:5]
-wall_thickness = 2;     // [0.5:0.1:5]
+wall_thickness = 2.5;   // [0.5:0.1:5]
 // Edge fillet radius
-r_edge = 2;             // [0.5:0.1:5]
+r_edge = 2.5;           // [0.5:0.1:5]
 pcb_thickness = 1.2;    // [0.5:0.1:2]
 sensor_pcb_thickness = 1.6;// [0.5:0.1:2]
 plate_thickness = 1.2;  // [0.5:0.1:2]
@@ -94,10 +94,10 @@ desk_color = "tan";
 hx = 21.5;
 hy = 18.62;
 
-dx = 2.54;
+dx = 3;
 dy = 1.1547 * dx;
 
-kx = 0.27;
+kx = 0.25;
 ky = 1.1547 * kx;
 
 mcu_size = [17.78, 33.02];
@@ -375,8 +375,8 @@ mounting_points_main = [
 ];
 
 mounting_points_raised = [
-    [-hx - dx/2 + s_key/2 + post_diameter/2, -2*hy/3 - dy/2],
-    [ hx + dx/2 - s_key/2 - post_diameter/2, -2*hy/3 - dy/2]
+    [-hx - dx/2 + post_diameter/2, -2*hy/3 - dy/2],
+    [ hx + dx/2 - post_diameter/2, -2*hy/3 - dy/2]
 ];
 
 mounting_points_sensor = [
