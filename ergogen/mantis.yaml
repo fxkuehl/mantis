@@ -81,161 +81,151 @@ points:
       rows:
         r1:
 
-    # This section defines the switch matrix. It's a little unintuitive
-    # to minimize the number of column pins between top and bottom PCBs.
+    # This section defines the switch matrix. It's quite unintuitive.
+    # 5x8 instead of 10x4 to reduce the number of controller pins needed
+    # and arranged to minimize the number of pins to the top PCB (4x4).
     # Keys are rotated in 60° increments to make a simulated key well
-    # with sculpted key caps. Define each row in its own zone to make
+    # with sculpted key caps. Define each "row" in its own zone to make
     # the key rotation easier. Otherwise the spread and stagger get very
     # confusing.
-    z3:
-      anchor:
-        ref: f_c0_r3
-      columns:
-        c1:
-          rows.r3.rotate: 0
-          key:
-            column_net: C1
-            mirror.column_net: M_C1
-        c2:
-          key:
-            column_net: C2
-            mirror.column_net: M_C2
-        c3:
-          key:
-            spread: 2hx
-            column_net: C3
-            mirror.column_net: M_C3
-        c4:
-          key:
-            spread: hx/2
-            stagger: -hy
-            column_net: C4
-            mirror.column_net: M_C4
-        c5:
-          key:
-            spread: hx/2
-            stagger: -hy
-            column_net: C5
-            mirror.column_net: M_C5
-      rows:
-        r3:
-          row_net: R3
-          rotate: -60
-    z2:
+    #
+    # Mirroring changes the row net, not the column net. Matrix rows
+    # don't correspond with key rows. Think of them as zones instead.
+    # There are only two zones with 4 "columns" on the top PCB describing
+    # the left half. With mirror zones, that makes 4 zones x 4 columns.
+    #
+    # The remainging 2 zones + 2 mirrors are used for the outside
+    # keys. The middle finger column is the only complete column with
+    # 4 rows on the main PCB.
+    z4:
       anchor:
         ref: f_c0_r2
       columns:
         c1:
-          rows.r2.rotate: 120
+          rows.l.rotate: 120
           key:
             column_net: C1
-            mirror.column_net: M_C1
         c2:
-          rows.r2.rotate: -60
+          rows.l.rotate: 0
           key:
-            spread: 2.5hx
+            spread: hx/2
             stagger: hy
             column_net: C2
-            mirror.column_net: M_C2
         c3:
           key:
-            spread: hx/2
-            stagger: -hy
             column_net: C3
-            mirror.column_net: M_C3
         c4:
           key:
-            spread: hx/2
-            stagger: -hy
             column_net: C4
-            mirror.column_net: M_C4
         c5:
-          #rows.r2.rotate: 180
           key:
-            spread: hx/2
-            stagger: -hy
             column_net: C5
-            mirror.column_net: M_C5
       rows:
-        r2:
-          row_net: R2
-          rotate: -120
-    z1:
-      anchor:
-        ref: f_c1_r2
-      columns:
-        c1:
-          rows.r1.rotate: -120
-          key:
-            column_net: C1
-            mirror.column_net: M_C1
-        c2:
-          rows.r1.rotate: -120
-          key:
-            column_net: C2
-            mirror.column_net: M_C2
-        c3:
-          key:
-            spread: hx/2
-            stagger: -hy
-            column_net: C3
-            mirror.column_net: M_C3
-        c4:
-          key:
-            spread: hx/2
-            stagger: -hy
-            column_net: C4
-            mirror.column_net: M_C4
-        c5:
-          rows.r1.rotate: 0
-          key:
-            spread: hx/2
-            stagger: -hy-dy
-            column_net: C5
-            mirror.column_net: M_C5
-      rows:
-        r1:
-          row_net: R1
-          rotate: 180
-    z0:
+        l:
+          row_net: L4
+          mirror.row_net: R4
+          rotate: -60
+    z3:
       anchor:
         ref: f_c1_r1
       columns:
         c1:
-          rows.r0.rotate: 180
+          rows.l.rotate: 180
           key:
             column_net: C1
-            mirror.column_net: M_C1
         c2:
-          rows.r0.rotate: 180
           key:
+            spread: hx/2
+            stagger: hy
             column_net: C2
-            mirror.column_net: M_C2
         c3:
-          rows.r0.rotate: 180
+          rows.l.rotate: 180
           key:
             spread: hx/2
             stagger: -hy
             column_net: C3
-            mirror.column_net: M_C3
         c4:
-          rows.r0.rotate: 60
           key:
             spread: hx/2
-            stagger: -hy-dy
+            stagger: hy
             column_net: C4
-            mirror.column_net: M_C4
         c5:
-          rows.r0.rotate: 0
           key:
-            spread: 1.5hx
+            column_net: C5
+      rows:
+        l:
+          row_net: L3
+          mirror.row_net: R3
+          rotate: -120
+    z2:
+      anchor:
+        ref: t_c1_r1
+      columns:
+        c1:
+          rows.l.rotate: 60
+          key:
+            column_net: C1
+        c2:
+          key:
+            spread: hx/2
+            stagger: hy+dy
+            column_net: C2
+        c3:
+          rows.l.rotate: -120
+          key:
+            spread: hx/2
+            stagger: hy
+            column_net: C3
+        c4:
+          rows.l.rotate: -60
+          key:
+            spread: hx/2
+            stagger: hy
+            column_net: C4
+        c5:
+          key:
+            spread: -3hx/2
             stagger: -hy
             column_net: C5
-            mirror.column_net: M_C5
       rows:
-        r0:
-          row_net: R0
+        l:
+          row_net: L2
+          mirror.row_net: R2
           rotate: 180
+    z1:
+      anchor:
+        ref: t_c3_r1
+      columns:
+        c1:
+          key:
+            column_net: C1
+        c2:
+          key:
+            spread: -hx/2
+            stagger: hy
+            column_net: C2
+        c3:
+          rows.l.rotate: -120
+          key:
+            spread: hx/2
+            stagger: hy+dy
+            column_net: C3
+        c4:
+          rows.l.rotate: -60
+          key:
+            spread: hx/2
+            stagger: hy
+            column_net: C4
+        c5:
+          rows.l.rotate: 180
+          key:
+            spread: -5hx/2
+            stagger: -hy
+            column_net: C5
+      rows:
+        l:
+          row_net: L1
+          mirror.row_net: R1
   key:
     spread: hx
     padding: hy
@@ -457,8 +447,8 @@ outlines:
     - what: rectangle
       where:
         shift: [0, 4.7]
-      size: [3.2, 3.2]
-      fillet: 0.4
+      size: [3.6, 3.1]
+      fillet: 0.2
   _switch_cutout1:
     - what: rectangle
       size: [13.8, 13.8]
@@ -599,10 +589,9 @@ outlines:
       fillet: fk+2kx
     - what: outline
       name: _rgb_cutout
-      where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
-              z2_c1_r2, z2_c2_r2, z2_c3_r2,
-              z1_c1_r1, z1_c2_r1, z1_c3_r1,
-              z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
+      where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
+              z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
+              z2_c5_l, z1_c1_l, z1_c5_l]
       asym: both
       operation: subtract
     - what: outline
@@ -613,10 +602,9 @@ outlines:
       name: _main_external
     - what: outline
       name: _key_slot_hexagon
-      where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
-              z2_c1_r2, z2_c2_r2, z2_c3_r2,
-              z1_c1_r1, z1_c2_r1, z1_c3_r1,
-              z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
+      where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
+              z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
+              z2_c5_l, z1_c1_l, z1_c5_l]
       asym: both
       fillet: fk+2kx
       operation: subtract
@@ -653,10 +641,9 @@ outlines:
       fillet: fk+2kx
     - what: outline
       name: _switch_cutout1
-      where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
-              z2_c1_r2, z2_c2_r2, z2_c3_r2,
-              z1_c1_r1, z1_c2_r1, z1_c3_r1,
-              z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
+      where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
+              z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
+              z2_c5_l, z1_c1_l, z1_c5_l]
       asym: both
       operation: subtract
     - what: outline
@@ -682,10 +669,9 @@ outlines:
       fillet: fk+kx
     - what: outline
       name: _switch_cutout1
-      where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
-              z2_c1_r2, z2_c2_r2, z2_c3_r2,
-              z1_c1_r1, z1_c2_r1, z1_c3_r1,
-              z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
+      where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
+              z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
+              z2_c5_l, z1_c1_l, z1_c5_l]
       asym: left
       operation: subtract
   raised_pcb:
@@ -711,10 +697,8 @@ outlines:
       fillet: fk+kx
     - what: outline
       name: _rgb_cutout
-      where: [z3_c4_r3, z3_c5_r3,
-              z2_c4_r2, z2_c5_r2,
-              z1_c4_r1, z1_c5_r1,
-              z0_c4_r0]
+      where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
+              z1_c2_l, z1_c3_l, z1_c4_l]
       asym: both
       operation: subtract
     - what: outline
@@ -723,10 +707,9 @@ outlines:
   _raised_key_slots:
     - what: outline
       name: _key_slot_hexagon
-      where: [z3_c3_r3, z3_c4_r3, z3_c5_r3,
-              z2_c3_r2, z2_c4_r2, z2_c5_r2,
-              z1_c3_r1, z1_c4_r1, z1_c5_r1,
-              z0_c3_r0, z0_c4_r0, z0_c5_r0]
+      where: [z4_c5_l, z3_c5_l, z2_c5_l, z1_c5_l,
+              z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
+              z1_c1_l, z1_c2_l, z1_c3_l, z1_c4_l]
       asym: both
       fillet: fk+2kx
   _raised_deck:
@@ -749,10 +732,8 @@ outlines:
       fillet: fk+2kx
     - what: outline
       name: _switch_cutout1
-      where: [z3_c4_r3, z3_c5_r3,
-              z2_c4_r2, z2_c5_r2,
-              z1_c4_r1, z1_c5_r1,
-              z0_c4_r0]
+      where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
+              z1_c2_l, z1_c3_l, z1_c4_l]
       asym: both
       operation: subtract
     - what: outline
@@ -806,10 +787,10 @@ outlines:
         shift: [0, 0.05]
     - what: outline
       name: _hexkey
-      where: [z3_c1_r3, z3_c2_r3, z3_c3_r3, z3_c4_r3, z3_c5_r3,
-              z2_c1_r2, z2_c2_r2, z2_c3_r2, z2_c4_r2, z2_c5_r2,
-              z1_c1_r1, z1_c2_r1, z1_c3_r1, z1_c4_r1, z1_c5_r1,
-              z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c4_r0, z0_c5_r0]
+      where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
+              z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
+              z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l, z2_c5_l,
+              z1_c1_l, z1_c2_l, z1_c3_l, z1_c4_l, z1_c5_l]
       asym: both
       operation: stack
     - what: outline
@@ -831,16 +812,107 @@ pcbs:
     outlines:
       main:
         outline: main_pcb
-      raised:
-        outline: _raised
-        layer: Dwgs.User
     footprints:
+      mcu:
+        what: promicro
+        where:
+          ref: f_c0_r3
+          shift: [9hx/2+dx/2, mcu_top - 17.78]
+          rotate: -90
+        params:
+          # Pin assignments: Left and right row nets are
+          # on the correct side for easier routing. SPI pins
+          # are connected to VIK out. Columns and LED use the
+          # remaining pins. There are not enough enough pins
+          # to connect I2C, but it's not needed for common
+          # trackball and trackpad modules. I2C pins can be
+          # broken out on the PCB and hand-wired to extra
+          # pins available on some controllers if absolutely
+          # needed.
+          orientation: down
+          # SPI
+          P15: SCLK
+          P14: MISO
+          P16: MOSI
+          P10: SPI_CS
+          # Left rows
+          P21: L4
+          P20: L3
+          P19: L2
+          P18: L1
+          # Right rows
+          P2: R4
+          P3: R3
+          P4: R2
+          P5: R1
+          # Columns
+          P0: C5
+          P6: C4
+          P7: C3
+          P8: C2
+          P9: C1
+          # LED
+          P1: TOP_LED
+          # Power and reset
+          RAW: 5V
+          GND: GND
+          RST: RST
+          VCC: 3_3V
+      # Optional reset button
+      reset:
+        what: button
+        where:
+          ref: f_c0_r3
+          shift: [9hx/2+dx/2, mcu_top-7]
+        params:
+          side: B
+          from: GND
+          to: RST
+      # VIK-out connector (use first 12 pins of promicro as placeholder)
+      vik_out:
+        what: promicro
+        where:
+          ref: f_c5_r3
+          shift: [hx/2+dx/2 + 17, -hy/3]
+        params:
+          designator: FFC
+          RAW: 3_3V
+          GND: GND
+          RST: SDA
+          VCC: SCL
+          P21: VIK_LED
+          P20: 5V
+          P19: VIK_GPIO1
+          P18: MOSI
+          P15: VIK_GPIO2
+          P14: SPI_CS
+          P16: MISO
+          P10: SCLK
+      # Connector to top PCB (use first 12 pins of promicro as placeholder)
+      to_top:
+        what: promicro
+        where:
+          ref: f_c5_r3
+          shift: [hx/2+dx/2, 0]
+        params:
+          designator: FFC
+          RAW: RAW
+          GND: GND
+          RST: TOP_LED
+          VCC: BOT_LED
+          P21: C1
+          P20: C2
+          P19: C3
+          P18: C4
+          P15: R1
+          P14: R2
+          P16: L2
+          P10: L1
       keys:
         what: choc
-        where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
-                z2_c1_r2, z2_c2_r2, z2_c3_r2,
-                z1_c1_r1, z1_c2_r1, z1_c3_r1,
-                z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
+        where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
+                z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
+                z2_c5_l, z1_c1_l, z1_c5_l]
         asym: both
         adjust:
           rotate: 180
@@ -849,13 +921,11 @@ pcbs:
           to: "{{colrow}}"
           keycaps: false
           hotswap: true
-          reverse: false
       diodes:
         what: diode
-        where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
-                z2_c1_r2, z2_c2_r2, z2_c3_r2,
-                z1_c1_r1, z1_c2_r1, z1_c3_r1,
-                z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
+        where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
+                z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
+                z2_c5_l, z1_c1_l, z1_c5_l]
         asym: both
         adjust:
           shift: [0, -3.5]
@@ -864,28 +934,46 @@ pcbs:
           to: "{{row_net}}"
       rgb:
         what: rgb
-        where: [z3_c1_r3, z3_c2_r3, z3_c3_r3,
-                z2_c1_r2, z2_c2_r2, z2_c3_r2,
-                z1_c1_r1, z1_c2_r1, z1_c3_r1,
-                z0_c1_r0, z0_c2_r0, z0_c3_r0, z0_c5_r0]
+        where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
+                z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
+                z2_c5_l, z1_c1_l, z1_c5_l]
         asym: both
         adjust.shift: [0, 4.7]
         params:
           side: B
           din: "di_{{colrow}}"
           dout: "do_{{colrow}}"
+          VCC: 5V
 
   mantis_raised:
     outlines:
       raised:
         outline: raised_pcb
     footprints:
+      # Connector to bottom PCB (use first 12 pins of promicro as placeholder)
+      to_bot:
+        what: promicro
+        where:
+          ref: f_c5_r3
+          shift: [hx/2+dx/2, 0]
+        params:
+          designator: FFC
+          RAW: RAW
+          GND: GND
+          RST: TOP_LED
+          VCC: BOT_LED
+          P21: C1
+          P20: C2
+          P19: C3
+          P18: C4
+          P15: R1
+          P14: R2
+          P16: L2
+          P10: L1
       keys:
         what: choc
-        where: [z3_c4_r3, z3_c5_r3,
-                z2_c4_r2, z2_c5_r2,
-                z1_c4_r1, z1_c5_r1,
-                z0_c4_r0]
+        where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
+                z1_c2_l, z1_c3_l, z1_c4_l]
         asym: both
         adjust:
           rotate: 180
@@ -893,62 +981,25 @@ pcbs:
           from: "{{column_net}}"
           to: "{{colrow}}"
           keycaps: false
-          hotswap: false
+          hotswap: true
       diodes:
         what: diode
-        where: [z3_c4_r3, z3_c5_r3,
-                z2_c4_r2, z2_c5_r2,
-                z1_c4_r1, z1_c5_r1,
-                z0_c4_r0]
+        where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
+                z1_c2_l, z1_c3_l, z1_c4_l]
         asym: both
         adjust:
           shift: [0, -3.5]
         params:
           from: "{{colrow}}"
           to: "{{row_net}}"
-      mcu:
-        what: promicro
-        where:
-          ref: f_c0_r3
-          shift: [9hx/2+dx/2, mcu_top - 17.78]
-          rotate: -90
-        params:
-          orientation: up
-          P0: R2
-          P1: R3
-          P2: R1
-          P3: RT
-          P4: C1
-          P5: C2
-          P6: C3
-          P7: C4
-          P8: C5
-          P9: LED
-          P14: M_C4
-          P15: M_C3
-          P16: M_C5
-          P18: M_C2
-          P19: M_C1
-          RAW: VCC
-          VCC: 3_3V
-      reset:
-        what: button
-        where:
-          ref: f_c0_r3
-          shift: [9hx/2+dx/2, mcu_top-7]
-        params:
-          side: F
-          from: GND
-          to: RST
       rgb:
         what: rgb
-        where: [z3_c4_r3, z3_c5_r3,
-                z2_c4_r2, z2_c5_r2,
-                z1_c4_r1, z1_c5_r1,
-                z0_c4_r0]
+        where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
+                z1_c2_l, z1_c3_l, z1_c4_l]
         adjust.shift: [0, 4.7]
         asym: both
         params:
           side: B
           din: "di_{{colrow}}"
           dout: "do_{{colrow}}"
+          VCC: 5V
