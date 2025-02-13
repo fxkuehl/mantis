@@ -114,6 +114,41 @@ module saddle_dish(D, d, alpha, size, n, o = 0, double = false) {
                convexity = 10);
 }
 
+// Saddle-shaped dish with reverse parabolic double-saddle option
+//
+// Parabolic in x-direction. 4th-order polynomial in y-direction with a
+// small parabolic dip in the middle and sloping down beyond that.
+//
+// D - major diameter of the parabolic dish in x-direction
+// d - minor diameter of the parabolic dip in y-direction
+// double - Use reverse parabola in to slope down for positive x
+//
+// At x = 0, y = +-d/2 the slope is 0
+module saddle2_dish(D, d, alpha, size, n, o = 0, double = false) {
+    b = tan(alpha) / D;
+    a = -b * (D/2)^2;
+    c = -2*b / d^2;
+    /*
+    echo(a, b, c);
+    echo("f(0,0)=", a);
+    echo("f(D/2,0)=", b * (D/2)^2 + a);
+    echo("f(0,d/2)=", c * (d/2)^4 + b * (d/2)^2 + a);
+    echo("f(0,size/2)=", c * (size/2)^4 + b * (size/2)^2 + a);
+    */
+    points = [for (i = [0 : n]) each let (y = i * size / n - size/2)
+        [for (j = [0 : n]) let (x = j * size / n - size/2)
+            [x, y,
+             c * y^4 + b * y^2 + a +
+             (double && x > 0 ? -b : b) * x^2 +
+             (double && x > 0 ? 0 : 0) * x^4]
+        ]
+    ];
+    points_offset = o ? __offset_helper(points, n, o) : points;
+    polyhedron(points = concat(points_offset, __points_helper(size)),
+               faces = __faces_helper(n),
+               convexity = 10);
+}
+
 // Saddle-shaped dish with cubic double-saddle option
 //
 // Parabolic in x-direction. 4th-order polynomial in y-direction with a
@@ -124,7 +159,7 @@ module saddle_dish(D, d, alpha, size, n, o = 0, double = false) {
 // double - Use cubic curve in x direction to slope down for positive x
 //
 // At x = 0, y = +-d/2 the slope is 0
-module saddle2_dish(D, d, alpha, size, n, o = 0, double = false) {
+module saddle3_dish(D, d, alpha, size, n, o = 0, double = false) {
     b = tan(alpha) / D;
     c = -2*b / d^2;
     p = double ? 0 : b;

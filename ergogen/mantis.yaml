@@ -211,7 +211,7 @@ points:
             stagger: hy+dy
             column_net: C3
         c4:
-          rows.l.rotate: -60
+          rows.l.rotate: -120
           key:
             spread: hx/2
             stagger: hy

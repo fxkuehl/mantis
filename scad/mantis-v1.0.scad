@@ -66,6 +66,8 @@ head_diameter = 4.0; // [2:0.1:8]
 /* [Keycaps] */
 // RGB LED cutouts
 rgb = false;
+// Saddle shaped dish
+saddle = true;
 // Tilt angle for home keys
 tilt1 = 15;
 // Rise of the home keys
@@ -799,11 +801,11 @@ module key_profile(x) {
     $rgb = rgb;
 
     if (x == 0) {
-        switch_key($tilt=tilt1, $rise=rise1);
+        switch_key($tilt=tilt1, $rise=rise1, $saddle=saddle);
     } else if (x == 1) {
-        switch_key($tilt=tilt2, $rise=rise2);
+        switch_key($tilt=tilt2, $rise=rise2, $saddle=saddle);
     } else if (x == 2) {
-        switch_key($tilt=tilt3, $rise=rise3);
+        switch_key($tilt=tilt3, $rise=rise3, $saddle=saddle);
     }
 }
 
@@ -838,8 +840,8 @@ module keyboard() {
                                                               [2.0, 0, 180, 1]
         ];
         raised_fingers = [
-        [4.0, 2, -60, 1], [4.5, 1, -60, 1],
-        [3.5, 1,-120, 0], [4.0, 0,-120, 0],
+        [4.0, 2, -60, 1], [4.5, 1,-120, 1],
+        [3.5, 1,-120, 0], [4.0, 0,-120, 1],
         [3.0, 0, 180, 2]
         ];
         raised_thumbs =   [[2.5, -1, 60, 0], [3.5, -1, 0, 0]];
