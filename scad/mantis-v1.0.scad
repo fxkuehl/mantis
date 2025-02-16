@@ -109,9 +109,9 @@ forehead_x = (mcu_top - 8*hy/3 + dy/4) * hx / (2*hy/3);
 
 // Fillets and Spacing
 f_key = 3.0;
-s_key = 0.54;
-s_pcb = 0.27;
-spacing = 0.54;
+s_key = 0.5;
+s_pcb = 0.25;
+spacing = 0.5;
 
 // Prevent rendering key in keycap.scad
 no_key = true;
@@ -652,21 +652,8 @@ module sensor() {
 
     // PCB
     color(pcb_color) render(convexity = 4) difference() {
-        union() {
-            v = hx + dx - 2*spacing;
-            translate([-v/2, -5.96 - 1, -9.05 + 1.65])
-                cube([v, 18.75, sensor_pcb_thickness], center=false);
-            w = 2*hx + dx - 2*spacing;
-            translate([-w/2, -5.96 - 1, -9.05 + 1.65])
-                cube([w, 10.5, sensor_pcb_thickness], center=false);
-        }
-
-        // This cut-out is slightly less tall than recommended in the data
-        // sheet. But it should fit while leaving 0.76mm more space for traces
-        // above the sensor package.
-        translate([-8.6/2, -5.96, -9.05 + 1.65])
-            cube([8.6, 16.2, 1.7], center=false);
-
+        translate([0, 0, -9.05+1.65])
+            flat_extrusion("outlines/sensor_pcb.dxf", sensor_pcb_thickness);
         for(p = mounting_points_sensor)
             translate([p.x, p.y, -9.05]) cylinder(5, d=bolt_diameter + 0.2);
     }

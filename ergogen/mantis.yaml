@@ -12,9 +12,6 @@ units:
   kx: 0.54/2
   ky: 1.1547kx
   fk: 3
-  # Space around raised PCB and fillet radius
-  rx: 0.5
-  ry: 1.1547rx
   # Trackball diameter
   d_ball: 34
   # MCU vertical offset from top row key center
@@ -561,7 +558,7 @@ outlines:
     - what: outline
       name: _raised
       operation: add
-      fillet: kx+fk-rx
+      fillet: kx+fk
     - what: outline
       name: _rounded_nibble
       where: [z0_c5_r0, z3_c3_r3]
@@ -742,6 +739,22 @@ outlines:
       operation: subtract
     - what: outline
       name: _mcu_cutout
+      operation: subtract
+  sensor_pcb:
+    - what: rectangle
+      size: [hx+dx-1, 18.75]
+      adjust:
+        shift: [254, -127 + 18.75/2 - 6.96]
+    - what: rectangle
+      size: [2*hx+dx-1, 10.5]
+      adjust:
+        shift: [254, -127 + 10.5/2 - 6.96]
+      operation: add
+      fillet: 1
+    - what: rectangle
+      size: [8.6, 16.2]
+      adjust:
+        shift: [254, -127 + 16.2/2 - 5.96]
       operation: subtract
 
   composite_plates:
