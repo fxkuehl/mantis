@@ -647,22 +647,25 @@ module lens(offset) {
  */
 module sensor() {
     // Sensor package
-    color("dimgray") translate([-5.45, -5.48, -9.05])
-        cube([10.9, 16.2, 2.91], center=false);
+    color("dimgray") translate([-5.05, -5.48, -9.05])
+        cube([10.1, 16.2, 2.91], center=false);
 
     // PCB
     color(pcb_color) render(convexity = 4) difference() {
         union() {
             v = hx + dx - 2*spacing;
-            translate([-v/2, -5.48 - 1, -9.05 + 1.65])
-                cube([v, 18, sensor_pcb_thickness], center=false);
+            translate([-v/2, -5.96 - 1, -9.05 + 1.65])
+                cube([v, 18.75, sensor_pcb_thickness], center=false);
             w = 2*hx + dx - 2*spacing;
-            translate([-w/2, -5.48 - 1, -9.05 + 1.65])
-                cube([w, 10, sensor_pcb_thickness], center=false);
+            translate([-w/2, -5.96 - 1, -9.05 + 1.65])
+                cube([w, 10.5, sensor_pcb_thickness], center=false);
         }
 
-        translate([-8.9/2, -5.48, -8.55 + 1.65])
-            cube([8.9, 15.2, 1.7], center=false);
+        // This cut-out is slightly less tall than recommended in the data
+        // sheet. But it should fit while leaving 0.76mm more space for traces
+        // above the sensor package.
+        translate([-8.6/2, -5.96, -9.05 + 1.65])
+            cube([8.6, 16.2, 1.7], center=false);
 
         for(p = mounting_points_sensor)
             translate([p.x, p.y, -9.05]) cylinder(5, d=bolt_diameter + 0.2);
