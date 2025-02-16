@@ -625,14 +625,14 @@ module ffc_connector() {
 
 module main_pcb_assembly() {
     main_pcb();
-    translate([0, hy, 0]) rotate([0, 180, 0]) ffc_connector();
-    translate([-17, 2*hy/3, 0]) rotate([0, 180, 0]) ffc_connector();
+    translate([0, 7*hy/3, 0]) rotate([0, 180, 0]) ffc_connector();
+    translate([-17, 4*hy/3, 0]) rotate([0, 180, 0]) ffc_connector();
     translate([0, mcu_y, pcb_thickness]) controller();
 }
 
 module raised_pcb_assembly() {
     raised_pcb();
-    translate([0, hy, 0]) rotate([0, 180, 0]) ffc_connector();
+    translate([0, 2*hy/3, 0]) rotate([0, 180, 180]) ffc_connector();
 }
 
 module lens(offset) {
@@ -659,7 +659,7 @@ module sensor() {
     }
 
     // Connector
-    translate([-17, -3, -9.05 + 1.65]) rotate([0, 180, 0]) ffc_connector();
+    translate([-17, -3, -9.05 + 1.65]) rotate([0, 180, 180]) ffc_connector();
 
     // Lens
     color("#ffffff", 0.3) lens(0);

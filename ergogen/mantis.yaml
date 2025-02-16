@@ -450,6 +450,10 @@ outlines:
     - what: rectangle
       size: [13.8, 13.8]
       fillet: 0.6
+  _ffc_cutout:
+    - what: rectangle
+      size: [7, 3.5]
+      fillet: 1
   _mcu_cutout:
     - what: rectangle
       size: [17.78 + 4kx, 33.02 + 4kx]
@@ -457,16 +461,6 @@ outlines:
         ref: f_c0_r3
         shift: [9hx/2+dx/2, mcu_top-16.51]
       fillet: 2kx
-  _mounting_cutout:
-    - what: rectangle
-      size: [2hx + dx + 2kx, 2mount_width]
-      where:
-        ref: f_c0_r3
-        shift: [9hx/2+dx/2, mcu_top]
-    - what: outline
-      name: _mcu_cutout
-      operation: subtract
-      fillet: mount_width/2
   _main_cutouts:
     - what: rectangle
       size: [2hx + dx + 2kx, 2mount_width]
@@ -474,8 +468,37 @@ outlines:
         ref: f_c0_r3
         shift: [9hx/2+dx/2, mcu_top]
       fillet: mount_width/2
+  _main_pcb_cutouts:
+    - what: outline
+      name: _main_cutouts
     - what: outline
       name: _mcu_cutout
+      operation: subtract
+      fillet: mount_width/2
+    - what: outline
+      name: _ffc_cutout
+      where:
+        ref: f_c0_r3
+        shift: [9hx/2+dx/2-17, -3hy+4hy/3 - 5]
+      operation: add
+    - what: outline
+      name: _ffc_cutout
+      where:
+        ref: f_c0_r3
+        shift: [9hx/2+dx/2, -3hy+7hy/3 - 5]
+      operation: add
+  _main_plate_cutouts:
+    - what: outline
+      name: _main_cutouts
+    - what: outline
+      name: _mcu_cutout
+      operation: add
+    - what: outline
+      name: _ffc_cutout
+      where:
+        ref: f_c0_r3
+        shift: [9hx/2+dx/2-17, -3hy+4hy/3 - 6.5]
+      operation: add
   _trackball:
     - what: circle
       where:
@@ -596,7 +619,7 @@ outlines:
       asym: both
       operation: subtract
     - what: outline
-      name: _mounting_cutout
+      name: _main_pcb_cutouts
       operation: subtract
   _main_deck:
     - what: outline
@@ -648,7 +671,7 @@ outlines:
       asym: both
       operation: subtract
     - what: outline
-      name: _main_cutouts
+      name: _main_plate_cutouts
       operation: subtract
   main_split_plate:
     - what: outline
