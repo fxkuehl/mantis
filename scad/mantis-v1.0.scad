@@ -511,10 +511,10 @@ module case() union() {
         render(convexity=10) union() {
             base_plate_base(hfit, vfit);
             case_inside(0, 0);
-            translate([0, 0, main_height - deck_thickness - 0.01])
-                main_key_slots(deck_thickness + 0.02);
-            translate([0, 0, main_height - deck_thickness - 0.01])
-                raised_key_slots(raised_height + deck_thickness + 0.02);
+            translate([0, 0, main_height - deck_thickness - vfit - 0.01])
+                main_key_slots(deck_thickness + vfit + 0.02);
+            translate([0, 0, main_height - deck_thickness - vfit - 0.01])
+                raised_key_slots(raised_height + deck_thickness + vfit + 0.02);
 
             translate(trackball_position)
                 corr_sphere(trackball_radius + spacing);
