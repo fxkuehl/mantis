@@ -625,7 +625,7 @@ module ffc_connector() {
 
 module main_pcb_assembly() {
     main_pcb();
-    translate([0, 7*hy/3, 0]) rotate([0, 180, 0]) ffc_connector();
+    translate([0, hy, 0]) rotate([0, 180, 0]) ffc_connector();
     translate([-17, 4*hy/3, 0]) rotate([0, 180, 0]) ffc_connector();
     translate([0, mcu_y, pcb_thickness]) controller();
 }
@@ -749,10 +749,10 @@ module trackball_holder() intersection() {
                     }
                 }
                 w = 2*hx + dx;
-                h = 12;
+                h = 25;
                 translate(trackball_position) rotate([60, 0, 0])
-                    translate([-w/2, -h, -trackball_radius - h])
-                    cube([w, 20, h - 2.4 + vfit], center=false);
+                    translate([-w/2, -10, -trackball_radius - h])
+                    cube([w, 30, h - 2.4 + vfit], center=false);
             }
             color(mc, alpha=ca)
                 translate(trackball_position) rotate([60, 0, 0])

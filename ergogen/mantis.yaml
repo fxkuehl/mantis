@@ -452,7 +452,7 @@ outlines:
       fillet: 0.6
   _ffc_cutout:
     - what: rectangle
-      size: [7, 3.5]
+      size: [7, 3]
       fillet: 1
   _mcu_cutout:
     - what: rectangle
@@ -479,13 +479,7 @@ outlines:
       name: _ffc_cutout
       where:
         ref: f_c0_r3
-        shift: [9hx/2+dx/2-17, -3hy+4hy/3 - 5]
-      operation: add
-    - what: outline
-      name: _ffc_cutout
-      where:
-        ref: f_c0_r3
-        shift: [9hx/2+dx/2, -3hy+7hy/3 - 5]
+        shift: [9hx/2+dx/2-17, -13hy/6]
       operation: add
   _main_plate_cutouts:
     - what: outline
@@ -497,7 +491,14 @@ outlines:
       name: _ffc_cutout
       where:
         ref: f_c0_r3
-        shift: [9hx/2+dx/2-17, -3hy+4hy/3 - 6.5]
+        shift: [9hx/2+dx/2-17, -13hy/6 - 1.5]
+      operation: add
+    # Make the plate symmetrical for easier assembly
+    - what: outline
+      name: _ffc_cutout
+      where:
+        ref: f_c0_r3
+        shift: [9hx/2+dx/2+17, -13hy/6 - 1.5]
       operation: add
   _trackball:
     - what: circle
@@ -537,11 +538,11 @@ outlines:
       - shift: [0, hy]
       - shift: [-hx/2, hy/3]
       - shift: [0, 4hy/3 + dy]
-      #- shift: [hx + dx/2 + kx, 2hy/3 + dy/4 + ky/2]
-      #- shift: [hx + dx/2 + kx, -2hy/3 - dy/4 - ky/2]
-      - shift: [hx/2, hy/3]
-      - shift: [hx + dx + 2kx, 0]
-      - shift: [hx/2, -hy/3]
+      - shift: [hx + dx/2 + kx, 2hy/3 + dy/4 + ky/2]
+      - shift: [hx + dx/2 + kx, -2hy/3 - dy/4 - ky/2]
+      #- shift: [hx/2, hy/3]
+      #- shift: [hx + dx + 2kx, 0]
+      #- shift: [hx/2, -hy/3]
       - shift: [0, -4hy/3 - dy]
       - shift: [-hx/2, -hy/3]
       - shift: [0, -hy]
@@ -913,7 +914,7 @@ pcbs:
         what: promicro
         where:
           ref: f_c5_r3
-          shift: [hx/2+dx/2 + 17, -hy/3]
+          shift: [hx/2+dx/2 - 17, hy/3]
         params:
           designator: FFC
           RAW: 3_3V
