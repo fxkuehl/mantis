@@ -382,8 +382,8 @@ mounting_points_raised = [
 ];
 
 mounting_points_sensor = [
-    [-10, 0],
-    [ 10, 0]
+    [-9, 0],
+    [ 9, 0]
 ];
 
 module trackball_frame(h, oo, oi, f) difference() {
