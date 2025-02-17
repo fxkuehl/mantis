@@ -893,9 +893,9 @@ pcbs:
           P8: C2
           P9: C1
           # LED
-          P1: TOP_LED
+          P1: LED
           # Power and reset
-          RAW: 5V
+          RAW: VCC
           GND: GND
           RST: RST
           VCC: 3_3V
@@ -922,7 +922,7 @@ pcbs:
           RST: SDA
           VCC: SCL
           P21: VIK_LED
-          P20: 5V
+          P20: VCC
           P19: VIK_GPIO1
           P18: MOSI
           P15: VIK_GPIO2
@@ -937,7 +937,7 @@ pcbs:
           shift: [hx/2+dx/2, 0]
         params:
           designator: FFC
-          RAW: RAW
+          RAW: VCC
           GND: GND
           RST: TOP_LED
           VCC: BOT_LED
@@ -959,19 +959,32 @@ pcbs:
           rotate: 180
         params:
           from: "{{column_net}}"
-          to: "{{colrow}}"
+          to: "{{column_net}}_{{row_net}}"
           keycaps: false
           hotswap: true
-      diodes:
+      diodes_l:
         what: diode
         where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
                 z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
                 z2_c5_l, z1_c1_l, z1_c5_l]
-        asym: both
+        asym: source
         adjust:
-          shift: [0, -3.5]
+          shift: [5.8, -4.1]
+          rotate: -90
         params:
-          from: "{{colrow}}"
+          from: "{{column_net}}_{{row_net}}"
+          to: "{{row_net}}"
+      diodes_r:
+        what: diode
+        where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
+                z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
+                z2_c5_l, z1_c1_l, z1_c5_l]
+        asym: clone
+        adjust:
+          shift: [-5.8, -4.1]
+          rotate: 90
+        params:
+          from: "{{column_net}}_{{row_net}}"
           to: "{{row_net}}"
       rgb:
         what: rgb
@@ -982,9 +995,8 @@ pcbs:
         adjust.shift: [0, 4.7]
         params:
           side: B
-          din: "di_{{colrow}}"
-          dout: "do_{{colrow}}"
-          VCC: 5V
+          din: "DI_{{column_net}}_{{row_net}}"
+          dout: "DO_{{column_net}}_{{row_net}}"
 
   mantis_raised:
     outlines:
@@ -992,25 +1004,27 @@ pcbs:
         outline: raised_pcb
     footprints:
       # Connector to bottom PCB (use first 12 pins of promicro as placeholder)
+      # Inverted pin assignment and 180° rotation for type A cable
       to_bot:
         what: promicro
         where:
           ref: f_c5_r3
-          shift: [hx/2+dx/2, 0]
+          shift: [hx/2+dx/2, -7]
+          rotate: 180
         params:
           designator: FFC
-          RAW: RAW
-          GND: GND
-          RST: TOP_LED
-          VCC: BOT_LED
-          P21: C1
-          P20: C2
-          P19: C3
-          P18: C4
-          P15: R1
-          P14: R2
-          P16: L2
-          P10: L1
+          RAW: L1
+          GND: L2
+          RST: R2
+          VCC: R1
+          P21: C4
+          P20: C3
+          P19: C2
+          P18: C1
+          P15: BOT_LED
+          P14: TOP_LED
+          P16: GND
+          P10: VCC
       keys:
         what: choc
         where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
@@ -1020,18 +1034,30 @@ pcbs:
           rotate: 180
         params:
           from: "{{column_net}}"
-          to: "{{colrow}}"
+          to: "{{column_net}}_{{row_net}}"
           keycaps: false
           hotswap: true
-      diodes:
+      diodes_l:
         what: diode
         where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
                 z1_c2_l, z1_c3_l, z1_c4_l]
-        asym: both
+        asym: source
         adjust:
-          shift: [0, -3.5]
+          shift: [5.8, -4.1]
+          rotate: -90
         params:
-          from: "{{colrow}}"
+          from: "{{column_net}}_{{row_net}}"
+          to: "{{row_net}}"
+      diodes_r:
+        what: diode
+        where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
+                z1_c2_l, z1_c3_l, z1_c4_l]
+        asym: clone
+        adjust:
+          shift: [-5.8, -4.1]
+          rotate: 90
+        params:
+          from: "{{column_net}}_{{row_net}}"
           to: "{{row_net}}"
       rgb:
         what: rgb
@@ -1041,6 +1067,5 @@ pcbs:
         asym: both
         params:
           side: B
-          din: "di_{{colrow}}"
-          dout: "do_{{colrow}}"
-          VCC: 5V
+          din: "DI_{{column_net}}_{{row_net}}"
+          dout: "DO_{{column_net}}_{{row_net}}"
