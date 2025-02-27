@@ -789,8 +789,8 @@ module raised_gasket_pads()
             radius = deck_thickness + gasket_pad_thickness;
             angle = 12;
             translate(pivot) rotate([0, 90, 0])
-                linear_extrude(3*hx, center=true) offset(r = radius)
-                polygon([[0, -hy], [0, 0], hy*[sin(angle), cos(angle)]]);
+                linear_extrude(6*hx, center=true) offset(r = radius)
+                polygon([[0, -6*hy], [0, 0], hy*[sin(angle), cos(angle)]]);
         }
 module mezzanine() {
     ca = render_case ? 0 : case_alpha;
