@@ -26,13 +26,17 @@ case_alpha = 1.0; // [0.1:0.1:1.0]
 show_desk = true;
 
 /* [Design dimensions in mm] */
+// Fillet style
+fillet_style = 1;      // [0:Flat, 1:Parabolic, 2:Circular]
+// Edge fillet radius
+r_edge = 1;             // [0.5:0.1:5]
+// Corner fillet radius
+r_corner = 2;           // [0.5:0.1:5]
+wall_thickness = 2;     // [0.5:0.1:5]
 main_height = 13;       // [5:0.1:15]
 raised_height = 10;     // [5:0.1:15]
 base_thickness = 2.5;   // [0.5:0.1:5]
 deck_thickness = 3;     // [0.5:0.1:5]
-wall_thickness = 2.5;   // [0.5:0.1:5]
-// Edge fillet radius
-r_edge = 2.5;           // [0.5:0.1:5]
 pcb_thickness = 1.2;    // [0.5:0.1:2]
 sensor_pcb_thickness = 1.6;// [0.5:0.1:2]
 plate_thickness = 1.2;  // [0.5:0.1:2]
@@ -157,7 +161,7 @@ module half_hex_outline() polygon([
     [-hx/2,  1 * hy/3]
 ]);
 
-module main_outline_template() polygon([
+main_outline_points = [
     [             0, -6*hy/3 - dy + dy/4],  // mouth
     [    -hx - dx/2, -8*hy/3 - dy],         // left mandible
     [-3.0*hx - dx/2, -4*hy/3 - dy],
@@ -177,7 +181,65 @@ module main_outline_template() polygon([
     [ 3.0*hx + dx/2, -2*hy/3],              // right mandible
     [ 3.0*hx + dx/2, -4*hy/3 - dy],
     [     hx + dx/2, -8*hy/3 - dy]
-]);
+];
+
+module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
+                         fille_style, round_bottom=true) {
+    assert(f_edge <= f_corner);
+
+    n = len(points);
+    m = round(3.1416 / 3 * fxy / $fs);
+    p = n * (m + 1);
+    ac = tan(60)^2 / (4*f_corner);
+    ae = tan(60)^2 / (4*f_edge);
+    z1 = fillet_style == 1 ? sqrt(f_corner/ac) : f_corner;
+    q = round(z1 * 1.5708 / $fs);
+    Q = round_bottom ? 2*q : q;
+    fscale = 1 / (1 / sin(60) - 1);
+    //echo(z1, q);
+
+    bottom = at_z(round_bottom ?
+        offset_fillet_poly(points, o-f_edge, fxy+f_edge,
+                           fxy-f_edge+(f_corner-f_edge)*fscale, m) :
+        offset_fillet_poly(points, o, fxy, fxy, m), 0);
+    top = at_z(offset_fillet_poly(points, o-f_edge, fxy+f_edge,
+                                  fxy-f_edge+(f_corner-f_edge)*fscale, m), h);
+
+    bottom_fillet = round_bottom ? [for (i = [1 : q]) each let (
+        z = (fillet_style == 2 ? cos(90*i/q) : 1 - i/q) * z1,
+        _r = max(0, f_edge - (z1-z)),
+        r = fillet_style == 0 ? _r :
+            fillet_style == 1 ? ae * _r^2 :
+                                f_edge - sqrt(f_edge^2 - _r^2),
+        dr = ((fillet_style == 0 ? z :
+               fillet_style == 1 ? ac * z^2 :
+                                   z1-sqrt(f_corner^2 - z^2))
+              - r) * fscale
+    ) at_z(offset_fillet_poly(points, o - r, fxy + r,
+                              fxy - r + dr, m), z1 - z)] : [];
+    top_fillet = [for (i = [q : -1 : 1]) each let (
+        z = (fillet_style == 2 ? cos(90*i/q) : 1 - i/q) * z1,
+        _r = max(0, f_edge - (z1-z)),
+        r = fillet_style == 0 ? _r :
+            fillet_style == 1 ? ae * _r^2 :
+                                f_edge - sqrt(f_edge^2 - _r^2),
+        dr = ((fillet_style == 0 ? z :
+               fillet_style == 1 ? ac * z^2 :
+                                   z1-sqrt(f_corner^2 - z^2))
+              - r) * fscale
+    ) at_z(offset_fillet_poly(points, o - r, fxy + r,
+                              fxy - r + dr, m), h - z1 + z)];
+    points = concat(bottom, bottom_fillet, top_fillet, top);
+    bottom_face = [for (i = [p-1 : -1 : 0]) i];
+    top_face = [for (i = [p * (1 + Q) : p * (2 + Q) - 1]) i];
+    side_faces = [for (i = [0 : Q]) each
+        [for (j = [0 : p-1])
+            [i*p + j, i*p + (j+1)%p, (i+1)*p + (j+1)%p, (i+1)*p + j]]];
+    faces = concat([bottom_face, top_face], side_faces);
+    polyhedron(points, faces, convexity=10);
+}
+
+module main_outline_template() polygon(main_outline_points);
 module main_outline(variant) difference() {
     main_outline_template();
     if (variant == 1) {
@@ -219,15 +281,58 @@ module main_extrusion(h, o, fxy, fz, variant=0) {
     }
 }
 
-module raised_outline() {
-    wx = wall_thickness;
-    wy = 1.1547*wx;
-    polygon([
+raised_outline_points = let (
+    wx = wall_thickness,
+    wy = 1.1547*wx
+) [
     [-0.5*hx - dx/2 + kx, -5*hy/3 - dy + ky + wy+ky/2],
+    [-1.0*hx - dx/2 + wx + 2*kx, -4*hy/3 - dy + ky + wy/2],
   //[-1.0*hx - dx/2 + wx + kx, -4*hy/3 - dy + ky + wy/2+ky/2],
-  [-1.0*hx - dx/2 + kx, -4*hy/3 - dy + ky + wy+ky/2],
-  [-1.0*hx - dx/2 + kx, -4*hy/3 - dy + ky + ky/2],
-    [-1.5*hx - dx/2     , -5*hy/3 - dy + ky],
+  //[-1.0*hx - dx/2 + kx, -4*hy/3 - dy + ky + wy+ky/2],
+  //[-1.0*hx - dx/2 + kx, -4*hy/3 - dy + ky + ky/2],
+    //[-1.5*hx - dx/2     , -5*hy/3 - dy + ky],
+    //[-1.5*hx - dx/2     , -5*hy/3 - dy],
+    [-2.0*hx - dx/2     , -6*hy/3 - dy],
+    [-3.0*hx - dx/2     , -4*hy/3 - dy],
+    [-3.0*hx - dx/2     , -2*hy/3 - dy],
+    [-2.5*hx - dx/2 + kx,   -hy/3 - dy + ky],
+    [-2.5*hx - dx/2 + kx,    hy/3 - ky/2],
+    [-2.0*hx - dx/2 + kx,  2*hy/3 - ky/2],
+    [-2.0*hx - dx/2 + kx,  4*hy/3 - ky/2],
+    [-1.5*hx - dx/2 + kx,  5*hy/3 - ky/2],
+    [-1.5*hx - dx/2 + kx,  7*hy/3 - ky/2],
+    [-1.0*hx - dx/2 + kx,  8*hy/3 - ky/2],
+    [-1.0*hx - dx/2 + kx, mcu_top],
+    [ 1.0*hx + dx/2 - kx, mcu_top],
+    [ 1.0*hx + dx/2 - kx,  8*hy/3 - ky/2],
+    [ 1.5*hx + dx/2 - kx,  7*hy/3 - ky/2],
+    [ 1.5*hx + dx/2 - kx,  5*hy/3 - ky/2],
+    [ 2.0*hx + dx/2 - kx,  4*hy/3 - ky/2],
+    [ 2.0*hx + dx/2 - kx,  2*hy/3 - ky/2],
+    [ 2.5*hx + dx/2 - kx,    hy/3 - ky/2],
+    [ 2.5*hx + dx/2 - kx,   -hy/3 - dy + ky],
+    [ 3.0*hx + dx/2     , -2*hy/3 - dy],
+    [ 3.0*hx + dx/2     , -4*hy/3 - dy],
+    [ 2.0*hx + dx/2     , -6*hy/3 - dy],
+    //[ 1.5*hx + dx/2     , -5*hy/3 - dy],
+    //[ 1.5*hx + dx/2     , -5*hy/3 - dy + ky],
+  //[ 1.0*hx + dx/2 - kx, -4*hy/3 - dy + ky + ky/2],
+  //[ 1.0*hx + dx/2 - kx, -4*hy/3 - dy + ky + wy+ky/2],
+  //[ 1.0*hx + dx/2 - wx - kx, -4*hy/3 - dy + ky + wy/2+ky/2],
+    [ 1.0*hx + dx/2 - wx - 2*kx, -4*hy/3 - dy + ky + wy/2],
+    [ 0.5*hx + dx/2 - kx, -5*hy/3 - dy + ky + wy+ky/2]
+];
+
+raised_outline_points1 = let (
+    wx = wall_thickness,
+    wy = 1.1547*wx
+) [
+    [-0.5*hx - dx/2 + kx, -5*hy/3 - dy + ky + wy+ky/2],
+  //[-1.0*hx - dx/2 + wx + 2*kx, -4*hy/3 - dy + ky + wy/2],
+  //[-1.0*hx - dx/2 + wx + kx, -4*hy/3 - dy + ky + wy/2+ky/2],
+    [-1.25*hx - dx/2 + kx, -7*hy/6 - dy + ky + wy+ky/2],
+  //[-1.0*hx - dx/2 + kx, -4*hy/3 - dy + ky + ky/2],
+    [-1.5*hx - dx/2     , -5*hy/3 - dy + ky + hy/2],
     [-1.5*hx - dx/2     , -5*hy/3 - dy],
     [-2.0*hx - dx/2     , -6*hy/3 - dy],
     [-3.0*hx - dx/2     , -4*hy/3 - dy],
@@ -251,14 +356,16 @@ module raised_outline() {
     [ 3.0*hx + dx/2     , -2*hy/3 - dy],
     [ 3.0*hx + dx/2     , -4*hy/3 - dy],
     [ 2.0*hx + dx/2     , -6*hy/3 - dy],
-    [ 1.5*hx + dx/2     , -5*hy/3 - dy],
-    [ 1.5*hx + dx/2     , -5*hy/3 - dy + ky],
-  [ 1.0*hx + dx/2 - kx, -4*hy/3 - dy + ky + ky/2],
-  [ 1.0*hx + dx/2 - kx, -4*hy/3 - dy + ky + wy+ky/2],
-  //[ 1.0*hx + dx/2 - wx - kx, -4*hy/3 - dy + ky + wy/2+ky/2],
+    //[ 1.5*hx + dx/2     , -5*hy/3 - dy],
+    //[ 1.5*hx + dx/2     , -5*hy/3 - dy + ky],
+  //[ 1.0*hx + dx/2 - kx, -4*hy/3 - dy + ky + ky/2],
+  //[ 1.0*hx + dx/2 - kx, -4*hy/3 - dy + ky + wy+ky/2],
+    [ 1.0*hx + dx/2 - wx - 2*kx, -4*hy/3 - dy + ky + wy/2],
     [ 0.5*hx + dx/2 - kx, -5*hy/3 - dy + ky + wy+ky/2]
-    ]);
-}
+];
+
+
+module raised_outline() polygon(raised_outline_points);
 module raised_offset_fillet(o, fo, fi)
     offset(r     =     fo, $fa = fa_from_fs(fo))
     offset(r     = -fo-fi, $fa = fa_from_fs(fi))
@@ -445,13 +552,15 @@ module case_inside(oh, ov) difference() {
 //translate([0, 0, 50]) case_inside(hfit, vfit);
 module case_outside() {
     union() {
-        main_extrusion(main_height,
-                       s_pcb + wall_thickness,
-                       f_key + s_key + wall_thickness, r_edge);
-        translate([0, 0, main_height - r_edge])
-            raised_extrusion(raised_height + r_edge,
-                             s_pcb + wall_thickness,
-                             f_key + s_key + wall_thickness, r_edge);
+        fillet_polyhedron(main_outline_points, main_height,
+                          s_pcb + wall_thickness,
+                          f_key + s_key + wall_thickness, r_edge, r_corner,
+                          fillet_style);
+        translate([0, 0, main_height - 2*r_corner])
+            fillet_polyhedron(raised_outline_points, raised_height + 2*r_corner,
+                              s_pcb + wall_thickness,
+                              f_key + s_key + wall_thickness, r_edge, r_corner,
+                              fillet_style, round_bottom=false);
     }
 }
 module base_plate_base(oh, ov) intersection() {
