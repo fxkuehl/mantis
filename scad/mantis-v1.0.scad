@@ -493,6 +493,7 @@ mounting_points_sensor = [
     [ 9, 0]
 ];
 
+trackball_wall = 2.0;
 module trackball_frame(h, oo, oi, f) difference() {
     linear_extrude(h) offset(r = f) offset(delta = oo - f) polygon([
         [  -hx/2 - dx/2, -5 * hy/3 - dy],
@@ -507,7 +508,7 @@ module trackball_frame(h, oo, oi, f) difference() {
     ]);
     translate([trackball_position.x, trackball_position.y, -0.01]) union() {
         cylinder(h + 0.02,
-                 r = trackball_radius + s_key + wall_thickness + 0.1 - oi);
+                 r = trackball_radius + s_key + trackball_wall + hfit - oi);
         translate([0, 0, h/2 + 0.01])
             cube([2*hx + dx + 2*oo - 2*oi - 2*post_diameter,
                  trackball_diameter, h + 0.02], center = true);
@@ -534,22 +535,23 @@ module pivot_installation_cut(width, o, fxy) difference() {
         }
 }
 //translate([0, 0, 0]) pivot_installation_cut(7*hx + dx, s_pcb, f_key + s_key);
-module case_inside(oh, ov) difference() {
-    union() {
-        translate([0, 0, base_thickness + ov])
-            main_extrusion(main_height-base_thickness-deck_thickness - 2*ov,
-                           s_pcb - oh, f_key + s_key - oh, 0, 1);
+module case_inside(oh, ov) union() {
+    translate([0, 0, base_thickness + ov])
+        main_extrusion(main_height-base_thickness-deck_thickness - 2*ov,
+                       s_pcb - oh, f_key + s_key - oh, 0, 1);
+    difference() {
         translate([0, 0, main_height - deck_thickness - ov - 0.01])
             raised_extrusion(raised_height + 0.01,
                              s_pcb - oh, f_key + s_key - oh, 0);
+        translate([0, 0,
+                   main_height - deck_thickness + base_thickness + vfit])
+            trackball_frame(raised_height, -s_key/2, oh, f_key + s_key);
+        width = oh ? 7*hx + dx : 2*hx + dx;
+        pivot_installation_cut(width, s_pcb - oh, f_key + s_key - oh);
     }
-    translate([0, 0,
-               main_height - deck_thickness + base_thickness + vfit])
-        trackball_frame(raised_height, -s_key/2, oh, f_key + s_key);
-    width = oh ? 7*hx + dx : 2*hx + dx;
-    pivot_installation_cut(width, s_pcb - oh, f_key + s_key - oh);
 }
 //translate([0, 0, 50]) case_inside(hfit, vfit);
+
 module case_outside() {
     union() {
         fillet_polyhedron(main_outline_points, main_height,
@@ -841,7 +843,7 @@ module bearings(size, offset, what=0) {
 module trackball_holder() intersection() {
     ca = render_case ? 0 : case_alpha;
     mc = render_case ? undef : mezzanine_color;
-    wall = 2.0;
+    wall = trackball_wall;
     difference() {
         union() {
             difference() {

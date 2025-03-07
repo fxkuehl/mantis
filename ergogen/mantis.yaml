@@ -516,10 +516,10 @@ outlines:
     - what: polygon
       points:
       - ref: t_c3_r1
-        shift: [hx/2 - kx, -2hy/3 + ky]
+        shift: [hx/2 - kx, -2hy/3 - ky/2]
       - shift: [0, hy]
       - shift: [-hx/2, hy/3]
-      - shift: [0, 2hy/3 + dy]
+      - shift: [0, 2hy/3 + dy + ky]
       - shift: [hx/2, hy/3]
       - shift: [0, 2hy/3]
       #- shift: [hx/2 + dx/2 + kx, hy/3 + dy/4 + ky/2]
@@ -527,26 +527,25 @@ outlines:
       - shift: [hx + dx + 2kx, 0]
       - shift: [0, -2hy/3]
       - shift: [hx/2, -hy/3]
-      - shift: [0, -2hy/3 - dy]
+      - shift: [0, -2hy/3 - dy - ky]
       - shift: [-hx/2, -hy/3]
       - shift: [0, -hy]
   _trackball_main_cutout:
     - what: polygon
       points:
       - ref: t_c3_r1
-        shift: [hx/2 - kx, -2hy/3 + ky]
+        shift: [hx/2 - kx, -2hy/3 - ky/2]
       - shift: [0, hy]
       - shift: [-hx/2, hy/3]
-      - shift: [0, 4hy/3 + dy]
+      - shift: [0, 4hy/3 + dy + ky]
       - shift: [hx + dx/2 + kx, 2hy/3 + dy/4 + ky/2]
       - shift: [hx + dx/2 + kx, -2hy/3 - dy/4 - ky/2]
       #- shift: [hx/2, hy/3]
       #- shift: [hx + dx + 2kx, 0]
       #- shift: [hx/2, -hy/3]
-      - shift: [0, -4hy/3 - dy]
+      - shift: [0, -4hy/3 - dy - ky]
       - shift: [-hx/2, -hy/3]
       - shift: [0, -hy]
-      operation: add
   _raised_padded:
     $extends: outlines._raised_template
     $args: [kx, ky]
