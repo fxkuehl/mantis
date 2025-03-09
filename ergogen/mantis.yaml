@@ -78,151 +78,107 @@ points:
       rows:
         r1:
 
-    # This section defines the switch matrix. It's quite unintuitive.
-    # 5x8 instead of 10x4 to reduce the number of controller pins needed
-    # and arranged to minimize the number of pins to the top PCB (4x4).
-    # Keys are rotated in 60° increments to make a simulated key well
-    # with sculpted key caps. Define each "row" in its own zone to make
-    # the key rotation easier. Otherwise the spread and stagger get very
-    # confusing.
+    # This section defines the switch matrix and switch rotation. Keys
+    # are rotated in 60° increments to make a simulated key well with
+    # sclupted keycaps.
     #
-    # Mirroring changes the row net, not the column net. Matrix rows
-    # don't correspond with key rows. Think of them as zones instead.
-    # There are only two zones with 4 "columns" on the top PCB describing
-    # the left half. With mirror zones, that makes 4 zones x 4 columns.
+    # The 7x6 matrix for up to 42 keys leaves room for two mouse buttons.
+    # Each keyboard half as 3 rows, 7 columns. Thus mirroring changes the
+    # the row net. The raised PCB uses 2 mirrored "rows" and 4 "columns"
+    # for an optimal 4x4 matrix requiring 8 pins to connect the two PCBs.
+    # Matrix "rows" correspond approximately with rows on the main PCB
+    # and columns on the raised PCB. The top two rows on main have 4
+    # columns, the lower row as 3 columns. The lowest middle finger and
+    # thumb key as well as a possible mouse key are added to the top
+    # 4-column row. The raised PCB "rows" complete the lower two rows
+    # of the main PCB.
     #
-    # The remainging 2 zones + 2 mirrors are used for the outside
-    # keys. The middle finger column is the only complete column with
-    # 4 rows on the main PCB.
-    z4:
-      anchor:
-        ref: f_c0_r2
+    # Each row uses its own zone to make the key rotation easier.
+    # Otherwise the spread and stagger get very confusing because they
+    # are relative to the rotation of the first key in the previous row
+    # in the same zone.
+    zn1: # Lower row (3) + outer raised column (4) = 7
+      anchor.ref: f_c4_r3
+      rows.l:
+        rotate: 180
+        row_net: L1
+        mirror.row_net: R1
+      columns:
+        c1:
+          rows.l.rotate: -60
+          key.column_net: C1
+        c2.key:
+          spread: -7hx/2
+          stagger: -hy
+          column_net: C2
+        c3.key.column_net: C3
+        c4.key.column_net: C4
+        c5:
+          rows.l.rotate: -120
+          key.column_net: C5
+        c6.key:
+          spread: -hx/2
+          stagger: -hy
+          column_net: C6
+        c7:
+          rows.l.rotate: 60
+          key:
+            spread: -hx/2
+            stagger: -hy - dy
+            column_net: C7
+    zn2: # Middle row (4) + inner raised column (3) = 7
+      anchor.ref: f_c0_r2
+      rows.l:
+        rotate: -120
+        row_net: L2
+        mirror.row_net: R2
       columns:
         c1:
           rows.l.rotate: 120
-          key:
-            column_net: C1
-        c2:
+          key.column_net: C1
+        c2.key.column_net: C2
+        c3.key.column_net: C3
+        c4.key.column_net: C4
+        c5.key:
+          spread: 3hx/2
+          stagger: -hy
+          column_net: C5
+        c6.key:
+          spread: -hx/2
+          stagger: -hy
+          column_net: C6
+        c7:
           rows.l.rotate: 0
           key:
-            spread: hx/2
-            stagger: hy
-            column_net: C2
-        c3:
-          key:
-            column_net: C3
-        c4:
-          key:
-            column_net: C4
-        c5:
-          key:
-            column_net: C5
-      rows:
-        l:
-          row_net: L4
-          mirror.row_net: R4
-          rotate: -60
-    z3:
-      anchor:
-        ref: f_c1_r1
+            spread: -hx/2
+            stagger: -hy - dy
+            column_net: C7
+    zn3: # Upper row (4) + lowest middle-finger, thumb, mouse (3) = 7
+      anchor.ref: f_c0_r3
+      rows.l:
+        rotate: -60
+        row_net: L3
+        mirror.row_net: R3
       columns:
         c1:
-          rows.l.rotate: 180
-          key:
-            column_net: C1
-        c2:
-          key:
-            spread: hx/2
-            stagger: hy
-            column_net: C2
-        c3:
-          rows.l.rotate: 180
-          key:
-            spread: hx/2
-            stagger: -hy
-            column_net: C3
-        c4:
-          key:
-            spread: hx/2
-            stagger: hy
-            column_net: C4
+          rows.l.rotate: 0
+          key.column_net: C1
+        c2.key.column_net: C2
+        c3.key.column_net: C3
+        c4.key.column_net: C4
         c5:
-          key:
-            column_net: C5
-      rows:
-        l:
-          row_net: L3
-          mirror.row_net: R3
-          rotate: -120
-    z2:
-      anchor:
-        ref: t_c1_r1
-      columns:
-        c1:
-          rows.l.rotate: 60
-          key:
-            column_net: C1
-        c2:
-          key:
-            spread: hx/2
-            stagger: hy+dy
-            column_net: C2
-        c3:
-          rows.l.rotate: -120
-          key:
-            spread: hx/2
-            stagger: hy
-            column_net: C3
-        c4:
-          rows.l.rotate: -60
-          key:
-            spread: hx/2
-            stagger: hy
-            column_net: C4
-        c5:
+          rows.l.rotate: 180
           key:
             spread: -3hx/2
-            stagger: -hy
+            stagger: -3hy
             column_net: C5
-      rows:
-        l:
-          row_net: L2
-          mirror.row_net: R2
-          rotate: 180
-    z1:
-      anchor:
-        ref: t_c3_r1
-      columns:
-        c1:
+        c6:
+          rows.l.rotate: 0
           key:
-            column_net: C1
-        c2:
-          key:
-            spread: -hx/2
-            stagger: hy
-            column_net: C2
-        c3:
-          rows.l.rotate: -120
-          key:
-            spread: hx/2
-            stagger: hy+dy
-            column_net: C3
-        c4:
-          rows.l.rotate: -120
-          key:
-            spread: hx/2
-            stagger: hy
-            column_net: C4
-        c5:
-          rows.l.rotate: 180
-          key:
-            spread: -5hx/2
-            stagger: -hy
-            column_net: C5
-      rows:
-        l:
-          row_net: L1
-          mirror.row_net: R1
+            spread: 2hx
+            stagger: -2hy - dy
+            column_net: C6
+        # c7 available for a mouse button
   key:
     spread: hx
     padding: hy
@@ -582,12 +538,6 @@ outlines:
       name: _raised
       operation: add
       fillet: kx+fk
-    - what: outline
-      name: _rounded_nibble
-      where: [z0_c5_r0, z3_c3_r3]
-      asym: both
-      operation: subtract
-      fillet: my/2
 
   main_pcb:
     - what: outline
@@ -613,9 +563,10 @@ outlines:
       fillet: fk+2kx
     - what: outline
       name: _rgb_cutout
-      where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
-              z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
-              z2_c5_l, z1_c1_l, z1_c5_l]
+      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
+              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
+              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
+              zn3_c5_l, zn3_c6_l]
       asym: both
       operation: subtract
     - what: outline
@@ -626,9 +577,10 @@ outlines:
       name: _main_external
     - what: outline
       name: _key_slot_hexagon
-      where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
-              z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
-              z2_c5_l, z1_c1_l, z1_c5_l]
+      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
+              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
+              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
+              zn3_c5_l, zn3_c6_l]
       asym: both
       fillet: fk+2kx
       operation: subtract
@@ -665,9 +617,10 @@ outlines:
       fillet: fk+2kx
     - what: outline
       name: _switch_cutout1
-      where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
-              z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
-              z2_c5_l, z1_c1_l, z1_c5_l]
+      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
+              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
+              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
+              zn3_c5_l, zn3_c6_l]
       asym: both
       operation: subtract
     - what: outline
@@ -693,9 +646,10 @@ outlines:
       fillet: fk+kx
     - what: outline
       name: _switch_cutout1
-      where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
-              z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
-              z2_c5_l, z1_c1_l, z1_c5_l]
+      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
+              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
+              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
+              zn3_c5_l, zn3_c6_l]
       asym: left
       operation: subtract
   raised_pcb:
@@ -721,8 +675,8 @@ outlines:
       fillet: fk+kx
     - what: outline
       name: _rgb_cutout
-      where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
-              z1_c2_l, z1_c3_l, z1_c4_l]
+      where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
+                        zn2_c5_l, zn2_c6_l, zn2_c7_l]
       asym: both
       operation: subtract
     - what: outline
@@ -731,9 +685,9 @@ outlines:
   _raised_key_slots:
     - what: outline
       name: _key_slot_hexagon
-      where: [z4_c5_l, z3_c5_l, z2_c5_l, z1_c5_l,
-              z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
-              z1_c1_l, z1_c2_l, z1_c3_l, z1_c4_l]
+      where: [zn1_c1_l, zn1_c4_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
+                        zn2_c4_l, zn2_c5_l, zn2_c6_l, zn2_c7_l,
+                        zn3_c4_l, zn3_c5_l, zn3_c6_l]
       asym: both
       fillet: fk+2kx
   _raised_deck:
@@ -756,8 +710,8 @@ outlines:
       fillet: fk+2kx
     - what: outline
       name: _switch_cutout1
-      where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
-              z1_c2_l, z1_c3_l, z1_c4_l]
+      where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
+                        zn2_c5_l, zn2_c6_l, zn2_c7_l]
       asym: both
       operation: subtract
     - what: outline
@@ -827,10 +781,9 @@ outlines:
         shift: [0, 0.05]
     - what: outline
       name: _hexkey
-      where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
-              z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
-              z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l, z2_c5_l,
-              z1_c1_l, z1_c2_l, z1_c3_l, z1_c4_l, z1_c5_l]
+      where: [zn1_c1_l, zn1_c2_l, zn1_c3_l, zn1_c4_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
+              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l, zn2_c5_l, zn2_c6_l, zn2_c7_l,
+              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l, zn3_c5_l, zn3_c6_l]
       asym: both
       operation: stack
     - what: outline
@@ -950,9 +903,10 @@ pcbs:
           P10: L1
       keys:
         what: choc
-        where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
-                z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
-                z2_c5_l, z1_c1_l, z1_c5_l]
+        where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
+                zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
+                zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
+                zn3_c5_l, zn3_c6_l]
         asym: both
         adjust:
           rotate: 180
@@ -963,9 +917,10 @@ pcbs:
           hotswap: true
       diodes_l:
         what: diode
-        where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
-                z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
-                z2_c5_l, z1_c1_l, z1_c5_l]
+        where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
+                zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
+                zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
+                zn3_c5_l, zn3_c6_l]
         asym: source
         adjust:
           shift: [5.8, -4.1]
@@ -975,9 +930,10 @@ pcbs:
           to: "{{row_net}}"
       diodes_r:
         what: diode
-        where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
-                z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
-                z2_c5_l, z1_c1_l, z1_c5_l]
+        where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
+                zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
+                zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
+                zn3_c5_l, zn3_c6_l]
         asym: clone
         adjust:
           shift: [-5.8, -4.1]
@@ -987,9 +943,10 @@ pcbs:
           to: "{{row_net}}"
       rgb:
         what: rgb
-        where: [z4_c1_l, z4_c2_l, z4_c3_l, z4_c4_l, z4_c5_l,
-                z3_c1_l, z3_c2_l, z3_c3_l, z3_c4_l, z3_c5_l,
-                z2_c5_l, z1_c1_l, z1_c5_l]
+        where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
+                zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
+                zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
+                zn3_c5_l, zn3_c6_l]
         asym: both
         adjust.shift: [0, 4.7]
         params:
@@ -1026,8 +983,8 @@ pcbs:
           P10: VCC
       keys:
         what: choc
-        where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
-                z1_c2_l, z1_c3_l, z1_c4_l]
+        where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
+                          zn2_c5_l, zn2_c6_l, zn2_c7_l]
         asym: both
         adjust:
           rotate: 180
@@ -1038,8 +995,8 @@ pcbs:
           hotswap: true
       diodes_l:
         what: diode
-        where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
-                z1_c2_l, z1_c3_l, z1_c4_l]
+        where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
+                          zn2_c5_l, zn2_c6_l, zn2_c7_l]
         asym: source
         adjust:
           shift: [5.8, -4.1]
@@ -1049,8 +1006,8 @@ pcbs:
           to: "{{row_net}}"
       diodes_r:
         what: diode
-        where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
-                z1_c2_l, z1_c3_l, z1_c4_l]
+        where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
+                          zn2_c5_l, zn2_c6_l, zn2_c7_l]
         asym: clone
         adjust:
           shift: [-5.8, -4.1]
@@ -1060,8 +1017,8 @@ pcbs:
           to: "{{row_net}}"
       rgb:
         what: rgb
-        where: [z2_c1_l, z2_c2_l, z2_c3_l, z2_c4_l,
-                z1_c2_l, z1_c3_l, z1_c4_l]
+        where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
+                          zn2_c5_l, zn2_c6_l, zn2_c7_l]
         adjust.shift: [0, 4.7]
         asym: both
         params:
