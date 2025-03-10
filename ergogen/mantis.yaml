@@ -813,44 +813,53 @@ pcbs:
           shift: [9hx/2+dx/2, mcu_top - 17.78]
           rotate: -90
         params:
-          # Pin assignments: Left and right row nets are
-          # on the correct side for easier routing. SPI pins
-          # are connected to VIK out. Columns and LED use the
-          # remaining pins. There are not enough enough pins
-          # to connect I2C, but it's not needed for common
-          # trackball and trackpad modules. I2C pins can be
-          # broken out on the PCB and hand-wired to extra
-          # pins available on some controllers if absolutely
-          # needed.
+          # Pin assignments
+          #
+          # SPI pins for VIK-out use pins P0-3, which won't work on an
+          # original ProMicro, but work with RP2040 controllers and use
+          # high-speed pins on nice!nano to prevent interference with
+          # Bluetooth. ProMicro isn't really supported with VIK anyway as
+          # VIK requires 3.3V logic. In a pinch, pins P0,1 could still
+          # work with I2C.
+          #
+          # LED uses P4, which is another high-speed pin and supports SPI
+          # MOSI on RP2040 and nice!nano.
+          #
+          # Left and right row nets are on the correct side for easier
+          # routing. Columns use the remaining pins. There are not
+          # enough pins to connect I2C, but it's not needed for common
+          # trackball and trackpad modules. Jumpers can be used to
+          # repurpose P0,1 for I2C in case a future Mantis variant needs
+          # I2C instead of SPI.
           orientation: down
           # SPI
-          P15: SCLK
-          P14: MISO
-          P16: MOSI
-          P10: SPI_CS
-          # Left rows
-          P21: L4
-          P20: L3
-          P19: L2
-          P18: L1
-          # Right rows
-          P2: R4
-          P3: R3
-          P4: R2
-          P5: R1
-          # Columns
-          P0: C5
-          P6: C4
-          P7: C3
-          P8: C2
-          P9: C1
+          P0: SPI_CS
+          P1: MISO
+          P2: SCLK
+          P3: MOSI
           # LED
-          P1: LED
+          P4: LED
+          # Left rows
+          P21: L3
+          P20: L2
+          P19: L1
+          # Right rows
+          P5: R3
+          P6: R2
+          P7: R1
+          # Columns
+          P18: C1
+          P15: C2
+          P14: C3
+          P16: C4
+          P10: C5
+          P8: C6
+          P9: C7
           # Power and reset
-          RAW: VCC
+          RAW: RAW
           GND: GND
           RST: RST
-          VCC: 3_3V
+          VCC: 3V3
       # Optional reset button
       reset:
         what: button
@@ -869,12 +878,12 @@ pcbs:
           shift: [hx/2+dx/2 - 17, hy/3]
         params:
           designator: FFC
-          RAW: 3_3V
+          RAW: 3V3
           GND: GND
           RST: SDA
           VCC: SCL
           P21: VIK_LED
-          P20: VCC
+          P20: VIK_5V
           P19: VIK_GPIO1
           P18: MOSI
           P15: VIK_GPIO2
@@ -889,14 +898,14 @@ pcbs:
           shift: [hx/2+dx/2, 0]
         params:
           designator: FFC
-          RAW: VCC
+          RAW: LED_VCC
           GND: GND
           RST: TOP_LED
           VCC: BOT_LED
           P21: C1
-          P20: C2
-          P19: C3
-          P18: C4
+          P20: C5
+          P19: C6
+          P18: C7
           P15: R1
           P14: R2
           P16: L2
@@ -953,6 +962,7 @@ pcbs:
           side: B
           din: "DI_{{column_net}}_{{row_net}}"
           dout: "DO_{{column_net}}_{{row_net}}"
+          VCC: LED_VCC
 
   mantis_raised:
     outlines:
@@ -973,14 +983,14 @@ pcbs:
           GND: L2
           RST: R2
           VCC: R1
-          P21: C4
-          P20: C3
-          P19: C2
+          P21: C7
+          P20: C6
+          P19: C5
           P18: C1
           P15: BOT_LED
           P14: TOP_LED
           P16: GND
-          P10: VCC
+          P10: LED_VCC
       keys:
         what: choc
         where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
@@ -1025,3 +1035,4 @@ pcbs:
           side: B
           din: "DI_{{column_net}}_{{row_net}}"
           dout: "DO_{{column_net}}_{{row_net}}"
+          VCC: LED_VCC
