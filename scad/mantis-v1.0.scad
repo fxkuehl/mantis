@@ -28,11 +28,16 @@ show_desk = true;
 /* [Design dimensions in mm] */
 // Fillet style
 fillet_style = 1;      // [0:Flat, 1:Parabolic, 2:Circular]
-// Edge fillet radius
-r_edge = 1;             // [0.5:0.1:5]
-// Corner fillet radius
-r_corner = 2;           // [0.5:0.1:5]
-wall_thickness = 2;     // [0.5:0.1:5]
+// Main Edge fillet radius
+r_edge_main = 0.5;             // [0.5:0.1:5]
+// Raised Edge fillet radius
+r_edge_raised = 0.5;           // [0.5:0.1:5]
+// Main Corner fillet radius
+r_corner_main = 2.5;           // [0.5:0.1:5]
+// Raised Corner fillet radius
+r_corner_raised = 1.6;         // [0.5:0.1:5]
+wall_thickness_main = 2.5;     // [0.5:0.1:5]
+wall_thickness_raised = 2.5;   // [0.5:0.1:5]
 main_height = 13;       // [5:0.1:15]
 raised_height = 10;     // [5:0.1:15]
 base_thickness = 2.5;   // [0.5:0.1:5]
@@ -72,6 +77,10 @@ head_diameter = 4.0; // [2:0.1:8]
 rgb = false;
 // Saddle shaped dish
 saddle = true;
+// Dish diameter
+dish_diam = 14;
+// Angle of the dish at the rim
+slope = 15;
 // Tilt angle for home keys
 tilt1 = 15;
 // Rise of the home keys
@@ -282,7 +291,7 @@ module main_extrusion(h, o, fxy, fz, variant=0) {
 }
 
 raised_outline_points = let (
-    wx = wall_thickness,
+    wx = wall_thickness_raised,
     wy = 1.1547*wx
 ) [
     [-0.5*hx - dx/2 + kx, -5*hy/3 - dy + ky + wy+ky/2],
@@ -324,7 +333,7 @@ raised_outline_points = let (
 ];
 
 raised_outline_points1 = let (
-    wx = wall_thickness,
+    wx = wall_thickness_raised,
     wy = 1.1547*wx
 ) [
     [-0.5*hx - dx/2 + kx, -5*hy/3 - dy + ky + wy+ky/2],
@@ -555,21 +564,23 @@ module case_inside(oh, ov) union() {
 module case_outside() {
     union() {
         fillet_polyhedron(main_outline_points, main_height,
-                          s_pcb + wall_thickness,
-                          f_key + s_key + wall_thickness, r_edge, r_corner,
-                          fillet_style);
-        translate([0, 0, main_height - 2*r_corner])
-            fillet_polyhedron(raised_outline_points, raised_height + 2*r_corner,
-                              s_pcb + wall_thickness,
-                              f_key + s_key + wall_thickness, r_edge, r_corner,
-                              fillet_style, round_bottom=false);
+                          s_pcb + wall_thickness_main,
+                          f_key + s_key + wall_thickness_main,
+                          r_edge_main, r_corner_main, fillet_style);
+        translate([0, 0, main_height - 2*r_corner_main])
+            fillet_polyhedron(raised_outline_points,
+                              raised_height + 2*r_corner_main,
+                              s_pcb + wall_thickness_raised,
+                              f_key + s_key + wall_thickness_raised,
+                              r_edge_raised, r_corner_raised, fillet_style,
+                    round_bottom=(wall_thickness_main < wall_thickness_raised));
     }
 }
 module base_plate_base(oh, ov) intersection() {
     translate([0, 0, -ov - 0.01])
         main_extrusion(base_thickness + 2*ov + 0.01,
-                       s_pcb + wall_thickness/2 + oh,
-                       f_key + s_key + wall_thickness + oh, 0);
+                       s_pcb + wall_thickness_main/2 + oh,
+                       f_key + s_key + wall_thickness_main + oh, 0);
     if (!ov)
         case_outside();
 }
@@ -635,10 +646,11 @@ module case() union() {
 
             usb_height = 0.6 + 1.5;
             usb_offset = 1.255 + 2.5;
-            translate([0, mcu_top + s_pcb + wall_thickness + 0.1,
+            w = max(wall_thickness_main, wall_thickness_raised);
+            translate([0, mcu_top + s_pcb + w + 0.1,
                        main_height + raised_height - deck_thickness
                        - usb_height/2 - usb_offset])
-                usb_port_template(usb_offset, wall_thickness + 0.2, usb_height);
+                usb_port_template(usb_offset, w + 0.2, usb_height);
 
             /* Mounting holes */
             h_main = main_height - base_thickness - deck_thickness;
@@ -900,6 +912,8 @@ module trackball_holder() intersection() {
 module key_profile(x) {
     $fa = $fs*2;
     $rgb = rgb;
+    $slope = slope;
+    $dish_diam = dish_diam;
 
     if (x == 0) {
         switch_key($tilt=tilt1, $rise=rise1, $saddle=saddle);
@@ -1020,25 +1034,19 @@ if (show_desk) {
         cube([600, 350, 20]);
     // Approximate shadow to give a sense of the distance from the desk surface:
     // 1. Core shadow slightly smaller than the outline
-    o = (show_case ? s_pcb + wall_thickness : 0) - elevation;
-    f = (show_case ? f_key + s_key + wall_thickness : f_key + s_pcb) - elevation;
-    if (show_case) {
-        color("black", alpha=0.5) translate([0, 0, -elevation - 0.49])
-            main_offset_fillet(s_pcb + wall_thickness - elevation,
-                               f_key + s_key + wall_thickness + elevation,
-                               f_key + s_key + wall_thickness + elevation);
-    } else if (show_pcb || show_plate) {
-        color("black", alpha=0.3) translate([0, 0, -elevation - 0.49])
-            main_offset_fillet(-main_pcb_z - elevation,
-                               f_key + s_pcb + main_pcb_z + elevation,
-                               f_key + s_pcb + main_pcb_z + elevation);
+    o = (show_case ? s_pcb + wall_thickness_main : -main_pcb_z) - elevation;
+    f = (show_case ? f_key + s_key + wall_thickness_main :
+                     f_key + s_pcb + main_pcb_z) + elevation;
+    if (show_case || show_pcb || show_plate) {
+        color("black", alpha=show_case ? 0.5 : 0.3)
+            translate([0, 0, -elevation - 0.49]) main_offset_fillet(o, f, f);
     }
     // 2. Partial shadow of the main body, raised part and trackball
     shadow_width = 2.5 + elevation/4;
     color("black", alpha=0.2) translate([0, 0, -elevation - 0.48])
             render(convexity=10) union() {
-        o = (show_case ? s_pcb + wall_thickness : 0) + shadow_width;
-        f = (show_case ? f_key + s_key + wall_thickness : f_key + s_pcb) + shadow_width;
+        o = (show_case ? s_pcb + wall_thickness_main : 0) + shadow_width;
+        f = (show_case ? f_key + s_key + wall_thickness_main : f_key + s_pcb) + shadow_width;
         if (show_case || show_pcb || show_plate) {
             translate([shadow_width, -shadow_width, 0])
                 main_offset_fillet(o, f, f);
