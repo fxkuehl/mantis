@@ -172,13 +172,13 @@ points:
             spread: -3hx/2
             stagger: -3hy
             column_net: C5
-        c6:
+        # c6 available for a mouse button
+        c7:
           rows.l.rotate: 0
           key:
             spread: 2hx
             stagger: -2hy - dy
-            column_net: C6
-        # c7 available for a mouse button
+            column_net: C7
   key:
     spread: hx
     padding: hy
@@ -566,7 +566,7 @@ outlines:
       where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
               zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
               zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-              zn3_c5_l, zn3_c6_l]
+              zn3_c5_l, zn3_c7_l]
       asym: both
       operation: subtract
     - what: outline
@@ -580,7 +580,7 @@ outlines:
       where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
               zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
               zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-              zn3_c5_l, zn3_c6_l]
+              zn3_c5_l, zn3_c7_l]
       asym: both
       fillet: fk+2kx
       operation: subtract
@@ -620,7 +620,7 @@ outlines:
       where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
               zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
               zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-              zn3_c5_l, zn3_c6_l]
+              zn3_c5_l, zn3_c7_l]
       asym: both
       operation: subtract
     - what: outline
@@ -649,7 +649,7 @@ outlines:
       where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
               zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
               zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-              zn3_c5_l, zn3_c6_l]
+              zn3_c5_l, zn3_c7_l]
       asym: left
       operation: subtract
   raised_pcb:
@@ -687,7 +687,7 @@ outlines:
       name: _key_slot_hexagon
       where: [zn1_c1_l, zn1_c4_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
                         zn2_c4_l, zn2_c5_l, zn2_c6_l, zn2_c7_l,
-                        zn3_c4_l, zn3_c5_l, zn3_c6_l]
+                        zn3_c4_l, zn3_c5_l, zn3_c7_l]
       asym: both
       fillet: fk+2kx
   _raised_deck:
@@ -783,7 +783,7 @@ outlines:
       name: _hexkey
       where: [zn1_c1_l, zn1_c2_l, zn1_c3_l, zn1_c4_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
               zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l, zn2_c5_l, zn2_c6_l, zn2_c7_l,
-              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l, zn3_c5_l, zn3_c6_l]
+              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l, zn3_c5_l,           zn3_c7_l]
       asym: both
       operation: stack
     - what: outline
@@ -915,7 +915,7 @@ pcbs:
         where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
                 zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
                 zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-                zn3_c5_l, zn3_c6_l]
+                zn3_c5_l, zn3_c7_l]
         asym: both
         adjust:
           rotate: 180
@@ -929,7 +929,7 @@ pcbs:
         where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
                 zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
                 zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-                zn3_c5_l, zn3_c6_l]
+                zn3_c5_l, zn3_c7_l]
         asym: source
         adjust:
           shift: [5.8, -4.1]
@@ -942,7 +942,7 @@ pcbs:
         where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
                 zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
                 zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-                zn3_c5_l, zn3_c6_l]
+                zn3_c5_l, zn3_c7_l]
         asym: clone
         adjust:
           shift: [-5.8, -4.1]
@@ -955,7 +955,7 @@ pcbs:
         where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
                 zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
                 zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-                zn3_c5_l, zn3_c6_l]
+                zn3_c5_l, zn3_c7_l]
         asym: both
         adjust.shift: [0, 4.7]
         params:
