@@ -475,6 +475,9 @@ module countersunk_screw(length, offset) {
 module mcu(height, offset)
     translate([0, mcu_y, 0]) linear_extrude(height) offset(r=offset)
         square(mcu_size, center=true);
+module display_cable_cutout(height, offset)
+    translate([0, mcu_y - mcu_size.y/2, 0]) linear_extrude(height)
+        offset(r=offset) square([12-2*offset, 7-2*offset], center=true);
 
 module usb_port_template(o, depth, height=0.6) {
     rotate([90, 0, 0]) linear_extrude(depth) offset(r = o)
@@ -820,6 +823,9 @@ module mezzanine() {
             main_key_slots(base_thickness + gasket_pad_thickness + 0.02);
         translate([0, 0, main_height - deck_thickness - 0.01])
             mcu(base_thickness + gasket_pad_thickness + 0.02, spacing);
+        translate([0, 0, main_height - deck_thickness - 0.01])
+            display_cable_cutout(base_thickness + gasket_pad_thickness + 0.02,
+                                 spacing);
 
         for(p = mounting_points_raised)
             translate([p.x, p.y, main_height - deck_thickness])

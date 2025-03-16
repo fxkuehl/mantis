@@ -417,6 +417,20 @@ outlines:
         ref: f_c0_r3
         shift: [9hx/2+dx/2, mcu_top-16.51]
       fillet: 2kx
+  _display_main_cutout:
+    - what: rectangle
+      size: [12, 13]
+      where:
+        ref: f_c0_r3
+        shift: [9hx/2+dx/2, mcu_top-33.02]
+      fillet: 2kx
+  _display_raised_cutout:
+    - what: rectangle
+      size: [12, 7]
+      where:
+        ref: f_c0_r3
+        shift: [9hx/2+dx/2, mcu_top-33.02]
+      fillet: 2kx
   _main_cutouts:
     - what: rectangle
       size: [2hx + dx + 2kx, 2mount_width]
@@ -443,6 +457,8 @@ outlines:
     - what: outline
       name: _mcu_cutout
       operation: add
+    - what: outline
+      name: _display_main_cutout
     - what: outline
       name: _ffc_cutout
       where:
@@ -485,6 +501,26 @@ outlines:
       - shift: [hx/2, -hy/3]
       - shift: [0, -2hy/3 - dy - ky]
       - shift: [-hx/2, -hy/3]
+      - shift: [0, -hy]
+  _trackball_main_pcb_cutout:
+    - what: polygon
+      points:
+      - ref: t_c3_r1
+        shift: [hx/2 - kx, -2hy/3 - ky/2]
+      - shift: [0, hy]
+      - shift: [-hx/4, hy/6]
+      - shift: [0, hy]
+      - shift: [-hx/4, hy/6]
+      - shift: [0, hy/3 + dy + ky]
+      - shift: [hx + dx/2 + kx, 2hy/3 + dy/4 + ky/2]
+      - shift: [hx + dx/2 + kx, -2hy/3 - dy/4 - ky/2]
+      #- shift: [hx/2, hy/3]
+      #- shift: [hx + dx + 2kx, 0]
+      #- shift: [hx/2, -hy/3]
+      - shift: [0, -hy/3 - dy - ky]
+      - shift: [-hx/4, -hy/6]
+      - shift: [0, -hy]
+      - shift: [-hx/4, -hy/6]
       - shift: [0, -hy]
   _trackball_main_cutout:
     - what: polygon
@@ -558,7 +594,7 @@ outlines:
       operation: subtract
       fillet: fk+kx
     - what: outline
-      name: _trackball_main_cutout
+      name: _trackball_main_pcb_cutout
       operation: subtract
       fillet: fk+2kx
     - what: outline
@@ -682,6 +718,9 @@ outlines:
     - what: outline
       name: _mcu_cutout
       operation: subtract
+    - what: outline
+      name: _display_raised_cutout
+      operation: subtract
   _raised_key_slots:
     - what: outline
       name: _key_slot_hexagon
@@ -716,6 +755,9 @@ outlines:
       operation: subtract
     - what: outline
       name: _mcu_cutout
+      operation: subtract
+    - what: outline
+      name: _display_raised_cutout
       operation: subtract
   sensor_pcb:
     - what: rectangle
