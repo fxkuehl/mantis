@@ -364,6 +364,9 @@ outlines:
   _key_hexagon:
     $extends: outlines._hexagon_template
     $args: [kx, ky]
+  _key_silkscreen:
+    $extends: outlines._hexagon_template
+    $args: [2*kx, 2*ky]
   _nibble_hexagon:
     $extends: outlines._hexagon_template
     $args: [0, 0]
@@ -396,6 +399,79 @@ outlines:
         - shift: [0, -2.31]
         - shift: [-2.0, -1.155]
       fillet: .6
+  _choc_bot:
+    - what: rectangle
+      size: [10, 10]
+      fillet: 1.1
+  _choc_top_rect:
+    - what: rectangle
+      size: [10, 10]
+      where:
+        shift: [0, 5-2.2]
+  _choc_top:
+    - what: outline
+      name: _choc_top_rect
+    - what: outline
+      name: _choc_top_rect
+      where.rotate: -70
+      operation: intersect
+      fillet: 2.2
+  _rect_45:
+    - what: rectangle
+      size: [(0.85+2)*1.4142, (0.85+2)*1.4142]
+      where.rotate: 45
+  _choc_tab:
+    - what: rectangle
+      size: [2.6, 0.8]
+      fillet: 0.2
+  _choc_socket:
+    - what: rectangle
+      size: [9.55, 6.85]
+      where.shift: [-2.5, 1.1 - 5.9]
+    - what: outline
+      name: _choc_bot
+      where.shift: [-7.5, 1.1 - 5.9 - 5 - 1.225]
+      operation: subtract
+    - what: outline
+      name: _choc_top
+      where.shift: [-0.3, 2.2-3.575]
+      operation: subtract
+      fillet: 0.8
+    - what: outline
+      name: _rect_45
+      where.shift: [-3.5, -5.9 - 2.325 - 1]
+      operation: subtract
+    - what: outline
+      name: _rect_45
+      where.shift: [-1.5 + 4.775, -5.9 - 2.325 - 1]
+      operation: subtract
+    - what: outline
+      name: _rect_45
+      where.shift: [-1.5 + 4.775, -5.9 + 2.325 + 1]
+      operation: subtract
+  choc_socket_no_pad:
+    - what: outline
+      name: _choc_socket
+    - what: rectangle
+      size: [2.9, 2.9]
+      where.shift: [-2.5 - 4.775 - 1.3, -5.9 + 2.2]
+      operation: subtract
+    - what: rectangle
+      size: [2.9, 2.9]
+      where.shift: [-2.5 + 4.775 + 1.3, -5.9]
+      operation: subtract
+  choc_socket:
+    - what: outline
+      name: _choc_socket
+    - what: rectangle
+      size: [5.2, 2.6]
+      where.shift: [4.775 - 2.5, -5.9]
+    - what: rectangle
+      size: [5.2, 2.6]
+      where.shift: [-4.775 - 2.5, -5.9 + 2.2]
+    - what: outline
+      name: _choc_tab
+      where.shift: [-4.775 - 2.5 + 1, -1.775]
   _rgb_cutout:
     - what: rectangle
       where:
@@ -575,6 +651,23 @@ outlines:
       operation: add
       fillet: kx+fk
 
+  main_choc_sockets:
+    - what: outline
+      name: choc_socket
+      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
+              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
+              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
+              zn3_c5_l, zn3_c7_l]
+      asym: both
+  _main_key_silkscreen:
+    - what: outline
+      name: _key_silkscreen
+      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
+              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
+              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
+              zn3_c5_l, zn3_c7_l]
+      asym: both
+      fillet: fk-kx
   main_pcb:
     - what: outline
       name: _main_internal
@@ -688,6 +781,12 @@ outlines:
               zn3_c5_l, zn3_c7_l]
       asym: left
       operation: subtract
+  raised_choc_sockets:
+    - what: outline
+      name: choc_socket
+      where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
+                        zn2_c5_l, zn2_c6_l, zn2_c7_l]
+      asym: both
   raised_pcb:
     - what: outline
       name: _raised
@@ -847,6 +946,9 @@ pcbs:
     outlines:
       main:
         outline: main_pcb
+      keys:
+        outline: _main_key_silkscreen
+        layer: F.SilkS
     footprints:
       mcu:
         what: promicro
@@ -902,16 +1004,6 @@ pcbs:
           GND: GND
           RST: RST
           VCC: 3V3
-      # Optional reset button
-      reset:
-        what: button
-        where:
-          ref: f_c0_r3
-          shift: [9hx/2+dx/2, mcu_top-7]
-        params:
-          side: B
-          from: GND
-          to: RST
       # VIK-out connector (use first 12 pins of promicro as placeholder)
       vik_out:
         what: promicro
@@ -974,7 +1066,7 @@ pcbs:
                 zn3_c5_l, zn3_c7_l]
         asym: source
         adjust:
-          shift: [5.8, -4.1]
+          shift: [6.2, -4.1]
           rotate: -90
         params:
           from: "{{column_net}}_{{row_net}}"
@@ -987,7 +1079,7 @@ pcbs:
                 zn3_c5_l, zn3_c7_l]
         asym: clone
         adjust:
-          shift: [-5.8, -4.1]
+          shift: [-6.2, -4.1]
           rotate: 90
         params:
           from: "{{column_net}}_{{row_net}}"
@@ -1010,6 +1102,9 @@ pcbs:
     outlines:
       raised:
         outline: raised_pcb
+      sockets:
+        outline: raised_choc_sockets
+        layer: B.SilkS
     footprints:
       # Connector to bottom PCB (use first 12 pins of promicro as placeholder)
       # Inverted pin assignment and 180° rotation for type A cable
@@ -1051,7 +1146,7 @@ pcbs:
                           zn2_c5_l, zn2_c6_l, zn2_c7_l]
         asym: source
         adjust:
-          shift: [5.8, -4.1]
+          shift: [6.2, -4.1]
           rotate: -90
         params:
           from: "{{column_net}}_{{row_net}}"
@@ -1062,7 +1157,7 @@ pcbs:
                           zn2_c5_l, zn2_c6_l, zn2_c7_l]
         asym: clone
         adjust:
-          shift: [-5.8, -4.1]
+          shift: [-6.2, -4.1]
           rotate: 90
         params:
           from: "{{column_net}}_{{row_net}}"
