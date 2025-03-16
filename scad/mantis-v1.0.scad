@@ -834,9 +834,9 @@ module mezzanine() {
 }
 
 module bearings(size, offset, what=0) {
-    translate(trackball_position) rotate([12, 0, 0]) {
+    translate(trackball_position) rotate([7, 0, 0]) {
         for (phi = [0:120:240])
-            rotate([-50, 0, phi]) translate([0, 0, -trackball_radius - size/2])
+            rotate([-45, 0, phi]) translate([0, 0, -trackball_radius - size/2])
                 if (what == 0)
                     color("ghostwhite") corr_sphere(size/2 + offset);
                 else if (what == 1)
@@ -849,9 +849,9 @@ module bearings(size, offset, what=0) {
                                  r1 = size/2 + offset + (size/2 - spacing),
                                  r2 = size/2 + offset);
                 else if (what == 4)
-                    cylinder(h = size/2,
+                    cylinder(h = size,
                              r1 = size/2 + offset,
-                             r2 = size/2 + offset + size/2);
+                             r2 = size/2 + offset + size);
                 else if (what == 5)
                     translate([-size/4, -size/2 - offset, 0])
                         cube([size/2, size + 2*offset, size/2]);
