@@ -949,6 +949,9 @@ pcbs:
       keys:
         outline: _main_key_silkscreen
         layer: F.SilkS
+      plate:
+        outline: main_plate
+        layer: Dwgs.User
     footprints:
       mcu:
         what: promicro
@@ -1083,6 +1086,36 @@ pcbs:
           rotate: 90
         params:
           from: "{{column_net}}_{{row_net}}"
+          to: "{{row_net}}"
+      mouse:
+        what: choc
+        where: zn3_c7_l
+        asym: both
+        adjust:
+          shift: [3, 2hy/3 + 6.4 + 3]
+        params:
+          designator: "M"
+          from: "C6"
+          to: "C6_{{row_net}}"
+          keycaps: false
+          hotswap: false
+      diode_m1:
+        what: diode
+        where: zn3_c7_l
+        adjust:
+          shift: [-1, 2hy/3 + 6.4/2 + 3]
+          rotate: -90
+        params:
+          from: "C6_{{row_net}}"
+          to: "{{row_net}}"
+      diode_m2:
+        what: diode
+        where: mirror_zn3_c7_l
+        adjust:
+          shift: [-1, 2hy/3 + 6.4/2 + 3]
+          rotate: 90
+        params:
+          from: "C6_{{row_net}}"
           to: "{{row_net}}"
       rgb:
         what: rgb
