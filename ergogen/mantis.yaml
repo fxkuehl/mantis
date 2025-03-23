@@ -97,15 +97,20 @@ points:
     # Otherwise the spread and stagger get very confusing because they
     # are relative to the rotation of the first key in the previous row
     # in the same zone.
+    #
+    # Left and right are flipped so that the diodes and sockets can be
+    # mounted on the "front" side of the PCB. That avoids having to flip
+    # the footprints to the bottom of the PCB, which messes up the
+    # rotations in KiCAD.
     zn1: # Lower row (3) + outer raised column (4) = 7
       anchor.ref: f_c4_r3
-      rows.l:
+      rows.r:
         rotate: 180
-        row_net: L1
-        mirror.row_net: R1
+        row_net: R1
+        mirror.row_net: L1
       columns:
         c1:
-          rows.l.rotate: -60
+          rows.r.rotate: -60
           key.column_net: C1
         c2.key:
           spread: -7hx/2
@@ -114,27 +119,27 @@ points:
         c3.key.column_net: C3
         c4.key.column_net: C4
         c5:
-          rows.l.rotate: -120
+          rows.r.rotate: -120
           key.column_net: C5
         c6.key:
           spread: -hx/2
           stagger: -hy
           column_net: C6
         c7:
-          rows.l.rotate: 60
+          rows.r.rotate: 60
           key:
             spread: -hx/2
             stagger: -hy - dy
             column_net: C7
     zn2: # Middle row (4) + inner raised column (3) = 7
       anchor.ref: f_c0_r2
-      rows.l:
+      rows.r:
         rotate: -120
-        row_net: L2
-        mirror.row_net: R2
+        row_net: R2
+        mirror.row_net: L2
       columns:
         c1:
-          rows.l.rotate: 120
+          rows.r.rotate: 120
           key.column_net: C1
         c2.key.column_net: C2
         c3.key.column_net: C3
@@ -148,33 +153,33 @@ points:
           stagger: -hy
           column_net: C6
         c7:
-          rows.l.rotate: 0
+          rows.r.rotate: 0
           key:
             spread: -hx/2
             stagger: -hy - dy
             column_net: C7
     zn3: # Upper row (4) + lowest middle-finger, thumb, mouse (3) = 7
       anchor.ref: f_c0_r3
-      rows.l:
+      rows.r:
         rotate: -60
-        row_net: L3
-        mirror.row_net: R3
+        row_net: R3
+        mirror.row_net: L3
       columns:
         c1:
-          rows.l.rotate: 0
+          rows.r.rotate: 0
           key.column_net: C1
         c2.key.column_net: C2
         c3.key.column_net: C3
         c4.key.column_net: C4
         c5:
-          rows.l.rotate: 180
+          rows.r.rotate: 180
           key:
             spread: -3hx/2
             stagger: -3hy
             column_net: C5
         # c6 available for a mouse button
         c7:
-          rows.l.rotate: 0
+          rows.r.rotate: 0
           key:
             spread: 2hx
             stagger: -2hy - dy
@@ -525,7 +530,7 @@ outlines:
       name: _ffc_cutout
       where:
         ref: f_c0_r3
-        shift: [9hx/2+dx/2-17, -13hy/6]
+        shift: [9hx/2+dx/2+17, -13hy/6]
       operation: add
   _main_plate_cutouts:
     - what: outline
@@ -539,14 +544,14 @@ outlines:
       name: _ffc_cutout
       where:
         ref: f_c0_r3
-        shift: [9hx/2+dx/2-17, -13hy/6 - 1.5]
+        shift: [9hx/2+dx/2+17, -13hy/6 - 1.5]
       operation: add
     # Make the plate symmetrical for easier assembly
     - what: outline
       name: _ffc_cutout
       where:
         ref: f_c0_r3
-        shift: [9hx/2+dx/2+17, -13hy/6 - 1.5]
+        shift: [9hx/2+dx/2-17, -13hy/6 - 1.5]
       operation: add
   _trackball:
     - what: circle
@@ -654,18 +659,18 @@ outlines:
   main_choc_sockets:
     - what: outline
       name: choc_socket
-      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
-              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
-              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-              zn3_c5_l, zn3_c7_l]
+      where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+              zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+              zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+              zn3_c5_r, zn3_c7_r]
       asym: both
   _main_key_silkscreen:
     - what: outline
       name: _key_silkscreen
-      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
-              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
-              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-              zn3_c5_l, zn3_c7_l]
+      where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+              zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+              zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+              zn3_c5_r, zn3_c7_r]
       asym: both
       fillet: fk-kx
   main_pcb:
@@ -692,10 +697,10 @@ outlines:
       fillet: fk+2kx
     - what: outline
       name: _rgb_cutout
-      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
-              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
-              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-              zn3_c5_l, zn3_c7_l]
+      where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+              zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+              zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+              zn3_c5_r, zn3_c7_r]
       asym: both
       operation: subtract
     - what: outline
@@ -706,10 +711,10 @@ outlines:
       name: _main_external
     - what: outline
       name: _key_slot_hexagon
-      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
-              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
-              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-              zn3_c5_l, zn3_c7_l]
+      where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+              zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+              zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+              zn3_c5_r, zn3_c7_r]
       asym: both
       fillet: fk+2kx
       operation: subtract
@@ -746,10 +751,10 @@ outlines:
       fillet: fk+2kx
     - what: outline
       name: _switch_cutout1
-      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
-              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
-              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-              zn3_c5_l, zn3_c7_l]
+      where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+              zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+              zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+              zn3_c5_r, zn3_c7_r]
       asym: both
       operation: subtract
     - what: outline
@@ -775,17 +780,17 @@ outlines:
       fillet: fk+kx
     - what: outline
       name: _switch_cutout1
-      where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
-              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
-              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-              zn3_c5_l, zn3_c7_l]
+      where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+              zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+              zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+              zn3_c5_r, zn3_c7_r]
       asym: left
       operation: subtract
   raised_choc_sockets:
     - what: outline
       name: choc_socket
-      where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
-                        zn2_c5_l, zn2_c6_l, zn2_c7_l]
+      where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                        zn2_c5_r, zn2_c6_r, zn2_c7_r]
       asym: both
   raised_pcb:
     - what: outline
@@ -810,8 +815,8 @@ outlines:
       fillet: fk+kx
     - what: outline
       name: _rgb_cutout
-      where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
-                        zn2_c5_l, zn2_c6_l, zn2_c7_l]
+      where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                        zn2_c5_r, zn2_c6_r, zn2_c7_r]
       asym: both
       operation: subtract
     - what: outline
@@ -823,9 +828,9 @@ outlines:
   _raised_key_slots:
     - what: outline
       name: _key_slot_hexagon
-      where: [zn1_c1_l, zn1_c4_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
-                        zn2_c4_l, zn2_c5_l, zn2_c6_l, zn2_c7_l,
-                        zn3_c4_l, zn3_c5_l, zn3_c7_l]
+      where: [zn1_c1_r, zn1_c4_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                        zn2_c4_r, zn2_c5_r, zn2_c6_r, zn2_c7_r,
+                        zn3_c4_r, zn3_c5_r, zn3_c7_r]
       asym: both
       fillet: fk+2kx
   _raised_deck:
@@ -848,8 +853,8 @@ outlines:
       fillet: fk+2kx
     - what: outline
       name: _switch_cutout1
-      where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
-                        zn2_c5_l, zn2_c6_l, zn2_c7_l]
+      where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                        zn2_c5_r, zn2_c6_r, zn2_c7_r]
       asym: both
       operation: subtract
     - what: outline
@@ -922,9 +927,9 @@ outlines:
         shift: [0, 0.05]
     - what: outline
       name: _hexkey
-      where: [zn1_c1_l, zn1_c2_l, zn1_c3_l, zn1_c4_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
-              zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l, zn2_c5_l, zn2_c6_l, zn2_c7_l,
-              zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l, zn3_c5_l,           zn3_c7_l]
+      where: [zn1_c1_r, zn1_c2_r, zn1_c3_r, zn1_c4_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+              zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r, zn2_c5_r, zn2_c6_r, zn2_c7_r,
+              zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r, zn3_c5_r,           zn3_c7_r]
       asym: both
       operation: stack
     - what: outline
@@ -948,7 +953,7 @@ pcbs:
         outline: main_pcb
       keys:
         outline: _main_key_silkscreen
-        layer: F.SilkS
+        layer: B.SilkS
       plate:
         outline: main_plate
         layer: Dwgs.User
@@ -978,7 +983,7 @@ pcbs:
           # trackball and trackpad modules. Jumpers can be used to
           # repurpose P0,1 for I2C in case a future Mantis variant needs
           # I2C instead of SPI.
-          orientation: down
+          orientation: up
           # SPI
           P0: SPI_CS
           P1: MISO
@@ -1012,7 +1017,7 @@ pcbs:
         what: promicro
         where:
           ref: f_c5_r3
-          shift: [hx/2+dx/2 - 17, hy/3]
+          shift: [hx/2+dx/2 + 17, hy/3]
         params:
           designator: FFC
           RAW: 3V3
@@ -1043,16 +1048,16 @@ pcbs:
           P20: C5
           P19: C6
           P18: C7
-          P15: R1
-          P14: R2
-          P16: L2
-          P10: L1
+          P15: L1
+          P14: L2
+          P16: R2
+          P10: R1
       keys:
         what: choc
-        where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
-                zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
-                zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-                zn3_c5_l, zn3_c7_l]
+        where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+                zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+                zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+                zn3_c5_r, zn3_c7_r]
         asym: both
         adjust:
           rotate: 180
@@ -1061,35 +1066,35 @@ pcbs:
           to: "{{column_net}}_{{row_net}}"
           keycaps: false
           hotswap: true
-      diodes_l:
+      diodes_r:
         what: diode
-        where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
-                zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
-                zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-                zn3_c5_l, zn3_c7_l]
+        where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+                zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+                zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+                zn3_c5_r, zn3_c7_r]
         asym: source
         adjust:
-          shift: [6.2, -4.1]
+          shift: [-6.2, -4.1]
           rotate: -90
         params:
           from: "{{column_net}}_{{row_net}}"
           to: "{{row_net}}"
-      diodes_r:
+      diodes_l:
         what: diode
-        where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
-                zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
-                zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-                zn3_c5_l, zn3_c7_l]
+        where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+                zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+                zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+                zn3_c5_r, zn3_c7_r]
         asym: clone
         adjust:
-          shift: [-6.2, -4.1]
+          shift: [6.2, -4.1]
           rotate: 90
         params:
           from: "{{column_net}}_{{row_net}}"
           to: "{{row_net}}"
       mouse:
         what: choc
-        where: zn3_c7_l
+        where: zn3_c7_r
         asym: both
         adjust:
           shift: [3, 2hy/3 + 6.4 + 3]
@@ -1099,18 +1104,18 @@ pcbs:
           to: "C6_{{row_net}}"
           keycaps: false
           hotswap: false
-      diode_m1:
+      diode_mr:
         what: diode
-        where: zn3_c7_l
+        where: zn3_c7_r
         adjust:
           shift: [-1, 2hy/3 + 6.4/2 + 3]
           rotate: -90
         params:
           from: "C6_{{row_net}}"
           to: "{{row_net}}"
-      diode_m2:
+      diode_ml:
         what: diode
-        where: mirror_zn3_c7_l
+        where: mirror_zn3_c7_r
         adjust:
           shift: [-1, 2hy/3 + 6.4/2 + 3]
           rotate: 90
@@ -1119,10 +1124,10 @@ pcbs:
           to: "{{row_net}}"
       rgb:
         what: rgb
-        where: [          zn1_c2_l, zn1_c3_l, zn1_c4_l,
-                zn2_c1_l, zn2_c2_l, zn2_c3_l, zn2_c4_l,
-                zn3_c1_l, zn3_c2_l, zn3_c3_l, zn3_c4_l,
-                zn3_c5_l, zn3_c7_l]
+        where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+                zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+                zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+                zn3_c5_r, zn3_c7_r]
         asym: both
         adjust.shift: [0, 4.7]
         params:
@@ -1163,8 +1168,8 @@ pcbs:
           P10: LED_VCC
       keys:
         what: choc
-        where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
-                          zn2_c5_l, zn2_c6_l, zn2_c7_l]
+        where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                          zn2_c5_r, zn2_c6_r, zn2_c7_r]
         asym: both
         adjust:
           rotate: 180
@@ -1173,32 +1178,32 @@ pcbs:
           to: "{{column_net}}_{{row_net}}"
           keycaps: false
           hotswap: true
-      diodes_l:
+      diodes_r:
         what: diode
-        where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
-                          zn2_c5_l, zn2_c6_l, zn2_c7_l]
+        where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                          zn2_c5_r, zn2_c6_r, zn2_c7_r]
         asym: source
         adjust:
-          shift: [6.2, -4.1]
+          shift: [-6.2, -4.1]
           rotate: -90
         params:
           from: "{{column_net}}_{{row_net}}"
           to: "{{row_net}}"
-      diodes_r:
+      diodes_l:
         what: diode
-        where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
-                          zn2_c5_l, zn2_c6_l, zn2_c7_l]
+        where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                          zn2_c5_r, zn2_c6_r, zn2_c7_r]
         asym: clone
         adjust:
-          shift: [-6.2, -4.1]
+          shift: [6.2, -4.1]
           rotate: 90
         params:
           from: "{{column_net}}_{{row_net}}"
           to: "{{row_net}}"
       rgb:
         what: rgb
-        where: [zn1_c1_l, zn1_c5_l, zn1_c6_l, zn1_c7_l,
-                          zn2_c5_l, zn2_c6_l, zn2_c7_l]
+        where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                          zn2_c5_r, zn2_c6_r, zn2_c7_r]
         adjust.shift: [0, 4.7]
         asym: both
         params:
