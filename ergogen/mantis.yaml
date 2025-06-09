@@ -867,11 +867,11 @@ outlines:
     - what: rectangle
       size: [hx+dx-1, 18.75]
       adjust:
-        shift: [254, -127 + 18.75/2 - 6.96]
+        shift: [254, -127 + 18.75/2 - 5.9]
     - what: rectangle
       size: [2*hx+dx-1, 10.5]
       adjust:
-        shift: [254, -127 + 10.5/2 - 6.96]
+        shift: [254, -127 + 10.5/2 - 5.9]
       operation: add
       fillet: 1
     - what: rectangle

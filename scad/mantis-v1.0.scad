@@ -131,7 +131,7 @@ no_key = true;
 
 trackball_diameter = 34;
 trackball_radius = trackball_diameter / 2;
-trackball_position = [0, -hy - 3*dy/2, trackball_radius + 4];
+trackball_position = [0, -hy - 3*dy/2, trackball_radius + 3.25];
 //trackball_diameter = 24;
 //trackball_position = [0, -hy - 2*dy/2, trackball_diameter/2 + 10];
 
