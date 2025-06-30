@@ -62,9 +62,14 @@ hfit = 0.1; // [0.01:0.01:0.2]
 vfit = 0.01; // [0.01:0.01:0.2]
 
 // Some derived dimensions for the gaskets
-gasket_thickness = main_height - deck_thickness -
-                  (main_plate_z + plate_thickness);
-gasket_pad_thickness = main_plate_z - gasket_thickness - base_thickness;
+gasket_thickness_main = main_height - deck_thickness -
+                       (main_plate_z + plate_thickness);
+gasket_pad_thickness_main = main_plate_z - gasket_thickness_main -
+                            base_thickness;
+gasket_thickness_raised = main_height + raised_height - deck_thickness -
+                         (raised_plate_z + plate_thickness);
+gasket_pad_thickness_raised = raised_plate_z - gasket_thickness_raised -
+                              (main_height - deck_thickness + base_thickness);
 
 /* [Mounting points dimensions in mm] */
 // Default for M2 threaded insert
@@ -590,7 +595,7 @@ module base_plate_base(oh, ov) intersection() {
 }
 module main_gasket_pads() intersection() {
     translate([0, 0, base_thickness - vfit])
-        linear_extrude(gasket_pad_thickness, convexity=10)
+        linear_extrude(gasket_pad_thickness_main, convexity=10)
         offset(r = f_key + s_key) offset(delta = -f_key - s_key - s_pcb)
         union() {
         translate([-4.0*hx -  dx/2, 4*hy      ]) hex_outline();
@@ -795,7 +800,7 @@ module sensor() {
 module raised_gasket_pads()
     translate([0, 0, main_height - deck_thickness + base_thickness - vfit])
         intersection() {
-            linear_extrude(gasket_pad_thickness, convexity=10)
+            linear_extrude(gasket_pad_thickness_raised, convexity=10)
                 offset(r = f_key + s_key) offset(delta = -f_key - s_key - s_pcb)
                 union() {
                     translate([-2*hx -  dx/2, -2*hy - dy]) hex_outline();
@@ -804,7 +809,7 @@ module raised_gasket_pads()
                         square([2*hx + dx, hy], center=true);
                 }
             pivot = [0, mcu_top - post_diameter, -deck_thickness];
-            radius = deck_thickness + gasket_pad_thickness;
+            radius = deck_thickness + gasket_pad_thickness_raised;
             angle = 12;
             translate(pivot) rotate([0, 90, 0])
                 linear_extrude(6*hx, center=true) offset(r = radius)
@@ -821,11 +826,12 @@ module mezzanine() {
             raised_gasket_pads();
         }
         translate([0, 0, main_height - deck_thickness - 0.01])
-            main_key_slots(base_thickness + gasket_pad_thickness + 0.02);
+            main_key_slots(base_thickness + gasket_pad_thickness_raised + 0.02);
         translate([0, 0, main_height - deck_thickness - 0.01])
-            mcu(base_thickness + gasket_pad_thickness + 0.02, spacing);
+            mcu(base_thickness + gasket_pad_thickness_raised + 0.02, spacing);
         translate([0, 0, main_height - deck_thickness - 0.01])
-            display_cable_cutout(base_thickness + gasket_pad_thickness + 0.02,
+            display_cable_cutout(base_thickness +
+                                 gasket_pad_thickness_raised + 0.02,
                                  spacing);
 
         for(p = mounting_points_raised)
