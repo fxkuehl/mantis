@@ -51,6 +51,7 @@ main_switch_z = main_pcb_z + pcb_thickness;
 raised_plate_z = 17.4;  // [1:0.1:30]
 raised_pcb_z = 15.2;    // [1:0.1:30]
 raised_switch_z = raised_pcb_z + pcb_thickness;
+trackball_z = 20.2;     // [1:0.1:30]
 bump_recess = 1.0;      // [0:0.1:2]
 bump_diameter = 7.0;    // [1:0.1:12]
 bump_height = 1.5;      // [0:0.1:5]
@@ -131,7 +132,7 @@ no_key = true;
 
 trackball_diameter = 34;
 trackball_radius = trackball_diameter / 2;
-trackball_position = [0, -hy - 3*dy/2, trackball_radius + 3.25];
+trackball_position = [0, -hy - 3*dy/2, trackball_z];
 //trackball_diameter = 24;
 //trackball_position = [0, -hy - 2*dy/2, trackball_diameter/2 + 10];
 
