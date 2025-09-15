@@ -469,14 +469,58 @@ outlines:
     - what: outline
       name: _choc_socket
     - what: rectangle
-      size: [5.2, 2.6]
+      # Shrunk by 0.5mm on each side
+      size: [4.2, 1.6]
       where.shift: [4.775 - 2.5, -5.9]
     - what: rectangle
-      size: [5.2, 2.6]
+      # Shrunk by 0.5mm on each side
+      size: [4.2, 1.6]
       where.shift: [-4.775 - 2.5, -5.9 + 2.2]
     - what: outline
       name: _choc_tab
       where.shift: [-4.775 - 2.5 + 1, -1.775]
+  __pcb_foam_switch:
+    - what: outline
+      name: choc_socket
+    - what: rectangle
+      size: [1.7, 3.85]
+      where.shift: [6.2, -4.1]
+    - what: circle
+      radius: 0.95
+      where:
+        - shift: [-5.5, 0]
+    - what: circle
+      radius: 0.95
+      where:
+        - shift: [5.5, 0]
+    - what: circle
+      radius: 2.5
+    - what: circle
+      radius: 0.8
+      where:
+        - shift: [5, 5.15]
+  _pcb_foam_switch:
+    - what: outline
+      name: __pcb_foam_switch
+      expand: 1
+  pcb_foam_switch:
+    - what: outline
+      name: _pcb_foam_switch
+      expand: -1
+  _pcb_foam_switch_rgb:
+    - what: rectangle
+      size: [3.2, 2.8]
+      where.shift: [0, 4.93]
+    - what: rectangle
+      size: [7, 2.32]
+      where.shift: [0, 4.93]
+      expand: 1
+    - what: outline
+      name: _pcb_foam_switch
+  pcb_foam_switch_rgb:
+    - what: outline
+      name: _pcb_foam_switch_rgb
+      expand: -1
   _rgb_cutout:
     - what: rectangle
       where:
@@ -486,7 +530,7 @@ outlines:
   _switch_cutout1:
     - what: rectangle
       size: [13.8, 13.8]
-      fillet: 0.6
+      fillet: 1
   _ffc_cutout:
     - what: rectangle
       size: [7, 3]
@@ -656,14 +700,6 @@ outlines:
       operation: add
       fillet: kx+fk
 
-  main_choc_sockets:
-    - what: outline
-      name: choc_socket
-      where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
-              zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
-              zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
-              zn3_c5_r, zn3_c7_r]
-      asym: both
   _main_key_silkscreen:
     - what: outline
       name: _key_silkscreen
@@ -673,7 +709,7 @@ outlines:
               zn3_c5_r, zn3_c7_r]
       asym: both
       fillet: fk-kx
-  main_pcb:
+  _main_pcb:
     - what: outline
       name: _main_internal
     - what: outline
@@ -696,6 +732,12 @@ outlines:
       operation: subtract
       fillet: fk+2kx
     - what: outline
+      name: _main_pcb_cutouts
+      operation: subtract
+  main_pcb:
+    - what: outline
+      name: _main_pcb
+    - what: outline
       name: _rgb_cutout
       where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
               zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
@@ -703,8 +745,25 @@ outlines:
               zn3_c5_r, zn3_c7_r]
       asym: both
       operation: subtract
+  main_pcb_foam:
     - what: outline
-      name: _main_pcb_cutouts
+      name: _main_pcb
+    - what: outline
+      name: pcb_foam_switch_rgb
+      where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+              zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+              zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+              zn3_c5_r, zn3_c7_r]
+      asym: both
+      operation: subtract
+    - what: outline
+      name: _main_cutouts
+      operation: subtract
+    - what: outline
+      name: _mcu_cutout
+      operation: subtract
+    - what: outline
+      name: _display_raised_cutout
       operation: subtract
   _main_deck:
     - what: outline
@@ -786,13 +845,15 @@ outlines:
               zn3_c5_r, zn3_c7_r]
       asym: left
       operation: subtract
-  raised_choc_sockets:
+
+  _raised_key_silkscreen:
     - what: outline
-      name: choc_socket
+      name: _key_silkscreen
       where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
                         zn2_c5_r, zn2_c6_r, zn2_c7_r]
       asym: both
-  raised_pcb:
+      fillet: fk-kx
+  _raised_pcb:
     - what: outline
       name: _raised
     - what: outline
@@ -814,16 +875,28 @@ outlines:
       operation: subtract
       fillet: fk+kx
     - what: outline
+      name: _mcu_cutout
+      operation: subtract
+    - what: outline
+      name: _display_raised_cutout
+      operation: subtract
+  raised_pcb:
+    - what: outline
+      name: _raised_pcb
+    - what: outline
       name: _rgb_cutout
       where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
                         zn2_c5_r, zn2_c6_r, zn2_c7_r]
       asym: both
       operation: subtract
+  raised_pcb_foam:
     - what: outline
-      name: _mcu_cutout
-      operation: subtract
+      name: _raised_pcb
     - what: outline
-      name: _display_raised_cutout
+      name: pcb_foam_switch_rgb
+      where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                        zn2_c5_r, zn2_c6_r, zn2_c7_r]
+      asym: both
       operation: subtract
   _raised_key_slots:
     - what: outline
@@ -1129,7 +1202,7 @@ pcbs:
                 zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
                 zn3_c5_r, zn3_c7_r]
         asym: both
-        adjust.shift: [0, 4.7]
+        adjust.shift: [0, 4.93]
         params:
           side: B
           din: "DI_{{column_net}}_{{row_net}}"
@@ -1140,9 +1213,12 @@ pcbs:
     outlines:
       raised:
         outline: raised_pcb
-      sockets:
-        outline: raised_choc_sockets
+      keys:
+        outline: _raised_key_silkscreen
         layer: B.SilkS
+      plate:
+        outline: raised_plate
+        layer: Dwgs.User
     footprints:
       # Connector to bottom PCB (use first 12 pins of promicro as placeholder)
       # Inverted pin assignment and 180° rotation for type A cable
@@ -1204,7 +1280,7 @@ pcbs:
         what: rgb
         where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
                           zn2_c5_r, zn2_c6_r, zn2_c7_r]
-        adjust.shift: [0, 4.7]
+        adjust.shift: [0, 4.93]
         asym: both
         params:
           side: B
