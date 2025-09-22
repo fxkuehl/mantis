@@ -835,8 +835,6 @@ module mezzanine() {
             raised_gasket_pads();
         }
         translate([0, 0, main_height - deck_thickness - 0.01])
-            main_key_slots(base_thickness + gasket_pad_thickness_raised + 0.02);
-        translate([0, 0, main_height - deck_thickness - 0.01])
             mcu(base_thickness + gasket_pad_thickness_raised + 0.02, spacing);
         translate([0, 0, main_height - deck_thickness - 0.01])
             display_cable_cutout(base_thickness +
@@ -926,6 +924,7 @@ module trackball_holder() intersection() {
                     translate([p.x, p.y, -trackball_radius - 9.05+1.65 + 1.6])
                         cylinder(5, d = bore_diameter);
             }
+            main_key_slots(main_height + raised_height);
         }
     }
     render(convexity=10) case_inside(hfit, vfit);
