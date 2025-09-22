@@ -748,12 +748,21 @@ module controller() {
     translate([0, mcu_size.y/2, 10.9 + ex - 1.6]) usb_port(10.5);
 }
 
-module ffc_connector() {
+module ffc_connector_hirose() {
     color("beige") translate([-4, 0, 0]) cube([8, 2.2, 1.19]);
     color("dimgrey") translate([-6.57/2, -0.5, 0.6]) cube([6.57, 1.5, 0.6]);
     for (i = [0:11])
         color("gold") translate([i*0.5 - 2.75, 0.1, 0]) cube([0.15, 2.4, 0.35]);
 }
+
+module ffc_connector_molex() {
+    color("beige") translate([-10.7/2, -1.8, 0]) cube([10.7, 4, 1.8]);
+    color("dimgrey") translate([-9.1/2, -2.6, 1]) cube([9.1, 4, 0.9]);
+    for (i = [0:11])
+        color("gold") translate([i*0.5 - 2.75, -1.4, 0]) cube([0.15, 4, 0.35]);
+}
+
+module ffc_connector() ffc_connector_molex();
 
 module main_pcb_assembly() {
     main_pcb();
