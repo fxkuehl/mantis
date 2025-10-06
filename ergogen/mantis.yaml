@@ -83,7 +83,7 @@ points:
     # sclupted keycaps.
     #
     # The 7x6 matrix for up to 42 keys leaves room for two mouse buttons.
-    # Each keyboard half as 3 rows, 7 columns. Thus mirroring changes the
+    # Each keyboard half as 3 rows, 7 columns. Thus, mirroring changes the
     # the row net. The raised PCB uses 2 mirrored "rows" and 4 "columns"
     # for an optimal 4x4 matrix requiring 8 pins to connect the two PCBs.
     # Matrix "rows" correspond approximately with rows on the main PCB
@@ -91,7 +91,7 @@ points:
     # columns, the lower row as 3 columns. The lowest middle finger and
     # thumb key as well as a possible mouse key are added to the top
     # 4-column row. The raised PCB "rows" complete the lower two rows
-    # of the main PCB.
+    # of the main PCB. All thumb keys are in "column" 7.
     #
     # Each row uses its own zone to make the key rotation easier.
     # Otherwise the spread and stagger get very confusing because they
@@ -531,10 +531,26 @@ outlines:
     - what: rectangle
       size: [13.8, 13.8]
       fillet: 1
-  _ffc_cutout:
+  _switch_cutout2:
+    - what: rectangle
+      size: [13.8, 13.8]
+      fillet: 1
+    - what: rectangle
+      size: [14.3, 11.8]
+  _ffc_cable_cutout:
     - what: rectangle
       size: [7, 3]
       fillet: 1
+  _ffc_connector_cutout:
+    - what: rectangle
+      size: [11.5, 6]
+      where.shift: [0, 0.3]
+    - what: rectangle
+      size: [7, 7]
+      where.shift: [0, -5.5]
+  _capacitor_cutout:
+    - what: rectangle
+      size: [2.45, 0.8]
   _mcu_cutout:
     - what: rectangle
       size: [17.78 + 4kx, 33.02 + 4kx]
@@ -570,12 +586,6 @@ outlines:
       name: _mcu_cutout
       operation: subtract
       fillet: mount_width/2
-    - what: outline
-      name: _ffc_cutout
-      where:
-        ref: f_c0_r3
-        shift: [9hx/2+dx/2+17, -13hy/6]
-      operation: add
   _main_plate_cutouts:
     - what: outline
       name: _main_cutouts
@@ -585,17 +595,12 @@ outlines:
     - what: outline
       name: _display_main_cutout
     - what: outline
-      name: _ffc_cutout
+      name: _ffc_cable_cutout
       where:
         ref: f_c0_r3
-        shift: [9hx/2+dx/2+17, -13hy/6 - 1.5]
-      operation: add
-    # Make the plate symmetrical for easier assembly
-    - what: outline
-      name: _ffc_cutout
-      where:
-        ref: f_c0_r3
-        shift: [9hx/2+dx/2-17, -13hy/6 - 1.5]
+        shift: [9hx/2+dx/2+17, -13hy/6 - 1]
+      # Make the plate symmetrical for easier assembly
+      asym: both
       operation: add
   _trackball:
     - what: circle
@@ -647,6 +652,7 @@ outlines:
       - shift: [0, -hy]
       - shift: [-hx/4, -hy/6]
       - shift: [0, -hy]
+      fillet: fk+2kx
   _trackball_main_cutout:
     - what: polygon
       points:
@@ -663,6 +669,7 @@ outlines:
       - shift: [0, -4hy/3 - dy - ky]
       - shift: [-hx/2, -hy/3]
       - shift: [0, -hy]
+      fillet: fk+2kx
   _raised_padded:
     $extends: outlines._raised_template
     $args: [kx, ky]
@@ -700,6 +707,33 @@ outlines:
       operation: add
       fillet: kx+fk
 
+  base_relief_switch:
+    - what: outline
+      name: pcb_foam_switch
+      expand: 0.25
+  base_relief:
+    - what: outline
+      name: _ffc_connector_cutout
+      where:
+        ref: f_c5_r3
+        shift: [hx/2+dx/2, 0]
+    - what: outline
+      name: _ffc_connector_cutout
+      where:
+        ref: f_c5_r3
+        shift: [hx/2+dx/2 - 17, hy/3]
+      expand: 0.25
+    - what: outline
+      name: base_relief_switch
+      where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+              zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+              zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+              zn3_c5_r, zn3_c7_r]
+      asym: both
+    - what: outline
+      name: _mcu_cutout
+    - what: outline
+      name: _display_raised_cutout
   _main_key_silkscreen:
     - what: outline
       name: _key_silkscreen
@@ -709,7 +743,7 @@ outlines:
               zn3_c5_r, zn3_c7_r]
       asym: both
       fillet: fk-kx
-  _main_pcb:
+  __main_pcb:
     - what: outline
       name: _main_internal
     - what: outline
@@ -734,9 +768,27 @@ outlines:
     - what: outline
       name: _main_pcb_cutouts
       operation: subtract
+  _main_pcb:
+    - what: outline
+      name: __main_pcb
+    - what: outline
+      name: _ffc_cable_cutout
+      where:
+        ref: f_c0_r3
+        shift: [9hx/2+dx/2-17, -13hy/6]
+      operation: subtract
+  _main_pcb_flipped:
+    - what: outline
+      name: __main_pcb
+    - what: outline
+      name: _ffc_cable_cutout
+      where:
+        ref: f_c0_r3
+        shift: [9hx/2+dx/2+17, -13hy/6]
+      operation: subtract
   main_pcb:
     - what: outline
-      name: _main_pcb
+      name: _main_pcb_flipped
     - what: outline
       name: _rgb_cutout
       where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
@@ -757,6 +809,18 @@ outlines:
       asym: both
       operation: subtract
     - what: outline
+      name: _capacitor_cutout
+      where: [f_c0_r3, f_c2_r3]
+      adjust.shift: [0, -2hy/3]
+      asym: both
+      operation: subtract
+    - what: outline
+      name: _capacitor_cutout
+      where: [f_c3_r0, t_c3_r1]
+      adjust.shift: [0, 2hy/3]
+      asym: both
+      operation: subtract
+    - what: outline
       name: _main_cutouts
       operation: subtract
     - what: outline
@@ -764,6 +828,18 @@ outlines:
       operation: subtract
     - what: outline
       name: _display_raised_cutout
+      operation: subtract
+    - what: outline
+      name: _ffc_connector_cutout
+      where:
+        ref: f_c5_r3
+        shift: [hx/2+dx/2, 0]
+      operation: subtract
+    - what: outline
+      name: _ffc_connector_cutout
+      where:
+        ref: f_c5_r3
+        shift: [hx/2+dx/2 - 17, hy/3]
       operation: subtract
   _main_deck:
     - what: outline
@@ -819,6 +895,23 @@ outlines:
     - what: outline
       name: _main_plate_cutouts
       operation: subtract
+  main_plate_foam:
+    - what: outline
+      name: _main_pcb
+    - what: outline
+      name: _trackball_main_cutout
+      operation: subtract
+    - what: outline
+      name: _switch_cutout2
+      where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
+              zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
+              zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
+              zn3_c5_r, zn3_c7_r]
+      asym: both
+      operation: subtract
+    - what: outline
+      name: _main_plate_cutouts
+      operation: subtract
   main_split_plate:
     - what: outline
       name: _main_split
@@ -846,6 +939,19 @@ outlines:
       asym: left
       operation: subtract
 
+  mezzanine_relief:
+    - what: outline
+      name: _ffc_connector_cutout
+      where:
+        ref: f_c5_r3
+        shift: [hx/2+dx/2, -9]
+        rotate: 180
+      expand: 0.25
+    - what: outline
+      name: base_relief_switch
+      where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                        zn2_c5_r, zn2_c6_r, zn2_c7_r]
+      asym: both
   _raised_key_silkscreen:
     - what: outline
       name: _key_silkscreen
@@ -898,6 +1004,19 @@ outlines:
                         zn2_c5_r, zn2_c6_r, zn2_c7_r]
       asym: both
       operation: subtract
+    - what: outline
+      name: _capacitor_cutout
+      where: [f_c4_r3, f_c4_r1]
+      adjust.shift: [0, -2hy/3]
+      asym: both
+      operation: subtract
+    - what: outline
+      name: _ffc_connector_cutout
+      where:
+        ref: f_c5_r3
+        shift: [hx/2+dx/2, -9]
+        rotate: 180
+      operation: subtract
   _raised_key_slots:
     - what: outline
       name: _key_slot_hexagon
@@ -936,6 +1055,16 @@ outlines:
     - what: outline
       name: _display_raised_cutout
       operation: subtract
+  raised_plate_foam:
+    - what: outline
+      name: _raised_pcb
+    - what: outline
+      name: _switch_cutout2
+      where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                        zn2_c5_r, zn2_c6_r, zn2_c7_r]
+      asym: both
+      operation: subtract
+
   sensor_pcb:
     - what: rectangle
       size: [hx+dx-1, 18.75]
@@ -1204,10 +1333,29 @@ pcbs:
         asym: both
         adjust.shift: [0, 4.93]
         params:
-          side: B
           din: "DI_{{column_net}}_{{row_net}}"
           dout: "DO_{{column_net}}_{{row_net}}"
           VCC: LED_VCC
+      # Diodes as placeholders for capacitors
+      # Will be updated from the schematic
+      cap1:
+        what: diode
+        where: [f_c0_r3, f_c2_r3]
+        adjust.shift: [0, -2hy/3]
+        asym: both
+        params:
+          designator: C
+          from: GND
+          to: LED_VCC
+      cap2:
+        what: diode
+        where: [f_c3_r0, t_c3_r1]
+        adjust.shift: [0, 2hy/3]
+        asym: both
+        params:
+          designator: C
+          from: GND
+          to: LED_VCC
 
   mantis_raised:
     outlines:
@@ -1226,7 +1374,7 @@ pcbs:
         what: promicro
         where:
           ref: f_c5_r3
-          shift: [hx/2+dx/2, -7]
+          shift: [hx/2+dx/2, -9]
           rotate: 180
         params:
           designator: FFC
@@ -1283,7 +1431,17 @@ pcbs:
         adjust.shift: [0, 4.93]
         asym: both
         params:
-          side: B
           din: "DI_{{column_net}}_{{row_net}}"
           dout: "DO_{{column_net}}_{{row_net}}"
           VCC: LED_VCC
+      # Diodes as placeholders for capacitors
+      # Will be updated from the schematic
+      cap:
+        what: diode
+        where: [f_c4_r3, f_c4_r1]
+        adjust.shift: [0, -2hy/3]
+        asym: both
+        params:
+          designator: C
+          from: GND
+          to: LED_VCC
