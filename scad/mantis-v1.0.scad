@@ -14,6 +14,8 @@ show_key = true;
 show_plate = true;
 // Switch PCBs
 show_pcb = true;
+// Foam or cork
+show_foam = true;
 // Trackball sensor
 show_sensor = true;
 show_bearing = true;
@@ -38,20 +40,22 @@ r_corner_main = 2.5;           // [0.5:0.1:5]
 r_corner_raised = 1.6;         // [0.5:0.1:5]
 wall_thickness_main = 2.5;     // [0.5:0.1:5]
 wall_thickness_raised = 2.5;   // [0.5:0.1:5]
-main_height = 13;       // [5:0.1:15]
+main_height = 12.3;     // [5:0.1:15]
 raised_height = 10;     // [5:0.1:15]
 base_thickness = 2.5;   // [0.5:0.1:5]
+base_relief_depth = 1;  // [0.5:0.1:2]
 deck_thickness = 3;     // [0.5:0.1:5]
 pcb_thickness = 1.2;    // [0.5:0.1:2]
+foam_thickness = 1.0;   // [0.5:0.1:2]
 sensor_pcb_thickness = 1.6;// [0.5:0.1:2]
 plate_thickness = 1.2;  // [0.5:0.1:2]
-main_plate_z = 7.4;     // [1:0.1:15]
-main_pcb_z = 5.2;       // [1:0.1:15]
+main_plate_z = 6.7;     // [1:0.1:15]
+main_pcb_z = 4.5;       // [1:0.1:15]
 main_switch_z = main_pcb_z + pcb_thickness;
-raised_plate_z = 17.4;  // [1:0.1:30]
-raised_pcb_z = 15.2;    // [1:0.1:30]
+raised_plate_z = 16.7;  // [1:0.1:30]
+raised_pcb_z = 14.5;    // [1:0.1:30]
 raised_switch_z = raised_pcb_z + pcb_thickness;
-trackball_z = 20.2;     // [1:0.1:30]
+trackball_z = 19.5;     // [1:0.1:30]
 bump_recess = 1.0;      // [0:0.1:2]
 bump_diameter = 7.0;    // [1:0.1:12]
 bump_height = 1.5;      // [0:0.1:5]
@@ -106,6 +110,7 @@ key_color = "linen";
 trackball_color = "deepskyblue";
 plate_color = "darkgreen";
 pcb_color = "green";
+foam_color = "goldenrod";
 mezzanine_color = "orange";
 case_color = "chocolate";
 base_color = "saddlebrown";
@@ -620,6 +625,15 @@ bump_positions = [
     [-2.00*hx - dx/2, -5*hy/3 - dy],
     [ 2.00*hx + dx/2, -5*hy/3 - dy]
 ];
+module base_relief() translate([0, 0, base_thickness - base_relief_depth])
+    flat_extrusion("outlines/base_relief.dxf", base_relief_depth+vfit);
+module drain_hole() union() {
+    radius = 7.5;
+    translate(trackball_position - [0, 0, trackball_radius])
+        cylinder(h=10, r=radius, center=true);
+    translate(trackball_position - [0, 0, trackball_z+vfit])
+        cylinder(1, radius+1, radius);
+}
 module base_plate() difference() {
     ca = render_case ? 0 : case_alpha;
     bc = render_case ? undef : base_color;
@@ -627,6 +641,12 @@ module base_plate() difference() {
         base_plate_base(0, 0);
         main_gasket_pads();
     }
+    base_relief();
+    translate(trackball_position + [0.25, 0.1, -0.3]) rotate([60, 0, 0])
+        translate([0, 0, -trackball_radius]) sensor();
+    translate(trackball_position + [-0.25, 0.1, -0.3]) rotate([60, 0, 0])
+        translate([0, 0, -trackball_radius]) sensor();
+    drain_hole();
     for (p = mounting_points_main)
         translate([p.x, p.y, 0])
             countersunk_screw(base_thickness, hfit);
@@ -687,12 +707,24 @@ module bump() union() {
 
 module main_pcb() color(pcb_color)
     flat_extrusion("outlines/main_pcb.dxf", pcb_thickness);
+module main_pcb_foam() color(foam_color)
+    translate([0, 0, -foam_thickness - vfit])
+    flat_extrusion("outlines/main_pcb_foam.dxf", foam_thickness - 2*vfit);
 module raised_pcb() color(pcb_color)
     flat_extrusion("outlines/raised_pcb.dxf", plate_thickness);
+module raised_pcb_foam() color(foam_color)
+    translate([0, 0, -foam_thickness - vfit])
+    flat_extrusion("outlines/raised_pcb_foam.dxf", foam_thickness - 2*vfit);
 module main_plate() color(plate_color)
     flat_extrusion("outlines/main_plate.dxf", pcb_thickness);
+module main_plate_foam() color(foam_color)
+    translate([0, 0, -foam_thickness - vfit])
+    flat_extrusion("outlines/main_plate_foam.dxf", foam_thickness - 2*vfit);
 module raised_plate() color(plate_color)
     flat_extrusion("outlines/raised_plate.dxf", plate_thickness);
+module raised_plate_foam() color(foam_color)
+    translate([0, 0, -foam_thickness - vfit])
+    flat_extrusion("outlines/raised_plate_foam.dxf", foam_thickness - 2*vfit);
 
 module female_header(height, pin_l, n) {
     pitch = 2.54;
@@ -773,7 +805,7 @@ module main_pcb_assembly() {
 
 module raised_pcb_assembly() {
     raised_pcb();
-    translate([0, 2*hy/3, 0]) rotate([0, 180, 180]) ffc_connector();
+    translate([0, hy-9, 0]) rotate([0, 180, 180]) ffc_connector();
 }
 
 module lens(offset) {
@@ -800,7 +832,7 @@ module sensor() {
     }
 
     // Connector
-    translate([-17, -3, -9.05 + 1.65]) rotate([0, 180, 180]) ffc_connector();
+    translate([-17, -1.7, -9.05 + 1.65]) rotate([0, 180, 180]) ffc_connector();
 
     // Lens
     color("#ffffff", 0.3) lens(0);
@@ -848,7 +880,7 @@ module mezzanine() {
 }
 
 module bearings(size, offset, what=0) {
-    translate(trackball_position) rotate([7, 0, 0]) {
+    translate(trackball_position) rotate([4, 0, 0]) {
         for (phi = [0:120:240])
             rotate([-45, 0, phi]) translate([0, 0, -trackball_radius - size/2])
                 if (what == 0)
@@ -908,6 +940,7 @@ module trackball_holder() intersection() {
         union() {
             translate(trackball_position)
                 corr_sphere(trackball_radius + spacing);
+            drain_hole();
             difference() {
                 bearings(bearing_size, 1.5, what=4);
                 bearings(bearing_size, 0.25, what=3);
@@ -935,6 +968,7 @@ module key_profile(x) {
     $rgb = rgb;
     $slope = slope;
     $dish_diam = dish_diam;
+    $explode=$explode/3;
 
     if (x == 0) {
         switch_key($tilt=tilt1, $rise=rise1, $saddle=saddle);
@@ -949,22 +983,30 @@ module keyboard() {
     ex = $explode;
 
     if (show_pcb) {
-        translate([0, 0, main_pcb_z + 1*ex]) main_pcb_assembly();
-        translate([0, 0, raised_pcb_z + 4*ex]) raised_pcb_assembly();
+        translate([0, 0, main_pcb_z + 2*ex]) main_pcb_assembly();
+        translate([0, 0, raised_pcb_z + 7*ex]) raised_pcb_assembly();
+        if (show_foam) {
+            translate([0, 0, main_pcb_z + 1*ex]) main_pcb_foam();
+            translate([0, 0, raised_pcb_z + 6*ex]) raised_pcb_foam();
+        }
     }
 
     if (show_plate) {
-        translate([0, 0, main_plate_z + 2*ex]) main_plate();
-        translate([0, 0, raised_plate_z + 4.8*ex]) raised_plate();
+        translate([0, 0, main_plate_z + 4*ex]) main_plate();
+        translate([0, 0, raised_plate_z + 9*ex]) raised_plate();
+        if (show_foam) {
+            translate([0, 0, main_plate_z + 3*ex]) main_plate_foam();
+            translate([0, 0, raised_plate_z + 8*ex]) raised_plate_foam();
+        }
     }
 
     if (show_sensor) {
-        translate(trackball_position + [0, 0, 2*ex]) rotate([60, 0, 0])
+        translate(trackball_position + [0, 0, 3*ex]) rotate([60, 0, 0])
             translate([0, 0, -trackball_radius]) sensor();
     }
 
     if (show_trackball) {
-        color(trackball_color) translate(trackball_position + [0, 0, 7*ex])
+        color(trackball_color) translate(trackball_position + [0, 0, 11*ex])
             rotate([30, 0, 180]) corr_sphere(trackball_radius);
     }
 
@@ -983,10 +1025,10 @@ module keyboard() {
         raised_thumbs =   [[2.5, -1, 60, 0], [3.5, -1, 0, 0]];
         main_thumbs =     [[4.0, -2,  0, 1]];
         union() {
-            main_z = main_switch_z + 4*ex;
-            raised_z = raised_switch_z + 7*ex;
-            hx = hx + ex/5;
-            hy = hy + ex/5;
+            main_z = main_switch_z + 7*ex;
+            raised_z = raised_switch_z + 11*ex;
+            hx = hx + ex/3;
+            hy = hy + ex/3;
             for (k = main_fingers) {
                 translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy, main_z])
                     rotate([0, 0, k[2]]) key_profile(k[3]);
@@ -1014,12 +1056,12 @@ module keyboard() {
         }
     }
 
-    if (show_bearing) translate([0, 0,  6.8*ex]) bearings(bearing_size, 0);
+    if (show_bearing) translate([0, 0,  5.5*ex]) bearings(bearing_size, 0);
 
     if (show_mezzanine) {
         pivot = [0, mcu_top - post_diameter, main_height - deck_thickness];
         angle = [12 - abs($t-0.5)*24, 0, 0];
-        translate([0, 0, 3*ex] + pivot) rotate(angle) translate(-pivot) {
+        translate([0, 0, 5*ex] + pivot) rotate(angle) translate(-pivot) {
             if (render_case)
                 color(mezzanine_color, alpha=case_alpha)
                     render(convexity=8) trackball_holder();
@@ -1042,10 +1084,10 @@ module keyboard() {
 
     if (show_case) {
         if (render_case)
-            translate([0, 0, 6*ex]) color(case_color, alpha=case_alpha)
+            translate([0, 0, 10.2*ex]) color(case_color, alpha=case_alpha)
                 render(convexity=10) case();
         else
-            translate([0, 0, 6*ex]) color(alpha=case_alpha) case();
+            translate([0, 0, 10.2*ex]) color(alpha=case_alpha) case();
     }
 }
 

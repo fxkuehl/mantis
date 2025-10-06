@@ -523,10 +523,10 @@ module choc_switch() {
             }
             translate([0, 0, -2]) cylinder(h = 2.01, d = 3.2);
             translate([0, 0, -2.65]) cylinder(h = 0.66, d1 = 2.8, d2 = 3.2);
-            translate([-5.22, 0, -2   ]) cylinder(h = 2.01, d = 1.8);
-            translate([-5.22, 0, -2.65]) cylinder(h = 0.66, d1 = 1.4, d2 = 1.8);
-            translate([ 5.22, 0, -2   ]) cylinder(h = 2.01, d = 1.8);
-            translate([ 5.22, 0, -2.65]) cylinder(h = 0.66, d1 = 1.4, d2 = 1.8);
+            translate([-5.5, 0, -2   ]) cylinder(h = 2.01, d = 1.8);
+            translate([-5.5, 0, -2.65]) cylinder(h = 0.66, d1 = 1.4, d2 = 1.8);
+            translate([ 5.5, 0, -2   ]) cylinder(h = 2.01, d = 1.8);
+            translate([ 5.5, 0, -2.65]) cylinder(h = 0.66, d1 = 1.4, d2 = 1.8);
         }
         translate([0, 0, 6.9]) cube(12.65, center = true);
         translate([0, 4.7, 0]) cube([5.3, 3.25, 2], center = true);
@@ -579,7 +579,7 @@ module choc_switch() {
 
 module switch_key() {
     if (show_key)
-        translate([0, 0, 5.5 + 3 - travel - $droop + $explode/5]) key(detail = 8);
+        translate([0, 0, 5.5 + 3 - travel - $droop + $explode]) key(detail = 8);
     choc_switch();
 }
 

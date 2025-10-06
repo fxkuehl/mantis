@@ -64,7 +64,7 @@ jobs="$jobs $!"
 
 echo "Exploded view ..."
 $osc $params --camera=5,30,270,65,0,15,1300 --imgsize=$sizeP \
-	-D \$explode=60 --projection=ortho \
+	-D \$explode=40 --projection=ortho \
 	-o "$dir/mantis_exploded.png" $scad &
 jobs="$jobs $!"
 
