@@ -634,6 +634,9 @@ module drain_hole() union() {
     translate(trackball_position - [0, 0, trackball_z+vfit])
         cylinder(1, radius+1, radius);
 }
+module power_switch_cutout() translate([-6/2, mcu_top, -vfit])
+    cube([6, 10, main_pcb_z+0.5+vfit]);
+
 module base_plate() difference() {
     ca = render_case ? 0 : case_alpha;
     bc = render_case ? undef : base_color;
@@ -647,6 +650,7 @@ module base_plate() difference() {
     translate(trackball_position + [-0.25, 0.1, -0.3]) rotate([60, 0, 0])
         translate([0, 0, -trackball_radius]) sensor();
     drain_hole();
+    power_switch_cutout();
     for (p = mounting_points_main)
         translate([p.x, p.y, 0])
             countersunk_screw(base_thickness, hfit);
@@ -680,6 +684,8 @@ module case() union() {
                        main_height + raised_height - deck_thickness
                        - usb_height/2 - usb_offset])
                 usb_port_template(usb_offset, w + 0.2, usb_height);
+
+            power_switch_cutout();
 
             /* Mounting holes */
             h_main = main_height - base_thickness - deck_thickness;
@@ -796,10 +802,22 @@ module ffc_connector_molex() {
 
 module ffc_connector() ffc_connector_molex();
 
+module pcm12_switch() {
+    color("silver") translate([-6.7/2, -2.6/2, 0]) cube([6.7, 2.6, 1.4]);
+    color("dimgrey") translate([-1.3, 2.58/2, 0.4]) cube([1.3, 1.5, 0.8]);
+    color("silver") translate([-7.7/2, -2.6/2, 0]) cube([7.7, 0.66, 0.15]);
+    color("silver") translate([-7.7/2, 2.6/2-0.66, 0]) cube([7.7, 0.66, 0.15]);
+    color("gold") translate([-0.75-0.2, -2.6/2-0.9, 0]) cube([0.4, 1, 0.15]);
+    color("gold") translate([-2.25-0.2, -2.6/2-0.9, 0]) cube([0.4, 1, 0.15]);
+    color("gold") translate([2.25-0.2, -2.6/2-0.9, 0]) cube([0.4, 1, 0.15]);
+}
+
 module main_pcb_assembly() {
     main_pcb();
     translate([0, hy, 0]) rotate([0, 180, 0]) ffc_connector();
     translate([-17, 4*hy/3, 0]) rotate([0, 180, 0]) ffc_connector();
+    translate([0, mcu_top - 2.6/2, 0]) rotate([0, 180, 0])
+        pcm12_switch();
     translate([0, mcu_y, pcb_thickness]) controller();
 }
 
