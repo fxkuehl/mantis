@@ -36,7 +36,7 @@ $clamp_z1 = 8.25;
 $clamp_z2 = 10.25;
 
 // How far the keys are pressed down (0-3mm)
-travel = 0.1;
+travel = 0; // [0:0.1:3]
 // Mantis plate explosion offset
 $explode = 0;
 // Set by files including this one
