@@ -203,8 +203,17 @@ main_outline_points = [
     [     hx + dx/2, -8*hy/3 - dy]
 ];
 
+// Polyhedron with variable fillets along z
+// points: points of a polygon describing the outline in x-y plane
+// h: height
+// o: offset in x-y plane
+// fxy: fillet in x-y plane of the bulk
+// f_edge: fillet of the top/bottom edge
+// f_corner: fillet of the corners
+// f_style: edge/corner fillet style (0: chamfer, 1: parabolic, 2: circular)
+// round_bottom: true if bottom side is fillet, false if bottom is flat
 module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
-                         fille_style, round_bottom=true) {
+                         fillet_style, round_bottom=true) {
     assert(f_edge <= f_corner);
 
     n = len(points);
@@ -215,15 +224,14 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
     z1 = fillet_style == 1 ? sqrt(f_corner/ac) : f_corner;
     q = round(z1 * 1.5708 / $fs);
     Q = round_bottom ? 2*q : q;
-    fscale = 1 / (1 / sin(60) - 1);
     //echo(z1, q);
 
     bottom = at_z(round_bottom ?
-        offset_fillet_poly(points, o-f_edge, fxy+f_edge,
-                           fxy-f_edge+(f_corner-f_edge)*fscale, m) :
+        offset_fillet_poly2(points, o-f_edge, fxy+f_edge, 0,
+                           fxy-f_edge, f_corner-f_edge, m) :
         offset_fillet_poly(points, o, fxy, fxy, m), 0);
-    top = at_z(offset_fillet_poly(points, o-f_edge, fxy+f_edge,
-                                  fxy-f_edge+(f_corner-f_edge)*fscale, m), h);
+    top = at_z(offset_fillet_poly2(points, o-f_edge, fxy+f_edge, 0,
+                                   fxy-f_edge, f_corner-f_edge, m), h);
 
     bottom_fillet = round_bottom ? [for (i = [1 : q]) each let (
         z = (fillet_style == 2 ? cos(90*i/q) : 1 - i/q) * z1,
@@ -234,9 +242,9 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
         dr = ((fillet_style == 0 ? z :
                fillet_style == 1 ? ac * z^2 :
                                    z1-sqrt(f_corner^2 - z^2))
-              - r) * fscale
-    ) at_z(offset_fillet_poly(points, o - r, fxy + r,
-                              fxy - r + dr, m), z1 - z)] : [];
+              - r)
+    ) at_z(offset_fillet_poly2(points, o - r, fxy + r, 0,
+                               fxy - r, dr, m), z1 - z)] : [];
     top_fillet = [for (i = [q : -1 : 1]) each let (
         z = (fillet_style == 2 ? cos(90*i/q) : 1 - i/q) * z1,
         _r = max(0, f_edge - (z1-z)),
@@ -246,9 +254,9 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
         dr = ((fillet_style == 0 ? z :
                fillet_style == 1 ? ac * z^2 :
                                    z1-sqrt(f_corner^2 - z^2))
-              - r) * fscale
-    ) at_z(offset_fillet_poly(points, o - r, fxy + r,
-                              fxy - r + dr, m), h - z1 + z)];
+              - r)
+    ) at_z(offset_fillet_poly2(points, o - r, fxy + r, 0,
+                              fxy - r, dr, m), h - z1 + z)];
     points = concat(bottom, bottom_fillet, top_fillet, top);
     bottom_face = [for (i = [p-1 : -1 : 0]) i];
     top_face = [for (i = [p * (1 + Q) : p * (2 + Q) - 1]) i];
@@ -305,7 +313,8 @@ raised_outline_points = let (
     wx = wall_thickness_raised,
     wy = 1.1547*wx
 ) [
-    [-0.5*hx - dx/2 + kx, -5*hy/3 - dy + ky + wy+ky/2],
+    [0, -2*hy - dy/2],
+  //[-0.5*hx - dx/2 + kx, -5*hy/3 - dy + ky + wy+ky/2],
     [-1.0*hx - dx/2 + wx + 2*kx, -4*hy/3 - dy + ky + wy/2],
   //[-1.0*hx - dx/2 + wx + kx, -4*hy/3 - dy + ky + wy/2+ky/2],
   //[-1.0*hx - dx/2 + kx, -4*hy/3 - dy + ky + wy+ky/2],
@@ -340,7 +349,7 @@ raised_outline_points = let (
   //[ 1.0*hx + dx/2 - kx, -4*hy/3 - dy + ky + wy+ky/2],
   //[ 1.0*hx + dx/2 - wx - kx, -4*hy/3 - dy + ky + wy/2+ky/2],
     [ 1.0*hx + dx/2 - wx - 2*kx, -4*hy/3 - dy + ky + wy/2],
-    [ 0.5*hx + dx/2 - kx, -5*hy/3 - dy + ky + wy+ky/2]
+  //[ 0.5*hx + dx/2 - kx, -5*hy/3 - dy + ky + wy+ky/2],
 ];
 
 raised_outline_points1 = let (
@@ -566,6 +575,9 @@ module case_inside(oh, ov) union() {
         translate([0, 0, main_height - deck_thickness - ov - 0.01])
             raised_extrusion(raised_height + 0.01,
                              s_pcb - oh, f_key + s_key - oh, 0);
+        translate([hx+dx/2, -5*hy/3 - dy + oh,
+                   main_height - deck_thickness - ov - 0.02]) rotate([0, 0, 180])
+            cube([2*hx+dx, hy, raised_height + 0.03]);
         translate([0, 0,
                    main_height - deck_thickness + base_thickness + vfit])
             trackball_frame(raised_height, -s_key/2, oh, f_key + s_key);
@@ -581,15 +593,19 @@ module case_outside() {
                           s_pcb + wall_thickness_main,
                           f_key + s_key + wall_thickness_main,
                           r_edge_main, r_corner_main, fillet_style);
-        translate([0, 0, main_height - 2*r_corner_main])
+        translate([0, 0, main_height - 2*r_corner_main]) difference() {
             fillet_polyhedron(raised_outline_points,
                               raised_height + 2*r_corner_main,
                               s_pcb + wall_thickness_raised,
                               f_key + s_key + wall_thickness_raised,
                               r_edge_raised, r_corner_raised, fillet_style,
                     round_bottom=(wall_thickness_main < wall_thickness_raised));
+            translate([hx+dx/2, -5*hy/3 - dy, -vfit]) rotate([0, 0, 180])
+                cube([2*hx+dx, hy, raised_height + 2*r_corner_main + 2*vfit]);
+        }
     }
 }
+//translate([0, 0, 50]) case_outside();
 module base_plate_base(oh, ov) intersection() {
     translate([0, 0, -ov - 0.01])
         main_extrusion(base_thickness + 2*ov + 0.01,
