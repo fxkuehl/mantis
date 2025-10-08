@@ -153,14 +153,6 @@ module flat_extrusion(outline, height, offset=0) {
         linear_extrude(height, convexity=10)
             offset(r=-offset) offset(r=2*offset) import(outline);
 }
-module rounded_extrusion(outline, height, radius) {
-    fa = 90 / round(radius * 1.5708 / $fs);
-    translate([-254, 127, radius]) minkowski() {
-        linear_extrude(height=height - 2*radius, convexity=10)
-            offset(delta = -min(3, radius)) import(outline);
-        full_sphere(radius, false, $fa = fa);
-    }
-}
 
 module hex_outline() polygon([
     [    0,  2 * hy/3],
@@ -295,18 +287,9 @@ module main_offset_fillet(o, fo, fi, variant) difference() {
             offset(delta =  -o-fo) square([w, d], center=true);
     }
 }
-module main_extrusion(h, o, fxy, fz, variant=0) {
-    if (fz) {
-        fa = 90 / round(fz * 1.5708 / $fs);
-        translate([0, 0, fz]) minkowski() {
-            linear_extrude(h - 2*fz, convexity=10)
-                main_offset_fillet(o - fz, fxy - fz, fxy + fz, variant);
-            full_sphere(fz, false, $fa = fa);
-        }
-    } else {
-        linear_extrude(h, convexity=10)
-            main_offset_fillet(o, fxy, fxy, variant);
-    }
+module main_extrusion(h, o, fxy, variant=0) {
+    linear_extrude(h, convexity=10)
+        main_offset_fillet(o, fxy, fxy, variant);
 }
 
 raised_outline_points = let (
@@ -399,18 +382,9 @@ module raised_offset_fillet(o, fo, fi)
     offset(r     =     fo, $fa = fa_from_fs(fo))
     offset(r     = -fo-fi, $fa = fa_from_fs(fi))
     offset(delta =   o+fi) raised_outline();
-module raised_extrusion(h, o, fxy, fz) {
-    if (fz) {
-        fa = 90 / round(fz * 1.5708 / $fs);
-        minkowski() {
-            linear_extrude(h - fz, convexity=10)
-                raised_offset_fillet(o - fz, fxy - fz, fxy + fz);
-            rotate([0, 180, 0]) half_sphere(fz, false, $fa = fa);
-        }
-    } else {
-        linear_extrude(h, convexity=10)
-            raised_offset_fillet(o, fxy, fxy);
-    }
+module raised_extrusion(h, o, fxy) {
+    linear_extrude(h, convexity=10)
+        raised_offset_fillet(o, fxy, fxy);
 }
 
 module main_key_slots(h) {
@@ -570,11 +544,11 @@ module pivot_installation_cut(width, o, fxy) difference() {
 module case_inside(oh, ov) union() {
     translate([0, 0, base_thickness + ov])
         main_extrusion(main_height-base_thickness-deck_thickness - 2*ov,
-                       s_pcb - oh, f_key + s_key - oh, 0, 1);
+                       s_pcb - oh, f_key + s_key - oh, 1);
     difference() {
         translate([0, 0, main_height - deck_thickness - ov - 0.01])
             raised_extrusion(raised_height + 0.01,
-                             s_pcb - oh, f_key + s_key - oh, 0);
+                             s_pcb - oh, f_key + s_key - oh);
         translate([hx+dx/2, -5*hy/3 - dy + oh,
                    main_height - deck_thickness - ov - 0.02]) rotate([0, 0, 180])
             cube([2*hx+dx, hy, raised_height + 0.03]);
@@ -610,7 +584,7 @@ module base_plate_base(oh, ov) intersection() {
     translate([0, 0, -ov - 0.01])
         main_extrusion(base_thickness + 2*ov + 0.01,
                        s_pcb + wall_thickness_main/2 + oh,
-                       f_key + s_key + wall_thickness_main + oh, 0);
+                       f_key + s_key + wall_thickness_main + oh);
     if (!ov)
         case_outside();
 }
@@ -630,7 +604,7 @@ module main_gasket_pads() intersection() {
         translate([-2.0*hx -  dx/2, -2*hy - dy]) hex_outline();
         translate([ 2.0*hx +  dx/2, -2*hy - dy]) hex_outline();
     }
-    main_extrusion(main_height, s_pcb - hfit, f_key + s_key - hfit, 0,
+    main_extrusion(main_height, s_pcb - hfit, f_key + s_key - hfit,
                    variant=1);
 }
 bump_positions = [
@@ -897,7 +871,7 @@ module mezzanine() {
         color(mc, alpha=ca) union() {
             translate([0, 0, main_height - deck_thickness])
                 raised_extrusion(base_thickness,
-                                 s_pcb, f_key + s_key, 0);
+                                 s_pcb, f_key + s_key);
             raised_gasket_pads();
         }
         translate([0, 0, main_height - deck_thickness - 0.01])
