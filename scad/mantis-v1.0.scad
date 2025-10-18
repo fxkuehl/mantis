@@ -16,6 +16,8 @@ show_plate = true;
 show_pcb = true;
 // Foam or cork
 show_foam = true;
+// nice!view display
+show_display = true;
 // Trackball sensor
 show_sensor = true;
 show_bearing = true;
@@ -28,6 +30,9 @@ case_alpha = 1.0; // [0.1:0.1:1.0]
 show_desk = true;
 
 /* [Design dimensions in mm] */
+// Whether to include a display
+has_display = true;
+display_bump_height = 2; // [0:0.5:5]
 // Fillet style
 fillet_style = 1;      // [0:Flat, 1:Parabolic, 2:Circular]
 // Main Edge fillet radius
@@ -127,7 +132,7 @@ kx = 0.25;
 ky = 1.1547 * kx;
 
 mcu_size = [17.78, 33.02];
-mcu_top = 10*hy/3 + dy/2;
+mcu_top = 10*hy/3 + 4;
 mcu_y = mcu_top - mcu_size.y/2;
 forehead_x = (mcu_top - 8*hy/3 + dy/4) * hx / (2*hy/3);
 
@@ -145,6 +150,9 @@ trackball_radius = trackball_diameter / 2;
 trackball_position = [0, -hy - 3*dy/2, trackball_z];
 //trackball_diameter = 24;
 //trackball_position = [0, -hy - 2*dy/2, trackball_diameter/2 + 10];
+
+display_position = [0, mcu_top-mcu_size.y - 2.6 + 18,
+                    main_height+raised_height-1];
 
 use <utils.scad>
 
@@ -387,6 +395,15 @@ module raised_extrusion(h, o, fxy) {
         raised_offset_fillet(o, fxy, fxy);
 }
 
+display_bump_points = [
+    [(hx + dx)/2, mcu_top + s_pcb + s_key/2 + wall_thickness_raised],
+    [(hx + dx)/2, 5*hy/3],
+    [0, 4*hy/3 - dy/4],
+    [-(hx + dx)/2, 5*hy/3],
+    [-(hx + dx)/2, mcu_top + s_pcb + s_key/2 + wall_thickness_raised]
+];
+//translate([0, 0, 30]) polygon(display_bump_points);
+
 module main_key_slots(h) {
     o = s_key/2 - 0.01;
 
@@ -577,6 +594,14 @@ module case_outside() {
             translate([hx+dx/2, -5*hy/3 - dy, -vfit]) rotate([0, 0, 180])
                 cube([2*hx+dx, hy, raised_height + 2*r_corner_main + 2*vfit]);
         }
+
+        if (has_display)
+            translate([0, 0, main_height+raised_height-r_corner_raised-vfit])
+                fillet_polyhedron(display_bump_points,
+                                  display_bump_height+r_corner_raised+vfit,
+                                  -s_key/2, 3+s_key/2,
+                                  r_edge_raised, r_corner_raised, 2,
+                                  false);
     }
 }
 //translate([0, 0, 50]) case_outside();
@@ -677,6 +702,9 @@ module case() union() {
 
             power_switch_cutout();
 
+            if (has_display)
+                translate(display_position) niceview_cutout();
+
             /* Mounting holes */
             h_main = main_height - base_thickness - deck_thickness;
             for (p = mounting_points_main)
@@ -774,6 +802,70 @@ module controller() {
     color(pcb_color) translate([-mcu_size.x/2, -mcu_size.y/2, 10.9 + ex])
         cube([mcu_size.x, mcu_size.y, 1.6]);
     translate([0, mcu_size.y/2, 10.9 + ex - 1.6]) usb_port(10.5);
+}
+
+module niceview() {
+    // PCB with through-hole pads
+    difference() {
+        union() {
+            color(pcb_color) linear_extrude(height=1)
+                offset(r=1) square([12, 34], center = true);
+            for (i = [0:4])
+                color("gold") translate([-5.12+i*2.54, -16.7, -0.05])
+                    cylinder(h=1.1, r=2.54/3, center=false);
+        }
+        for (i = [0:4])
+            translate([-5.12+i*2.54, -16.7, -0.1])
+                    cylinder(h=1.2, r=2.54/6, center=false);
+    }
+    // Display
+    color("darkslategrey") translate([0, -0.325, 1.45])
+        cube([13.5, 29.35, 0.9], center=true);
+    // Visible area
+    color("aliceblue") translate([0, -0.75, 1.9])
+        linear_extrude(height=0.01, center=true) difference() {
+            square([10.8, 25.3], center=true);
+            rotate(90)
+                text("Mantis v1.0", size = 2.5, font=":style=bold",
+                     halign="center", valign="center");
+        }
+
+    // Ribbon cable
+    color("goldenrod") translate([0, 13.7, 0.5]) rotate([0, 90, 0])
+        linear_extrude(height=10, center=true)
+        offset(r=0.5) square([0.5, 8], center=true);
+    // Ribbon connector on the bottom
+    translate([0, 10, 0]) rotate([0, 180, 180]) ffc_connector_hirose();
+}
+
+module niceview_cutout() union() {
+    // PCB + display
+    translate([0, 0, 0.95]) cube([14.2, 36.2, 1.91], center=true);
+    // Ribbon cable
+    translate([0, 13.7, 0.5]) rotate([0, 90, 0])
+        linear_extrude(height=10.5, center=true)
+        offset(r=0.75) square([0.5, 8], center=true);
+    // Opening for visible area with 0.5mm margin and 1mm fillet
+    translate([0, -0.75, 1.9+5])
+        linear_extrude(height=10.01, center=true) offset(r=1)
+            square([10.8-1, 25.3-1], center=true);
+    //cube([10.8, 25.3, 10.01], center=true);
+    // 3mm space underneath, with a 1mm ledge near the top
+    // and a latch near the bottom
+    translate([0, -0.5, -1.5]) difference() {
+        cube([14.2, 35.2, 3.01], center=true);
+        multmatrix([[1, 0, 0,   2.5],
+                    [0, 1, 1/3, -35.2/2 - 0.7],
+                    [0, 0, 1,   0],
+                    [0, 0, 0,   1]])
+            cube([3, 2, 3.02], center=true);
+    }
+    // Space around the latch
+    translate([0, -36.2/2 - 0.5, -0.55]) difference() {
+        linear_extrude(height=4.91, center=true) offset(r=1)
+            square([10-2, 3-2], center=true);
+        translate([-1, 1, -1]) cube([10, 3, 4.91], center=true);
+    }
 }
 
 module ffc_connector_hirose() {
@@ -1012,6 +1104,9 @@ module keyboard() {
         translate(trackball_position + [0, 0, 3*ex]) rotate([60, 0, 0])
             translate([0, 0, -trackball_radius]) sensor();
     }
+
+    if (has_display && show_display)
+        translate(display_position+[0, 0, 8*ex]) niceview();
 
     if (show_trackball) {
         color(trackball_color) translate(trackball_position + [0, 0, 11*ex])
