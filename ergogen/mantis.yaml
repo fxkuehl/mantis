@@ -15,7 +15,7 @@ units:
   # Trackball diameter
   d_ball: 34
   # MCU vertical offset from top row key center
-  mcu_top: hy/3 + dy/2
+  mcu_top: hy/3 + 4
   # Space for mounting HW near main PCB rear
   mount_width: 6
 
@@ -550,13 +550,17 @@ outlines:
       where.shift: [0, -5.5]
   _capacitor_cutout:
     - what: rectangle
-      size: [2.45, 0.8]
+      size: [2.45, 1]
   _mcu_cutout:
     - what: rectangle
       size: [17.78 + 4kx, 33.02 + 4kx]
       where:
         ref: f_c0_r3
         shift: [9hx/2+dx/2, mcu_top-16.51]
+      fillet: 2kx
+  _battery_cutout:
+    - what: rectangle
+      size: [14 + 4kx, 40 + 4kx]
       fillet: 2kx
   _display_main_cutout:
     - what: rectangle
@@ -598,10 +602,15 @@ outlines:
       name: _ffc_cable_cutout
       where:
         ref: f_c0_r3
-        shift: [9hx/2+dx/2+17, -13hy/6 - 1]
-      # Make the plate symmetrical for easier assembly
-      asym: both
+        shift: [9hx/2+dx/2 - 17, -13hy/6 - 1]
       operation: add
+    - what: outline
+      name: _battery_cutout
+      where:
+        ref: f_c4_r2
+        rotate: -30
+      adjust.shift: [5, 0]
+      asym: clone
   _trackball:
     - what: circle
       where:
@@ -777,6 +786,14 @@ outlines:
         ref: f_c0_r3
         shift: [9hx/2+dx/2-17, -13hy/6]
       operation: subtract
+    - what: outline
+      name: _battery_cutout
+      where:
+        ref: f_c4_r2
+        rotate: -30
+      adjust.shift: [5, 0]
+      asym: clone
+      operation: subtract
   _main_pcb_flipped:
     - what: outline
       name: __main_pcb
@@ -785,6 +802,14 @@ outlines:
       where:
         ref: f_c0_r3
         shift: [9hx/2+dx/2+17, -13hy/6]
+      operation: subtract
+    - what: outline
+      name: _battery_cutout
+      where:
+        ref: f_c4_r2
+        rotate: -30
+      adjust.shift: [5, 0]
+      asym: source
       operation: subtract
   main_pcb:
     - what: outline
@@ -1089,7 +1114,7 @@ outlines:
       name: _main_padded
       operation: stack
     - what: outline
-      name: main_pcb
+      name: main_pcb_foam
       operation: stack
     - what: outline
       name: main_plate
@@ -1097,7 +1122,7 @@ outlines:
         shift: [0, 0.05]
       operation: stack
     - what: outline
-      name: raised_pcb
+      name: raised_pcb_foam
       adjust:
         shift: [0, 0.07]
       operation: stack
