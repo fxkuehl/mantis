@@ -729,12 +729,12 @@ module bump() union() {
         rotate([0, 0, 90 + $fa/2]) half_sphere(diameter/2);
 }
 
-module main_pcb() color(pcb_color)
+module main_pcb() scale([-1, 1, 1]) color(pcb_color)
     flat_extrusion("outlines/main_pcb.dxf", pcb_thickness);
 module main_pcb_foam() color(foam_color)
     translate([0, 0, -foam_thickness - vfit])
     flat_extrusion("outlines/main_pcb_foam.dxf", foam_thickness - 2*vfit);
-module raised_pcb() color(pcb_color)
+module raised_pcb() scale([-1, 1, 1]) color(pcb_color)
     flat_extrusion("outlines/raised_pcb.dxf", plate_thickness);
 module raised_pcb_foam() color(foam_color)
     translate([0, 0, -foam_thickness - vfit])
