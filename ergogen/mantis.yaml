@@ -470,11 +470,11 @@ outlines:
       name: _choc_socket
     - what: rectangle
       # Shrunk by 0.5mm on each side
-      size: [4.2, 1.6]
+      size: [5.2, 2.6]
       where.shift: [4.775 - 2.5, -5.9]
     - what: rectangle
       # Shrunk by 0.5mm on each side
-      size: [4.2, 1.6]
+      size: [5.2, 2.6]
       where.shift: [-4.775 - 2.5, -5.9 + 2.2]
     - what: outline
       name: _choc_tab
@@ -483,7 +483,7 @@ outlines:
     - what: outline
       name: choc_socket
     - what: rectangle
-      size: [1.7, 3.85]
+      size: [1.8, 4.5]
       where.shift: [6.2, -4.1]
     - what: circle
       radius: 0.95
@@ -509,10 +509,10 @@ outlines:
       expand: -1
   _pcb_foam_switch_rgb:
     - what: rectangle
-      size: [3.2, 2.8]
+      size: [3.6, 3.1]
       where.shift: [0, 4.93]
     - what: rectangle
-      size: [7, 2.32]
+      size: [7.4, 2.72]
       where.shift: [0, 4.93]
       expand: 1
     - what: outline
@@ -521,10 +521,49 @@ outlines:
     - what: outline
       name: _pcb_foam_switch_rgb
       expand: -1
+  __pcb_foam_mouse:
+    - what: rectangle
+      size: [1.8, 4.5]
+      where:
+        ref: zn3_c7_r
+        shift: [-1, 2hy/3 + 6.4/2 + 3]
+      asym: both
+    - what: circle
+      radius: 1.25
+      where:
+        ref: zn3_c7_r
+        shift: [3, 2hy/3 + 6.4 + 3]
+      asym: both
+    - what: circle
+      radius: 1.25
+      where:
+        ref: zn3_c7_r
+        shift: [3, 2hy/3 + 6.4 + 3 + 5.08]
+      asym: both
+    - what: circle
+      radius: 1.25
+      where:
+        ref: zn3_c7_r
+        shift: [3, 2hy/3 + 6.4 + 3 - 5.08]
+      asym: both
+  _pcb_foam_mouse:
+    - what: outline
+      name: __pcb_foam_mouse
+    - what: rectangle
+      size: [2hx+dx - 10.22, 14]
+      where:
+        ref: zn3_c7_r
+        shift: [hx+dx/2, 2hy/3 + 6.4 + 3]
+      asym: source
+      expand: 0.9
+  pcb_foam_mouse:
+    - what: outline
+      name: _pcb_foam_mouse
+      expand: -0.9
   _rgb_cutout:
     - what: rectangle
       where:
-        shift: [0, 4.7]
+        shift: [0, 4.93]
       size: [3.6, 3.1]
       fillet: 0.2
   _switch_cutout1:
@@ -543,14 +582,20 @@ outlines:
       fillet: 1
   _ffc_connector_cutout:
     - what: rectangle
-      size: [11.5, 6]
-      where.shift: [0, 0.3]
+      size: [11.5, 7]
+      where.shift: [0, -0.2]
     - what: rectangle
       size: [7, 7]
       where.shift: [0, -5.5]
   _capacitor_cutout:
     - what: rectangle
-      size: [2.45, 1]
+      size: [2.7, 1.25]
+  _reset_cutout:
+    - what: rectangle
+      size: [8.5, 5.7]
+      where:
+        ref: f_c0_r3
+        shift: [9hx/2+dx/2 - 17, mcu_top - 8.89 - 1.85]
   _mcu_cutout:
     - what: rectangle
       size: [17.78 + 4kx, 33.02 + 4kx]
@@ -564,14 +609,14 @@ outlines:
       fillet: 2kx
   _display_main_cutout:
     - what: rectangle
-      size: [12, 13]
+      size: [13.7, 20]
       where:
         ref: f_c0_r3
         shift: [9hx/2+dx/2, mcu_top-33.02]
       fillet: 2kx
   _display_raised_cutout:
     - what: rectangle
-      size: [12, 7]
+      size: [13.7, 7.2]
       where:
         ref: f_c0_r3
         shift: [9hx/2+dx/2, mcu_top-33.02]
@@ -722,6 +767,10 @@ outlines:
       expand: 0.25
   base_relief:
     - what: outline
+      name: _reset_cutout
+    - what: outline
+      name: __pcb_foam_mouse
+    - what: outline
       name: _ffc_connector_cutout
       where:
         ref: f_c5_r3
@@ -834,6 +883,9 @@ outlines:
       asym: both
       operation: subtract
     - what: outline
+      name: pcb_foam_mouse
+      operation: subtract
+    - what: outline
       name: _capacitor_cutout
       where: [f_c0_r3, f_c2_r3]
       adjust.shift: [0, -2hy/3]
@@ -847,6 +899,9 @@ outlines:
       operation: subtract
     - what: outline
       name: _main_cutouts
+      operation: subtract
+    - what: outline
+      name: _reset_cutout
       operation: subtract
     - what: outline
       name: _mcu_cutout
@@ -1246,16 +1301,16 @@ pcbs:
           ref: f_c5_r3
           shift: [hx/2+dx/2 + 17, hy/3]
         params:
-          designator: FFC
+          designator: J
           RAW: 3V3
           GND: GND
           RST: SDA
           VCC: SCL
           P21: VIK_LED
           P20: VIK_5V
-          P19: VIK_GPIO1
+          P19: GPIO1
           P18: MOSI
-          P15: VIK_GPIO2
+          P15: GPIO2
           P14: SPI_CS
           P16: MISO
           P10: SCLK
@@ -1266,7 +1321,7 @@ pcbs:
           ref: f_c5_r3
           shift: [hx/2+dx/2, 0]
         params:
-          designator: FFC
+          designator: J
           RAW: LED_VCC
           GND: GND
           RST: TOP_LED
@@ -1279,6 +1334,40 @@ pcbs:
           P14: L2
           P16: R2
           P10: R1
+      # Placeholder for extra 3-pin nice!nano header
+      nn_extra_3:
+        what: promicro
+        where:
+          ref: f_c0_r3
+          shift: [9hx/2+dx/2, mcu_top - 33.02 + 6.35]
+          rotate: 90
+        params:
+          designator: J
+          RAW: SDA
+          GND: SCL
+          RST: GPIO2
+      # Placeholder for nice!view header
+      nv_header:
+        what: promicro
+        where:
+          ref: f_c0_r3
+          shift: [9hx/2+dx/2 + 5.08, mcu_top - 33.02 - 1.3]
+          rotate: 90
+        params:
+          designator: J
+          RAW: MOSI
+          GND: SCLK
+          RST: 3V3
+          VCC: GND
+          P21: NV_CS
+      reset:
+        what: button
+        where:
+          ref: f_c0_r3
+          shift: [9hx/2+dx/2 + 17, mcu_top - 8.89 - 1.85]
+        params:
+          from: RST
+          to: GND
       keys:
         what: choc
         where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
@@ -1402,7 +1491,7 @@ pcbs:
           shift: [hx/2+dx/2, -9]
           rotate: 180
         params:
-          designator: FFC
+          designator: J
           RAW: L1
           GND: L2
           RST: R2
