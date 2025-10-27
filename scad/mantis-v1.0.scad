@@ -429,20 +429,23 @@ module main_key_slots(h) {
 }
 module raised_key_slots(h) {
     o = s_key/2 - 0.01;
+    skirts = false;
 
     module left_fingers() translate([-dx/2, 0]) union() {
-        translate([-1.5*hx, 3*hy]) offset(delta = o) hex_outline();
-        for(i = [-2.0 : 1: -1.0])
+        if (!skirts)
+            translate([-1.5*hx, 3*hy]) offset(delta = o) hex_outline();
+        for(i = [(skirts ? -1.0 : -2.0) : 1: -1.0])
             translate([i*hx, 2*hy]) offset(delta = o) hex_outline();
-        for(i = [-2.5 : 1: -0.5])
+        for(i = [(skirts ? -1.5 : -2.5) : 1: -0.5])
             translate([i*hx,   hy]) offset(delta = o) hex_outline();
-        for(i = [-3.0 : 1: -1.0])
+        for(i = [(skirts ? -2.0 : -3.0) : 1: -1.0])
             translate([i*hx,    0]) offset(delta = o) hex_outline();
     }
     module left_thumb() translate([-dx/2, -dy]) union() {
         for(i = [-2.5 : 1: -1.5])
             translate([i*hx,  -hy]) offset(delta = o) hex_outline();
-        translate([  -hx, -2*hy]) offset(delta = o) hex_outline();
+        if (!skirts)
+            translate([  -hx, -2*hy]) offset(delta = o) hex_outline();
     }
 
     linear_extrude(h, convexity=10) {
@@ -665,6 +668,8 @@ module base_plate() difference() {
     translate(trackball_position + [-0.25, 0.1, -0.3]) rotate([60, 0, 0])
         translate([0, 0, -trackball_radius]) sensor();
     drain_hole();
+    translate([-17, mcu_top - 8.89 - 1.85, -vfit])
+        cylinder(h=base_thickness+2*vfit, r=1.5, center=false);
     power_switch_cutout();
     for (p = mounting_points_main)
         translate([p.x, p.y, 0])
@@ -894,12 +899,30 @@ module pcm12_switch() {
     color("gold") translate([2.25-0.2, -2.6/2-0.9, 0]) cube([0.4, 1, 0.15]);
 }
 
+module reset_button() {
+    color("silver") linear_extrude(height=0.8, center=false)
+        polygon([
+            [-2.55, 1.35], [-1.35, 2.55], [ 1.35, 2.55], [ 2.55, 1.35],
+            [ 2.55,-1.35], [ 1.35,-2.55], [-1.35,-2.55], [-2.55,-1.35]
+        ]);
+    color("silver") translate([0, 0, 0.79])
+        cylinder(h=0.41, r1=2.2, r2=2.0, center=false);
+    color("palegoldenrod") translate([0, 0, 1.19])
+        cylinder(h=0.31, r=1.0, center=true);
+    color("silver") translate([0, 1.85, 0.05])
+        cube([6.6, 0.5, 0.1], center=true);
+    color("silver") translate([0, -1.85, 0.05])
+        cube([6.6, 0.5, 0.1], center=true);
+}
+
 module main_pcb_assembly() {
     main_pcb();
     translate([0, hy, 0]) rotate([0, 180, 0]) ffc_connector();
     translate([-17, 4*hy/3, 0]) rotate([0, 180, 0]) ffc_connector();
     translate([0, mcu_top - 2.6/2, 0]) rotate([0, 180, 0])
         pcm12_switch();
+    translate([-17, mcu_top - 8.89 - 1.85, 0]) rotate([0, 180, 0])
+        reset_button();
     translate([0, mcu_y, pcb_thickness]) controller();
 }
 
