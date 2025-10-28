@@ -855,21 +855,30 @@ module niceview_cutout() union() {
         linear_extrude(height=10.01, center=true) offset(r=1)
             square([10.8-1, 25.3-1], center=true);
     //cube([10.8, 25.3, 10.01], center=true);
+
+    h = display_position.z - // latch height
+        (main_height + raised_height - deck_thickness);
+    l = 12;   // snap length
+    r = 0.8;  // snap width
+    g = 0.8;  // gap width
+    w = 3;    // latch width
+    d = 0.5;  // latch depth
+
     // 3mm space underneath, with a 1mm ledge near the top
     // and a latch near the bottom
     translate([0, -0.5, -1.5]) difference() {
         cube([14.2, 35.2, 3.01], center=true);
-        multmatrix([[1, 0, 0,   2.5],
-                    [0, 1, 1/3, -35.2/2 - 0.7],
-                    [0, 0, 1,   0],
+        multmatrix([[1, 0, 0,   (l - w)/2 - g],
+                    [0, 1, d/h, -35.2/2-1],
+                    [0, 0, 1,   1.5-h],
                     [0, 0, 0,   1]])
-            cube([3, 2, 3.02], center=true);
+            cube([3, 2, 6], center=true);
     }
     // Space around the latch
-    translate([0, -36.2/2 - 0.5, -0.55]) difference() {
-        linear_extrude(height=4.91, center=true) offset(r=1)
-            square([10-2, 3-2], center=true);
-        translate([-1, 1, -1]) cube([10, 3, 4.91], center=true);
+    translate([0, -36.2/2 - r/2, -0.55]) difference() {
+        linear_extrude(height=4.91, center=true) offset(r=g)
+            square([l-2*g, r], center=true);
+        translate([-g, g, -g]) cube([l, 2*g+r, 4.91], center=true);
     }
 }
 
@@ -979,6 +988,8 @@ module raised_gasket_pads()
                 linear_extrude(6*hx, center=true) offset(r = radius)
                 polygon([[0, -6*hy], [0, 0], hy*[sin(angle), cos(angle)]]);
         }
+module mezzanine_relief() translate([0, 0, main_height - deck_thickness + base_thickness - base_relief_depth])
+    flat_extrusion("outlines/mezzanine_relief.dxf", base_relief_depth+vfit);
 module mezzanine() {
     ca = render_case ? 0 : case_alpha;
     mc = render_case ? undef : mezzanine_color;
@@ -989,6 +1000,7 @@ module mezzanine() {
                                  s_pcb, f_key + s_key);
             raised_gasket_pads();
         }
+        mezzanine_relief();
         translate([0, 0, main_height - deck_thickness - 0.01])
             mcu(base_thickness + gasket_pad_thickness_raised + 0.02, spacing);
         translate([0, 0, main_height - deck_thickness - 0.01])
