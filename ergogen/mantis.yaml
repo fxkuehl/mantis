@@ -826,6 +826,10 @@ outlines:
     - what: outline
       name: _main_pcb_cutouts
       operation: subtract
+  __main_pcb_minus1mm:
+    - what: outline
+      name: __main_pcb
+      expand: -1
   _main_pcb:
     - what: outline
       name: __main_pcb
@@ -871,9 +875,7 @@ outlines:
               zn3_c5_r, zn3_c7_r]
       asym: both
       operation: subtract
-  main_pcb_foam:
-    - what: outline
-      name: _main_pcb
+  _main_pcb_foam_switches:
     - what: outline
       name: pcb_foam_switch_rgb
       where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
@@ -881,6 +883,14 @@ outlines:
               zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
               zn3_c5_r, zn3_c7_r]
       asym: both
+    - what: outline
+      name: __main_pcb_minus1mm
+      operation: intersect
+  main_pcb_foam:
+    - what: outline
+      name: _main_pcb
+    - what: outline
+      name: _main_pcb_foam_switches
       operation: subtract
     - what: outline
       name: pcb_foam_mouse
@@ -1019,19 +1029,6 @@ outlines:
       asym: left
       operation: subtract
 
-  mezzanine_relief:
-    - what: outline
-      name: _ffc_connector_cutout
-      where:
-        ref: f_c5_r3
-        shift: [hx/2+dx/2, -9]
-        rotate: 180
-      expand: 0.25
-    - what: outline
-      name: base_relief_switch
-      where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
-                        zn2_c5_r, zn2_c6_r, zn2_c7_r]
-      asym: both
   _raised_key_silkscreen:
     - what: outline
       name: _key_silkscreen
@@ -1066,6 +1063,30 @@ outlines:
     - what: outline
       name: _display_raised_cutout
       operation: subtract
+  _raised_pcb_minus1mm:
+    - what: outline
+      name: _raised_pcb
+      expand: -1
+  _raised_pcb_minus075mm:
+    - what: outline
+      name: _raised_pcb
+      expand: -0.75
+  mezzanine_relief:
+    - what: outline
+      name: _ffc_connector_cutout
+      where:
+        ref: f_c5_r3
+        shift: [hx/2+dx/2, -9]
+        rotate: 180
+      expand: 0.25
+    - what: outline
+      name: base_relief_switch
+      where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
+                        zn2_c5_r, zn2_c6_r, zn2_c7_r]
+      asym: both
+    - what: outline
+      name: _raised_pcb_minus075mm
+      operation: intersect
   raised_pcb:
     - what: outline
       name: _raised_pcb
@@ -1075,14 +1096,20 @@ outlines:
                         zn2_c5_r, zn2_c6_r, zn2_c7_r]
       asym: both
       operation: subtract
-  raised_pcb_foam:
-    - what: outline
-      name: _raised_pcb
+  _raised_pcb_foam_switches:
     - what: outline
       name: pcb_foam_switch_rgb
       where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
                         zn2_c5_r, zn2_c6_r, zn2_c7_r]
       asym: both
+    - what: outline
+      name: _raised_pcb_minus1mm
+      operation: intersect
+  raised_pcb_foam:
+    - what: outline
+      name: _raised_pcb
+    - what: outline
+      name: _raised_pcb_foam_switches
       operation: subtract
     - what: outline
       name: _capacitor_cutout
