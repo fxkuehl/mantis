@@ -136,6 +136,10 @@ mcu_top = 10*hy/3 + 4;
 mcu_y = mcu_top - mcu_size.y/2;
 forehead_x = (mcu_top - 8*hy/3 + dy/4) * hx / (2*hy/3);
 
+// Mezzanine thickness that results in equal space between main and raised
+// base and deck
+mezzanine_thickness = raised_height + deck_thickness + base_thickness - main_height;
+
 // Fillets and Spacing
 f_key = 3.0;
 s_key = 0.5;
@@ -573,7 +577,7 @@ module case_inside(oh, ov) union() {
                    main_height - deck_thickness - ov - 0.02]) rotate([0, 0, 180])
             cube([2*hx+dx, hy, raised_height + 0.03]);
         translate([0, 0,
-                   main_height - deck_thickness + base_thickness + vfit])
+                   main_height - deck_thickness + mezzanine_thickness + vfit])
             trackball_frame(raised_height, -s_key/2, oh, f_key + s_key);
         width = oh ? 7*hx + dx : 2*hx + dx;
         pivot_installation_cut(width, s_pcb - oh, f_key + s_key - oh);
@@ -988,7 +992,8 @@ module raised_gasket_pads()
                 linear_extrude(6*hx, center=true) offset(r = radius)
                 polygon([[0, -6*hy], [0, 0], hy*[sin(angle), cos(angle)]]);
         }
-module mezzanine_relief() translate([0, 0, main_height - deck_thickness + base_thickness - base_relief_depth])
+module mezzanine_relief() translate([0, 0, main_height - deck_thickness +
+                                     mezzanine_thickness - base_relief_depth])
     flat_extrusion("outlines/mezzanine_relief.dxf", base_relief_depth+vfit);
 module mezzanine() {
     ca = render_case ? 0 : case_alpha;
@@ -996,7 +1001,7 @@ module mezzanine() {
     difference() {
         color(mc, alpha=ca) union() {
             translate([0, 0, main_height - deck_thickness])
-                raised_extrusion(base_thickness,
+                raised_extrusion(mezzanine_thickness,
                                  s_pcb, f_key + s_key);
             raised_gasket_pads();
         }
@@ -1009,7 +1014,8 @@ module mezzanine() {
                                  spacing);
 
         for(p = mounting_points_raised)
-            translate([p.x, p.y, main_height - deck_thickness])
+            translate([p.x, p.y, main_height - deck_thickness
+                       + mezzanine_thickness - base_thickness])
                 countersunk_screw(base_thickness, hfit);
     }
 }
