@@ -7,6 +7,7 @@ version=1.0
 scad="mantis-v$version.scad"
 cust="${scad%.scad}.json"
 osc=`which openscad-nightly`
+colors=DeepOcean
 params=""
 if [ ! -x "$osc" ]; then
 	osc="openscad"
@@ -16,6 +17,9 @@ fi
 
 if [ -n "$1" ]; then
 	params="$params -p$cust -P$1"
+	if [ -n "$2" ]; then
+		colors="$2"
+	fi
 fi
 
 # Supersampling
@@ -28,25 +32,33 @@ sizeP=$((size*3/4)),$size
 # Sizes to scale down to
 sizes="1920 1440 1152"
 
-images="mantis.png mantis_bare.png mantis_naked.png mantis_top.png mantis_bottom.png mantis_exploded.png"
+images="mantis.png mantis_rear.png mantis_bare.png mantis_naked.png mantis_top.png mantis_bottom.png mantis_exploded.png"
 
-params="$params --colorscheme=DeepOcean -D \$fs=0.5 -D \$fa=1 -D render_pcbs=true -D bottom_color=\"purple\" -D top_color=\"white\""
+params="$params --colorscheme=$colors -D \$fs=0.5 -D \$fa=1 -D render_pcbs=true -D bottom_color=\"purple\" -D top_color=\"white\""
 
 trap 'echo "Killing background processes ..."; kill $jobs' INT
 
+persp_cam=15,0,10,45,0,22,450
+rear_cam=15,40,10,45,0,150,450
+
 echo "Perspective view ..."
-$osc $params --camera=15,12,10,50,0,22,450 --imgsize=$sizeW \
+$osc $params --camera=$persp_cam --imgsize=$sizeW \
 	-o "$dir/mantis.png" $scad &
 jobs="$jobs $!"
 
+echo "Rear view ..."
+$osc $params --camera=$rear_cam --imgsize=$sizeW \
+	-o "$dir/mantis_rear.png" $scad &
+jobs="$jobs $!"
+
 echo "Bare-bones view ..."
-$osc $params --camera=15,12,10,50,0,22,450 --imgsize=$sizeW \
+$osc $params --camera=$persp_cam --imgsize=$sizeW \
 	-D show_trackball=false -D show_key=false \
 	-o "$dir/mantis_bare.png" $scad &
 jobs="$jobs $!"
 
 echo "Naked view ..."
-$osc $params --camera=15,12,10,50,0,22,450 --imgsize=$sizeW \
+$osc $params --camera=$persp_cam --imgsize=$sizeW \
 	-D show_trackball=false -D show_key=false -D show_switch=false \
 	-D case_alpha=0.4 -o "$dir/mantis_naked.png" $scad &
 jobs="$jobs $!"
