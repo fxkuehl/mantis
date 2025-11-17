@@ -499,15 +499,15 @@ outlines:
       radius: 0.8
       where:
         - shift: [5, 5.15]
-  _pcb_foam_switch:
+  _pcb_foam_switch_ex:
     - what: outline
       name: __pcb_foam_switch
       expand: 1
-  pcb_foam_switch:
+  _pcb_foam_switch:
     - what: outline
-      name: _pcb_foam_switch
+      name: _pcb_foam_switch_ex
       expand: -1
-  _pcb_foam_switch_rgb:
+  _pcb_foam_switch_rgb_ex:
     - what: rectangle
       size: [3.6, 3.1]
       where.shift: [0, 4.93]
@@ -516,10 +516,10 @@ outlines:
       where.shift: [0, 4.93]
       expand: 1
     - what: outline
-      name: _pcb_foam_switch
-  pcb_foam_switch_rgb:
+      name: _pcb_foam_switch_ex
+  _pcb_foam_switch_rgb:
     - what: outline
-      name: _pcb_foam_switch_rgb
+      name: _pcb_foam_switch_rgb_ex
       expand: -1
   __pcb_foam_mouse:
     - what: rectangle
@@ -546,7 +546,7 @@ outlines:
         ref: zn3_c7_r
         shift: [3, 2hy/3 + 6.4 + 3 - 5.08]
       asym: both
-  _pcb_foam_mouse:
+  _pcb_foam_mouse_ex:
     - what: outline
       name: __pcb_foam_mouse
     - what: rectangle
@@ -556,9 +556,9 @@ outlines:
         shift: [hx+dx/2, 2hy/3 + 6.4 + 3]
       asym: source
       expand: 0.9
-  pcb_foam_mouse:
+  _pcb_foam_mouse:
     - what: outline
-      name: _pcb_foam_mouse
+      name: _pcb_foam_mouse_ex
       expand: -0.9
   _rgb_cutout:
     - what: rectangle
@@ -761,9 +761,9 @@ outlines:
       operation: add
       fillet: kx+fk
 
-  base_relief_switch:
+  _base_relief_switch:
     - what: outline
-      name: pcb_foam_switch
+      name: _pcb_foam_switch
       expand: 0.25
   base_relief:
     - what: outline
@@ -782,7 +782,7 @@ outlines:
         shift: [hx/2+dx/2 - 17, hy/3]
       expand: 0.25
     - what: outline
-      name: base_relief_switch
+      name: _base_relief_switch
       where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
               zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
               zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
@@ -877,7 +877,7 @@ outlines:
       operation: subtract
   _main_pcb_foam_switches:
     - what: outline
-      name: pcb_foam_switch_rgb
+      name: _pcb_foam_switch_rgb
       where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
               zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
               zn3_c1_r, zn3_c2_r, zn3_c3_r, zn3_c4_r,
@@ -893,7 +893,7 @@ outlines:
       name: _main_pcb_foam_switches
       operation: subtract
     - what: outline
-      name: pcb_foam_mouse
+      name: _pcb_foam_mouse
       operation: subtract
     - what: outline
       name: _capacitor_cutout
@@ -1080,7 +1080,7 @@ outlines:
         rotate: 180
       expand: 0.25
     - what: outline
-      name: base_relief_switch
+      name: _base_relief_switch
       where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
                         zn2_c5_r, zn2_c6_r, zn2_c7_r]
       asym: both
@@ -1098,7 +1098,7 @@ outlines:
       operation: subtract
   _raised_pcb_foam_switches:
     - what: outline
-      name: pcb_foam_switch_rgb
+      name: _pcb_foam_switch_rgb
       where: [zn1_c1_r, zn1_c5_r, zn1_c6_r, zn1_c7_r,
                         zn2_c5_r, zn2_c6_r, zn2_c7_r]
       asym: both
