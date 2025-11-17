@@ -889,6 +889,12 @@ outlines:
   main_pcb_foam:
     - what: outline
       name: _main_pcb
+    - what: rectangle
+      size: [15, 2]
+      where:
+        ref: mirror_f_c5_r3
+        shift: [0, 2hy/3+2]
+      operation: subtract
     - what: outline
       name: _main_pcb_foam_switches
       operation: subtract
