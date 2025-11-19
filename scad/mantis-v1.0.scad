@@ -113,6 +113,7 @@ rise3 = -0.5;
 
 /* [Colors] */
 key_color = "linen";
+key_color2 = "tan";
 trackball_color = "deepskyblue";
 plate_color = "darkgreen";
 pcb_color = "green";
@@ -120,7 +121,7 @@ foam_color = "goldenrod";
 mezzanine_color = "orange";
 case_color = "chocolate";
 base_color = "saddlebrown";
-desk_color = "tan";
+desk_color = "wheat";
 
 /* [Hidden] */
 hx = 21.5;
@@ -1155,12 +1156,13 @@ module trackball_holder() intersection() {
     render(convexity=10) case_inside(hfit, vfit);
 }
 
-module key_profile(x) {
+module key_profile(x, key_color="") {
     $fa = $fs*2;
     $rgb = rgb;
     $slope = slope;
     $dish_diam = dish_diam;
     $explode=$explode/3;
+    $key_color=key_color;
 
     if (x == 0) {
         switch_key($tilt=tilt1, $rise=rise1, $saddle=saddle);
@@ -1206,19 +1208,20 @@ module keyboard() {
     }
 
     if (show_key || show_switch) {
+        colors = [key_color, key_color2];
         main_fingers = [
-        [0.5, 3,   0, 0], [1.5, 3, -60, 1], [2.5, 3, -60, 1], [3.5, 3, -60, 1],
-        [0.0, 2, 120, 0], [1.0, 2,-120, 0], [2.0, 2,-120, 0], [3.0, 2,-120, 0],
-                          [0.5, 1, 180, 2], [1.5, 1, 180, 2], [2.5, 1, 180, 2],
-                                                              [2.0, 0, 180, 1]
+            [0.5,3,  0,0,0],[1.5,3, -60,1,0],[2.5,3, -60,1,0],[3.5,3, -60,1,0],
+            [0.0,2,120,0,0],[1.0,2,-120,0,1],[2.0,2,-120,0,1],[3.0,2,-120,0,1],
+                            [0.5,1, 180,2,0],[1.5,1, 180,2,0],[2.5,1, 180,2,0],
+                                                              [2.0,0, 180,1,0]
         ];
         raised_fingers = [
-        [4.0, 2, -60, 1], [4.5, 1,-120, 1],
-        [3.5, 1,-120, 0], [4.0, 0,-120, 1],
-        [3.0, 0, 180, 2]
+            [4.0,2, -60,1,0],[4.5,1,-120,1,0],
+            [3.5,1,-120,0,1],[4.0,0,-120,1,0],
+            [3.0,0, 180,2,0]
         ];
-        raised_thumbs =   [[2.5, -1, 60, 0], [3.5, -1, 0, 0]];
-        main_thumbs =     [[4.0, -2,  0, 1]];
+        raised_thumbs =   [[2.5,-1,60,0,0],[3.5,-1,0,0,1]];
+        main_thumbs =     [[4.0,-2, 0,1,0]];
         union() {
             main_z = main_switch_z + 7*ex;
             raised_z = raised_switch_z + 11*ex;
@@ -1226,27 +1229,27 @@ module keyboard() {
             hy = hy + ex/3;
             for (k = main_fingers) {
                 translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy, main_z])
-                    rotate([0, 0, k[2]]) key_profile(k[3]);
+                    rotate([0, 0, k[2]]) key_profile(k[3],colors[k[4]]);
                 translate([5*hx + dx/2 - k[0]*hx, k[1]*hy, main_z])
-                    rotate([0, 0, -k[2]]) key_profile(k[3]);
+                    rotate([0, 0,-k[2]]) key_profile(k[3],colors[k[4]]);
             }
             for (k = main_thumbs) {
                 translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy - dy, main_z])
-                    rotate([0, 0, k[2]]) key_profile(k[3]);
+                    rotate([0, 0, k[2]]) key_profile(k[3],colors[k[4]]);
                 translate([5*hx + dx/2 - k[0]*hx, k[1]*hy - dy, main_z])
-                    rotate([0, 0, -k[2]]) key_profile(k[3]);
+                    rotate([0, 0,-k[2]]) key_profile(k[3],colors[k[4]]);
             }
             for (k = raised_fingers) {
                 translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy, raised_z])
-                    rotate([0, 0, k[2]]) key_profile(k[3]);
+                    rotate([0, 0, k[2]]) key_profile(k[3],colors[k[4]]);
                 translate([5*hx + dx/2 - k[0]*hx, k[1]*hy, raised_z])
-                    rotate([0, 0, -k[2]]) key_profile(k[3]);
+                    rotate([0, 0,-k[2]]) key_profile(k[3],colors[k[4]]);
             }
             for (k = raised_thumbs) {
                 translate([-5*hx -dx/2 + k[0]*hx, k[1]*hy - dy, raised_z])
-                    rotate([0, 0, k[2]]) key_profile(k[3]);
+                    rotate([0, 0, k[2]]) key_profile(k[3],colors[k[4]]);
                 translate([5*hx + dx/2 - k[0]*hx, k[1]*hy - dy, raised_z])
-                    rotate([0, 0, -k[2]]) key_profile(k[3]);
+                    rotate([0, 0,-k[2]]) key_profile(k[3],colors[k[4]]);
             }
         }
     }
