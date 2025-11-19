@@ -86,6 +86,7 @@ bore_diameter = 2.7; // [1.5:0.1:6]
 post_diameter = 6.0; // [4:0.1:8]
 bolt_diameter = 2.0; // [1:0.1:4]
 head_diameter = 4.0; // [2:0.1:8]
+bolt_length = 5.0; // [3:1:10]
 
 /* [Keycaps] */
 // RGB LED cutouts
@@ -476,17 +477,28 @@ color("lime") translate([0, 0, main_height+raised_height])
 */
 
 module countersunk_screw(length, offset) {
-    head_radius = head_diameter/2 + 2*offset*sqrt(2);
+    head_radius = head_diameter/2 + 2*offset;
     bolt_radius = bolt_diameter/2 + offset;
     $fn = round(360/fa_from_fs(head_radius));
-    union() {
-        translate([0, 0, -offset])
-            cylinder(h = head_radius, r1 = head_radius, r2 = 0);
-        translate([0, 0, 0.01])
-            cylinder(h = length + offset - 0.01, r = bolt_radius);
-        if (offset)
-            translate([0, 0, -length])
-                cylinder(h = length - offset + 0.01, r = head_radius);
+    sc = offset ? undef : "gainsboro";
+    color(sc) difference() {
+        union() {
+            translate([0, 0, -offset])
+                cylinder(h = head_radius, r1 = head_radius, r2 = 0);
+            translate([0, 0, 0.01])
+                cylinder(h = length + offset - 0.01, r = bolt_radius);
+            if (offset)
+                translate([0, 0, -length])
+                    cylinder(h = length - offset + 0.01, r = head_radius);
+        }
+        if (!offset) {
+            rotate([90, 0, 0]) rotate([0, 0, 45])
+                linear_extrude(height = head_radius/4, center=true)
+                offset(r=head_radius/3) square(head_radius/3, center=true);
+            rotate([0, 90, 0]) rotate([0, 0, 45])
+                linear_extrude(height = head_radius/4, center=true)
+                offset(r=head_radius/3) square(head_radius/3, center=true);
+        }
     }
 }
 
@@ -1242,6 +1254,12 @@ module keyboard() {
     if (show_bearing) translate([0, 0,  5.5*ex]) bearings(bearing_size, 0);
 
     if (show_mezzanine) {
+        for(p = mounting_points_raised)
+            translate([p.x, p.y, main_height - deck_thickness +
+                       mezzanine_thickness - base_thickness + hfit +
+                       4.5*ex])
+                countersunk_screw(bolt_length, 0);
+
         pivot = [0, mcu_top - post_diameter, main_height - deck_thickness];
         angle = [12 - abs($t-0.5)*24, 0, 0];
         translate([0, 0, 5*ex] + pivot) rotate(angle) translate(-pivot) {
@@ -1254,6 +1272,10 @@ module keyboard() {
     }
 
     if (show_base) {
+        for (p = mounting_points_main)
+            translate([p.x, p.y, hfit - 0.5*ex])
+                countersunk_screw(bolt_length, 0);
+
         if (render_case)
             color(base_color, alpha=case_alpha) render(convexity=8)
                 base_plate();
