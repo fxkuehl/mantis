@@ -1,16 +1,18 @@
-function rotate_x(point, angle) = [
+function rotate_x(point, angle) = let (sin_a = sin(angle), cos_a = cos(angle)) [
     point.x,
-    point.y*cos(angle) - point.z*sin(angle),
-    point.z*cos(angle) + point.y*sin(angle)
+    point.y*cos_a - point.z*sin_a,
+    point.z*cos_a + point.y*sin_a
 ];
 function rotate_x_around(point, angle, origin=[0, 0, 0]) =
     rotate_x(point - origin, angle) + origin;
 
-function rotate_z(point, angle) = [
-    point.x*cos(angle) - point.y*sin(angle),
-    point.y*cos(angle) + point.x*sin(angle),
+function rotate_z(point, angle) = let (sin_a = sin(angle), cos_a = cos(angle)) [
+    point.x*cos_a - point.y*sin_a,
+    point.y*cos_a + point.x*sin_a,
     point.z
 ];
+function rotate_z_around(point, angle, origin=[0, 0, 0]) =
+    rotate_z(point - origin, angle) + origin;
 
 function scale_x(point, factor) = [point.x * factor, point.y, point.z];
 

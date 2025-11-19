@@ -695,8 +695,42 @@ module case() union() {
             translate([0, 0, main_height - deck_thickness - vfit - 0.01])
                 raised_key_slots(raised_height + deck_thickness + vfit + 0.02);
 
-            translate(trackball_position)
+            /* Position of the bottom right thumb key. The edge of that key
+             * marks the plane that cuts the sphere of the trackball. Rotate
+             * thatn around the z-axis so the distance of the plane to the
+             * center of the sphere become the y-coordinate. Then calculate
+             * the radius of the circle where the plane cuts the sphere.
+             *
+             * Use that to chamfer the sharp edge where the sphere cuts through
+             * the front of the case with a cylinder (perpendicular to the
+             * plane of the case) and a cone (perpendicular with the sphere).
+             */
+            p = rotate_z_around([hx + dx/2, -2*hy - dy, 20], -30,
+                                trackball_position) - trackball_position;
+            d_trackball_cut = -p.y - hx/2 - kx - 0.5;
+            r_trackball_cut = sqrt((trackball_radius+spacing)^2 -
+                                   d_trackball_cut^2);
+            translate(trackball_position) {
                 corr_sphere(trackball_radius + spacing);
+                difference() {
+                    union() {
+                        rotate([90, 0, 30])
+                            cylinder(2*d_trackball_cut,
+                                     r=r_trackball_cut+1);
+                        rotate([90, 0, 30])
+                            cylinder(2*d_trackball_cut,
+                                     r1=0, r2=2*(r_trackball_cut+1));
+                        rotate([90, 0, -30])
+                            cylinder(2*d_trackball_cut,
+                                     r=r_trackball_cut+1);
+                        rotate([90, 0, -30])
+                            cylinder(2*d_trackball_cut,
+                                     r1=0, r2=2*(r_trackball_cut+1));
+                    }
+                    translate([-50, -50, -trackball_z])
+                        cube([100, 100, main_height]);
+                }
+            }
             translate([0, 0,
                        main_height + raised_height - deck_thickness - 1])
                 mcu(2, 0);
