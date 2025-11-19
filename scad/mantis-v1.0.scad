@@ -1307,12 +1307,13 @@ if (show_desk) {
                      f_key + s_pcb + main_pcb_z) + elevation;
     if (show_case || show_pcb || show_plate) {
         color("black", alpha=show_case ? 0.5 : 0.3)
-            translate([0, 0, -elevation - 0.49]) main_offset_fillet(o, f, f);
+            translate([0, 0, -elevation])
+            linear_extrude(h=0.02, center=true) main_offset_fillet(o, f, f);
     }
     // 2. Partial shadow of the main body, raised part and trackball
     shadow_width = 2.5 + elevation/4;
-    color("black", alpha=0.2) translate([0, 0, -elevation - 0.48])
-            render(convexity=10) union() {
+    color("black", alpha=0.2) translate([0, 0, -elevation])
+            render(convexity=10) linear_extrude(h=0.04, center=true) union() {
         o = (show_case ? s_pcb + wall_thickness_main : 0) + shadow_width;
         f = (show_case ? f_key + s_key + wall_thickness_main : f_key + s_pcb) + shadow_width;
         if (show_case || show_pcb || show_plate) {
