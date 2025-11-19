@@ -1021,9 +1021,9 @@ module mezzanine() {
 }
 
 module bearings(size, offset, what=0) {
-    translate(trackball_position) rotate([4, 0, 0]) {
+    translate(trackball_position) rotate([9, 0, 0]) {
         for (phi = [0:120:240])
-            rotate([-45, 0, phi]) translate([0, 0, -trackball_radius - size/2])
+            rotate([-50, 0, phi]) translate([0, 0, -trackball_radius - size/2])
                 if (what == 0)
                     color("ghostwhite") corr_sphere(size/2 + offset);
                 else if (what == 1)
@@ -1039,9 +1039,14 @@ module bearings(size, offset, what=0) {
                     cylinder(h = size,
                              r1 = size/2 + offset,
                              r2 = size/2 + offset + size);
-                else if (what == 5)
-                    translate([-size/4, -size/2 - offset, 0])
-                        cube([size/2, size + 2*offset, size/2]);
+                else if (what == 5) {
+                    translate([-size/4, 0, 0])
+                        cube([size/2, size/2 + offset, size/2]);
+                    rotate([0, 0, 120]) translate([-size/4, 0, 0])
+                        cube([size/2, size/2 + offset, size/2]);
+                    rotate([0, 0, 240]) translate([-size/4, 0, 0])
+                        cube([size/2, size/2 + offset, size/2]);
+                }
     }
 }
 
@@ -1065,7 +1070,7 @@ module trackball_holder() intersection() {
                     }
                 }
                 w = 2*hx + dx;
-                h = 25;
+                h = 24;
                 translate(trackball_position) rotate([60, 0, 0])
                     translate([-w/2, -10, -trackball_radius - h])
                     cube([w, 30, h - 2.4 + vfit], center=false);
@@ -1087,7 +1092,7 @@ module trackball_holder() intersection() {
                 bearings(bearing_size, 0.25, what=3);
             }
             bearings(bearing_size, 0.01);
-            bearings(bearing_size, -0.05, what=1);
+            bearings(bearing_size, -0.1, what=1);
             bearings(bearing_size, -0.5, what=2);
             bearings(bearing_size, 1.4, what=5);
 
