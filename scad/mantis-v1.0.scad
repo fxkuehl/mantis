@@ -86,6 +86,8 @@ bore_diameter = 2.7; // [1.5:0.1:6]
 post_diameter = 6.0; // [4:0.1:8]
 bolt_diameter = 2.0; // [1:0.1:4]
 head_diameter = 4.0; // [2:0.1:8]
+flat_head_diameter = 3.5; // [2:0.1:8]
+flat_head_thickness = 0.5; // [0.1:0.1:2]
 bolt_length = 5.0; // [3:1:10]
 
 /* [Keycaps] */
@@ -500,6 +502,37 @@ module countersunk_screw(length, offset) {
                 linear_extrude(height = head_radius/4, center=true)
                 offset(r=head_radius/3) square(head_radius/3, center=true);
         }
+    }
+}
+
+module flat_head_screw(length) {
+    head_radius = flat_head_diameter/2;
+    bolt_radius = bolt_diameter/2;
+    $fn = round(360/fa_from_fs(head_radius));
+    color("gainsboro") difference() {
+        union() {
+            intersection() {
+                rotate_extrude(angle=360) intersection() {
+                    offset(r=flat_head_thickness)
+                        square(head_radius - flat_head_thickness,
+                               center=false);
+                    translate([0, -flat_head_thickness, 0]) square(head_radius);
+                }
+                translate([0, 0, -flat_head_thickness/2])
+                    cube([flat_head_diameter, flat_head_diameter,
+                          flat_head_thickness+0.01], center=true);
+            }
+            translate([0, 0, -0.01])
+                cylinder(h = length + 0.01, r = bolt_radius);
+        }
+        translate([0, 0, -flat_head_thickness])
+            rotate([90, 0, 0]) rotate([0, 0, 45])
+            linear_extrude(height = head_radius/4, center=true)
+            offset(r=bolt_radius/2) square(bolt_radius/2, center=true);
+        translate([0, 0, -flat_head_thickness])
+            rotate([0, 90, 0]) rotate([0, 0, 45])
+            linear_extrude(height = head_radius/4, center=true)
+            offset(r=bolt_radius/2) square(bolt_radius/2, center=true);
     }
 }
 
@@ -1195,6 +1228,12 @@ module keyboard() {
     }
 
     if (show_sensor) {
+        translate(trackball_position + [0, 0, 3*ex]) rotate([60, 0, 0])
+            for (p = mounting_points_sensor)
+                translate([p.x, p.y,
+                           -trackball_radius - 9.05+1.65 - ex/3])
+                    flat_head_screw(bolt_length);
+
         translate(trackball_position + [0, 0, 3*ex]) rotate([60, 0, 0])
             translate([0, 0, -trackball_radius]) sensor();
     }
