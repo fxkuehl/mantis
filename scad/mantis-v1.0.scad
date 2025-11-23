@@ -90,6 +90,9 @@ flat_head_diameter = 3.5; // [2:0.1:8]
 flat_head_thickness = 0.5; // [0.1:0.1:2]
 bolt_length = 5.0; // [3:1:10]
 
+gasket_length = 13; // [1:1:20]
+gasket_width = 4; // [1:1:20]
+
 /* [Keycaps] */
 // RGB LED cutouts
 rgb = false;
@@ -685,6 +688,56 @@ module main_gasket_pads() intersection() {
     main_extrusion(main_height, s_pcb - hfit, f_key + s_key - hfit,
                    variant=1);
 }
+
+main_gasket_pos_rot = [
+    [-4.00*hx - dx/2, 11/3*hy,   0],
+    [ 4.00*hx + dx/2, 11/3*hy,   0],
+    [-2.00*hx - dx/2, 11/3*hy,   0],
+    [ 2.00*hx + dx/2, 11/3*hy,   0],
+    [-5.25*hx - dx/2,  7/6*hy, -60],
+    [ 5.25*hx + dx/2,  7/6*hy,  60],
+    [-4.00*hx - dx/2,  1/3*hy,   0],
+    [ 4.00*hx + dx/2,  1/3*hy,   0],
+    [-2.00*hx - dx/2, -5/3*hy - dy,   0],
+    [ 2.00*hx + dx/2, -5/3*hy - dy,   0]
+];
+module main_gaskets() {
+    for (p = main_gasket_pos_rot) {
+        color(foam_color)
+            translate([p.x, p.y,
+                       plate_thickness + (gasket_thickness_main - vfit)/2])
+            rotate([0, 0, p.z])
+            cube([gasket_length, gasket_width, gasket_thickness_main-vfit],
+                 center=true);
+        color(foam_color)
+            translate([p.x, p.y,
+                       -(gasket_thickness_main - vfit)/2])
+            rotate([0, 0, p.z])
+            cube([gasket_length, gasket_width, gasket_thickness_main-vfit],
+                 center=true);
+    }
+}
+raised_gasket_pos = let (x = (hx + dx/2 + mcu_size.x/2) / 2) [
+    [-x, 3*hy],
+    [ x, 3*hy],
+    [-2.00*hx - dx/2, -5/3*hy - dy],
+    [ 2.00*hx + dx/2, -5/3*hy - dy]
+];
+module raised_gaskets() {
+    for (p = raised_gasket_pos) {
+        color(foam_color)
+            translate([p.x, p.y,
+                       plate_thickness + (gasket_thickness_main - vfit)/2])
+            cube([gasket_length, gasket_width, gasket_thickness_main-vfit],
+                 center=true);
+        color(foam_color)
+            translate([p.x, p.y,
+                       -(gasket_thickness_main - vfit)/2])
+            cube([gasket_length, gasket_width, gasket_thickness_main-vfit],
+                 center=true);
+    }
+}
+
 bump_positions = [
     [-4.00*hx - dx/2, 11*hy/3     ],
     [ 4.00*hx + dx/2, 11*hy/3     ],
@@ -1219,8 +1272,14 @@ module keyboard() {
     }
 
     if (show_plate) {
-        translate([0, 0, main_plate_z + 4*ex]) main_plate();
-        translate([0, 0, raised_plate_z + 9*ex]) raised_plate();
+        translate([0, 0, main_plate_z + 4*ex]) {
+            main_plate();
+            main_gaskets();
+        }
+        translate([0, 0, raised_plate_z + 9*ex]) {
+            raised_plate();
+            raised_gaskets();
+        }
         if (show_foam) {
             translate([0, 0, main_plate_z + 3*ex]) main_plate_foam();
             translate([0, 0, raised_plate_z + 8*ex]) raised_plate_foam();
