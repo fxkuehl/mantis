@@ -34,7 +34,7 @@ show_desk = true;
 has_display = true;
 display_bump_height = 2; // [0:0.5:5]
 // Fillet style
-fillet_style = 1;      // [0:Flat, 1:Parabolic, 2:Circular]
+fillet_style = 1;      // [0:Flat, 1:Root, 2:Circular, 3:Parabolic]
 // Main Edge fillet radius
 r_edge_main = 0.5;             // [0.5:0.1:5]
 // Raised Edge fillet radius
@@ -570,12 +570,14 @@ module case_inside(oh, ov) union() {
 }
 //translate([0, 0, 50]) case_inside(hfit, vfit);
 
+module case_main()
+    fillet_polyhedron(main_outline_points, main_height,
+                      s_pcb + wall_thickness_main,
+                      f_key + s_key + wall_thickness_main,
+                      r_edge_main, r_corner_main, fillet_style);
 module case_outside() {
     union() {
-        fillet_polyhedron(main_outline_points, main_height,
-                          s_pcb + wall_thickness_main,
-                          f_key + s_key + wall_thickness_main,
-                          r_edge_main, r_corner_main, fillet_style);
+        case_main();
         translate([0, 0, main_height - 2*r_corner_main]) difference() {
             fillet_polyhedron(raised_outline_points,
                               raised_height + 2*r_corner_main,
@@ -587,23 +589,26 @@ module case_outside() {
                 cube([2*hx+dx, hy, raised_height + 2*r_corner_main + 2*vfit]);
         }
 
-        if (has_display)
+        if (has_display) {
+            r = 2*display_bump_height/tan(60);
             translate([0, 0, main_height+raised_height-r_corner_raised-vfit])
                 fillet_polyhedron(display_bump_points,
                                   display_bump_height+r_corner_raised+vfit,
-                                  -s_key/2, 3+s_key/2,
-                                  r_edge_raised, r_corner_raised, 2,
+                                  -s_key/2, f_key+s_key/2,
+                                  r/2, r, 3,
                                   false);
+        }
     }
 }
 //translate([0, 0, 50]) case_outside();
+
 module base_plate_base(oh, ov) intersection() {
     translate([0, 0, -ov - 0.01])
         main_extrusion(base_thickness + 2*ov + 0.01,
                        s_pcb + wall_thickness_main/2 + oh,
                        f_key + s_key + wall_thickness_main + oh);
     if (!ov)
-        case_outside();
+        case_main();
 }
 module main_gasket_pads() intersection() {
     translate([0, 0, base_thickness - vfit])
