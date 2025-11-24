@@ -40,6 +40,7 @@ trap 'echo "Killing background processes ..."; kill $jobs' INT
 
 persp_cam=15,0,10,45,0,22,450
 rear_cam=15,40,10,45,0,150,450
+bottom_cam=15,30,10,225,0,225,450
 
 echo "Perspective view ..."
 $osc $params --camera=$persp_cam --imgsize=$sizeW \
@@ -69,8 +70,11 @@ $osc $params --camera=5,25,0,0,0,30,500 --imgsize=$sizeL \
 jobs="$jobs $!"
 
 echo "Bottom-up view ..."
-$osc $params --camera=0,8,0,180,0,180,400 --imgsize=$sizeW \
-	-D case_alpha=0.2 -D show_desk=false --projection=ortho \
+#$osc $params --camera=0,8,0,180,0,180,400 --imgsize=$sizeW \
+#	-D case_alpha=0.2 -D show_desk=false --projection=ortho \
+#	-o "$dir/mantis_bottom.png" $scad &
+$osc $params --camera=$bottom_cam --imgsize=$sizeL \
+	-D case_alpha=0.4 -D show_desk=false \
 	-o "$dir/mantis_bottom.png" $scad &
 jobs="$jobs $!"
 
