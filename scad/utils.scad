@@ -159,7 +159,73 @@ function offset_fillet_poly2(points, offset, fi, di, fo, do, corner_points)
         pc = c[0], u0 = c[1], w0 = c[2], f = c[3], gamma = c[4]
     ) [for (t = [-gamma : 2*gamma/corner_points : gamma])
         pc + f*u0 * cos(t) + f*w0 * sin(t)]];
+
+// Helper to add a z-coordinate to 2D points
 function at_z(points, z) = [for (p = points) [p.x, p.y, z]];
+
+// Polyhedron with variable fillets along z
+// points: points of a polygon describing the outline in x-y plane
+// h: height
+// o: offset in x-y plane
+// fxy: fillet in x-y plane of the bulk
+// f_edge: fillet of the top/bottom edge
+// f_corner: fillet of the corners
+// f_style: edge/corner fillet style (0: chamfer, 1: parabolic, 2: circular)
+// round_bottom: true if bottom side is fillet, false if bottom is flat
+module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
+                         fillet_style, round_bottom=true) {
+    assert(f_edge <= f_corner);
+
+    n = len(points);
+    m = round(3.1416 / 3 * fxy / $fs);
+    p = n * (m + 1);
+    ac = tan(60)^2 / (4*f_corner);
+    ae = tan(60)^2 / (4*f_edge);
+    z1 = fillet_style == 1 ? sqrt(f_corner/ac) : f_corner;
+    q = round(z1 * 1.5708 / $fs);
+    Q = round_bottom ? 2*q : q;
+    //echo(z1, q);
+
+    bottom = at_z(round_bottom ?
+        offset_fillet_poly2(points, o-f_edge, fxy+f_edge, 0,
+                           fxy-f_edge, f_corner-f_edge, m) :
+        offset_fillet_poly(points, o, fxy, fxy, m), 0);
+    top = at_z(offset_fillet_poly2(points, o-f_edge, fxy+f_edge, 0,
+                                   fxy-f_edge, f_corner-f_edge, m), h);
+
+    bottom_fillet = round_bottom ? [for (i = [1 : q]) each let (
+        z = (fillet_style == 2 ? cos(90*i/q) : 1 - i/q) * z1,
+        _r = max(0, f_edge - (z1-z)),
+        r = fillet_style == 0 ? _r :
+            fillet_style == 1 ? ae * _r^2 :
+                                f_edge - sqrt(f_edge^2 - _r^2),
+        dr = ((fillet_style == 0 ? z :
+               fillet_style == 1 ? ac * z^2 :
+                                   z1-sqrt(f_corner^2 - z^2))
+              - r)
+    ) at_z(offset_fillet_poly2(points, o - r, fxy + r, 0,
+                               fxy - r, dr, m), z1 - z)] : [];
+    top_fillet = [for (i = [q : -1 : 1]) each let (
+        z = (fillet_style == 2 ? cos(90*i/q) : 1 - i/q) * z1,
+        _r = max(0, f_edge - (z1-z)),
+        r = fillet_style == 0 ? _r :
+            fillet_style == 1 ? ae * _r^2 :
+                                f_edge - sqrt(f_edge^2 - _r^2),
+        dr = ((fillet_style == 0 ? z :
+               fillet_style == 1 ? ac * z^2 :
+                                   z1-sqrt(f_corner^2 - z^2))
+              - r)
+    ) at_z(offset_fillet_poly2(points, o - r, fxy + r, 0,
+                              fxy - r, dr, m), h - z1 + z)];
+    points = concat(bottom, bottom_fillet, top_fillet, top);
+    bottom_face = [for (i = [p-1 : -1 : 0]) i];
+    top_face = [for (i = [p * (1 + Q) : p * (2 + Q) - 1]) i];
+    side_faces = [for (i = [0 : Q]) each
+        [for (j = [0 : p-1])
+            [i*p + j, i*p + (j+1)%p, (i+1)*p + (j+1)%p, (i+1)*p + j]]];
+    faces = concat([bottom_face, top_face], side_faces);
+    polyhedron(points, faces, convexity=10);
+}
 
 // Half sphere with optimized number of faces for faster minkowski sums
 module half_sphere(r, staggered = true) {
