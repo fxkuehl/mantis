@@ -2,6 +2,7 @@
 $fa = 2;
 // Generate several keys as one part for lower printing cost (see https://3d.jlcpcb.com/help/article/213-Connected-Parts-Printing-Guide)
 n_keys = 1;
+$choc_version = 1; // [1: v1, 2: v2]
 // Whether to render RGB LED cutouts in the keycaps
 $rgb = true;
 // Whether to use a minkowski sum for more consistent thickness
@@ -36,7 +37,7 @@ $clamp_z1 = 8.25;
 $clamp_z2 = 10.25;
 
 // How far the keys are pressed down (0-3mm)
-travel = 0; // [0:0.1:3]
+travel = 0; // [0:0.1:3.3]
 // Mantis plate explosion offset
 $explode = 0;
 // Set by files including this one
@@ -267,7 +268,7 @@ module choc_peg() {
     }
 }
 
-module choc_stem() {
+module choc_stem_v1() {
     rotate([0, 0, $rot]) difference() {
         union() {
             rotate([0, 0, -$rot]) multmatrix([[1, 0, 0, 0],
@@ -300,6 +301,33 @@ module choc_stem() {
 
     rotate([0, 0, $rot]) translate([-2.85, 0, -3.5]) choc_peg($fn = $fn/2);
     rotate([0, 0, $rot]) translate([ 2.85, 0, -3.5]) choc_peg($fn = $fn/2);
+}
+
+module choc_stem_v2() {
+    translate([0, 0, -3.6]) difference() {
+        union() {
+            cylinder(h = 0.401, d1 = 5.1, d2 = 5.5, $fn = 360/10);
+            translate([0, 0, 0.4]) cylinder(h = 3.21, d = 5.5, $fn = 360/10);
+            translate([0, 0, 3.6])
+                multmatrix([[1, 0, 0, 0],
+                            [0, 1, -sin($tilt), 0],
+                            [0, 0, 1, 0]])
+                cylinder(h = 10, d = 6.5, $fn = 360/10);
+        }
+        translate([0, 0, -0.1]) rotate([0, 0, $rot])
+            linear_extrude(height=3.7) offset(r = -0.3)
+            polygon([[-2.35, 0.885], [-0.885, 0.885], [-0.885, 2.35],
+                     [ 0.885, 2.35], [ 0.885, 0.885], [ 2.35, 0.885],
+                     [ 2.35,-0.885], [ 0.885,-0.885], [ 0.885,-2.35],
+                     [-0.885,-2.35], [-0.885,-0.885], [-2.35,-0.885]]);
+    }
+}
+
+module choc_stem() {
+    if ($choc_version == 2)
+        choc_stem_v2();
+    else
+        choc_stem_v1();
 }
 
 module rgb_holes() {
@@ -350,6 +378,7 @@ module offsetkey(detail = 32) {
                                     $tilt, $slope, height, $thickness, da=5,
                                     dish=true, $print_stats=false);
                 rgb_holes();
+                switch_top();
             }
             translate([0, 0, $droop]) choc_stem($fn = detail);
         }
@@ -401,6 +430,7 @@ module saddlekey(detail = 32) {
                 translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
                 shell($thickness, da=5);
                 rgb_holes();
+                switch_top();
             }
             translate([0, 0, $droop]) choc_stem($fn = detail);
         }
@@ -440,6 +470,7 @@ module difkey(detail = 32) {
                                     tilt_i, slope_i, height_i, 0, da=5,
                                     $print_stats=false);
                 rgb_holes();
+                switch_top();
             }
             translate([0, 0, $droop]) choc_stem($fn = detail);
         }
@@ -476,6 +507,7 @@ module minkey(detail = 32) {
                 half_sphere($thickness, $fa = 360/16);
             }
                 rgb_holes();
+                switch_top();
             }
             translate([0, 0, $droop]) choc_stem($fn = detail);
         }
@@ -509,17 +541,17 @@ module sliced_key(slice=[30, 30, 1], offset=[0, 0, 0], dir=[0, 0, 1],
     }
 }
 
-module choc_switch() {
+module choc_switch_v1() {
     color("gray") render(convexity = 4) difference() {
         union() {
             linear_extrude(height = 0.701, scale = 1.05) {
-                offset(r = 0.6/1.05) square(12.6/1.05, center = true);
+                offset(r = 1.0/1.05) square(11.8/1.05, center = true);
             }
             translate([0, 0, 0.7]) linear_extrude(height = 1.51) {
-                offset(r = 0.6) square(12.6, center = true);
+                offset(r = 1.0) square(11.8, center = true);
             }
             translate([0, 0, 2.2]) linear_extrude(height = 0.8) {
-                offset(r = 1.2) square(12.6, center = true);
+                offset(r = 1.6) square(11.8, center = true);
             }
             translate([0, 0, -2]) cylinder(h = 2.01, d = 3.2);
             translate([0, 0, -2.65]) cylinder(h = 0.66, d1 = 2.8, d2 = 3.2);
@@ -554,11 +586,11 @@ module choc_switch() {
         union() {
             translate([0, 0, 2.99])
             linear_extrude(height = 0.51) {
-                offset(r = 0.6) square([12.4, 12.6], center = true);
+                offset(r = 1.0) square([11.6, 11.8], center = true);
             }
             translate([0, 0, 3.499])
             linear_extrude(height = 1.501, scale = 0.9) {
-                offset(r = 0.6) square([12.4, 12.6], center = true);
+                offset(r = 1.0) square([11.6, 11.8], center = true);
             }
             translate([0, 0, 4.99])
             linear_extrude(height = 0.51, convexity = 2, scale = 0.96) {
@@ -577,9 +609,94 @@ module choc_switch() {
     }
 }
 
+module choc_switch_v2() {
+    color("gray") render(convexity = 4) difference() {
+        union() {
+            linear_extrude(height = 0.701, scale = 1.05) {
+                offset(r = 1.0/1.05) square(11.95/1.05, center = true);
+            }
+            translate([0, 0, 0.7]) linear_extrude(height = 1.51) {
+                offset(r = 1.0) square(11.95, center = true);
+            }
+            translate([0, 0, 2.2]) linear_extrude(height = 0.8) {
+                offset(r = 1.5) square(12.0, center = true);
+            }
+            translate([0, 0, -2]) cylinder(h = 2.01, d = 4.8);
+            translate([0, 0, -2.65]) cylinder(h = 0.66, d1 = 2.8, d2 = 4.8);
+        }
+        translate([0, 0, 6.9]) cube(12.8, center = true);
+        translate([0, 4.7, 0]) cube([5.3, 3.25, 2], center = true);
+        translate([7.475, 0, 2.5]) cube([1, 10.8, 1], center = true);
+        translate([-7.475, 0, 2.5]) cube([1, 10.8, 1], center = true);
+    }
+    color("gold") translate([0, -5.9, -1]) rotate([90, 0, 0])
+    linear_extrude(height = 0.2, center = true) {
+        offset(r = 0.5) square([0.01, 3], center = true);
+    }
+    color("silver") translate([-5, -3.8, -1]) rotate([90, 0, 0])
+    linear_extrude(height = 0.2, center = true) {
+        offset(r = 0.5) square([0.01, 3], center = true);
+    }
+    color("silver") translate([5, 5.15, -1]) rotate([90, 0, 0])
+    linear_extrude(height = 0.2, center = true) {
+        offset(r = 0.5) square([0.01, 3], center = true);
+    }
+    color("red") translate([0, 0, 5.3+3.3-2-travel]) render(convexity = 4)
+    union() {
+        difference() {
+            cylinder(h=4, d=6.5, center=true);
+            translate([0, 0, 0.4]) cylinder(h=4, d=5.6, center=true);
+        }
+        cube([4, 1.1, 4], center=true);
+        cube([1.3, 4, 4], center=true);
+    }
+    color("white", 0.2) render(convexity = 4) difference() {
+        union() {
+            translate([0, 0, 2.99])
+            linear_extrude(height = 0.81) {
+                offset(r = 1.0) square(11.95, center = true);
+            }
+            translate([0, 0, 3.799])
+            linear_extrude(height = 1.501, scale = 0.9) {
+                offset(r = 1.0) square(11.95, center = true);
+            }
+        }
+        translate([0, 0, 2.98])
+        linear_extrude(height = 1.82, scale = 0.9) {
+            square(12.8, center = true);
+        }
+        translate([0, 0, 5]) cylinder(h=2, d=6.6, center=true);
+    }
+}
+
+module choc_switch() {
+    if ($choc_version == 2)
+        choc_switch_v2();
+    else
+        choc_switch_v1();
+}
+
+// Expanded switch-top for cutting away from key-cap bottom
+module switch_top(margin = 0.1) {
+    size       = $choc_version == 2 ? [11.95, 11.95] : [11.6, 11.8];
+    max_travel = $choc_version == 2 ? 3.3 : 3;
+    insertion = ($choc_version == 2 ? $droop : $droop - 0.5) + margin;
+    $fn = 20;
+
+    translate([0, 0, insertion - 10])
+        linear_extrude(height = 8.5) {
+            offset(r = 1.0 + 2*margin) square(size, center = true);
+        }
+    translate([0, 0, insertion - 1.501])
+        linear_extrude(height = 1.501, scale = 0.9) {
+            offset(r = 1.0 + 2*margin) square(size, center = true);
+        }
+}
+
 module switch_key() {
+    key_lift = $choc_version == 2 ? 5.3 + 3.3 : 5.5 + 3;
     if (show_key)
-        translate([0, 0, 5.5 + 3 - travel - $droop + $explode]) key(detail = 8);
+        translate([0, 0, key_lift - travel - $droop + $explode]) key(detail = 8);
     choc_switch();
 }
 
@@ -601,8 +718,10 @@ if (no_key) {
     // nothing
 } else if (show_switch && show_key) { // Single key with switch
     intersection() {
+        slice_x = $choc_version == 2 ? 6.39 : 6.3;
         switch_key($fn = 32);
-        color("white", 0.75) translate([-8.8, 0, $explode/2]) cube([30, 30, 50+$explode], center = true);
+        color("white", 0.75) translate([slice_x - 15, 0, $explode/2])
+            cube([30, 30, 50+$explode], center = true);
     }
 } else if (show_switch) { // Choc switch
     choc_switch($fn = 32);

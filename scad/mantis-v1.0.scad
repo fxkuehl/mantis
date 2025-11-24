@@ -94,6 +94,8 @@ gasket_length = 13; // [1:1:20]
 gasket_width = 4; // [1:1:20]
 
 /* [Keycaps] */
+// Switch type
+switch_type = 1; // [1: Choc v1, 2: Choc v2]
 // RGB LED cutouts
 rgb = false;
 // Saddle shaped dish
@@ -1185,18 +1187,20 @@ module trackball_holder() intersection() {
 
 module key_profile(x, key_color="") {
     $fa = $fs*2;
+    $choc_version = switch_type;
     $rgb = rgb;
     $slope = slope;
     $dish_diam = dish_diam;
     $explode=$explode/3;
     $key_color=key_color;
+    z_off = switch_type == 2 ? 0.5 : 0;
 
     if (x == 0) {
-        switch_key($tilt=tilt1, $rise=rise1, $saddle=saddle);
+        switch_key($tilt=tilt1, $rise=rise1+z_off, $saddle=saddle);
     } else if (x == 1) {
-        switch_key($tilt=tilt2, $rise=rise2, $saddle=saddle);
+        switch_key($tilt=tilt2, $rise=rise2+z_off, $saddle=saddle);
     } else if (x == 2) {
-        switch_key($tilt=tilt3, $rise=rise3, $saddle=saddle);
+        switch_key($tilt=tilt3, $rise=rise3+z_off, $saddle=saddle);
     }
 }
 
