@@ -568,14 +568,14 @@ outlines:
       fillet: 0.2
   _switch_cutout1:
     - what: rectangle
-      size: [13.8, 13.8]
+      size: [14, 14]
       fillet: 1
   _switch_cutout2:
     - what: rectangle
-      size: [13.8, 13.8]
+      size: [14, 14]
       fillet: 1
     - what: rectangle
-      size: [14.3, 11.8]
+      size: [15, 10]
   _ffc_cable_cutout:
     - what: rectangle
       size: [7, 3]
