@@ -96,6 +96,8 @@ gasket_width = 4; // [1:1:20]
 /* [Keycaps] */
 // Switch type
 switch_type = 1; // [1: Choc v1, 2: Choc v2]
+// Switch color scheme
+switch_colors = 6; // [0: Red, 1: Blue, 2: Brown, 3: Pro Red, 4: Pink, 5: Robin, 6: Sunset, 7: Twilight, 8: Nocturnal, 9: Sunrise, 10: Bokeh]
 // RGB LED cutouts
 rgb = false;
 // Saddle shaped dish
@@ -1193,6 +1195,7 @@ module key_profile(x, key_color="") {
     $dish_diam = dish_diam;
     $explode=$explode/3;
     $key_color=key_color;
+    $color_scheme=switch_colors;
     z_off = switch_type == 2 ? 0.5 : 0;
 
     if (x == 0) {

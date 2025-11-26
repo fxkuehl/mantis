@@ -52,6 +52,8 @@ show_sliced_key = false;
 $print_stats = false;
 
 $key_color = "";
+// Switch color scheme
+$color_scheme = 0; // [0: Red, 1: Blue, 2: Brown, 3: Pro Red, 4: Pink, 5: Robin, 6: Sunset, 7: Twilight, 8: Nocturnal, 9: Sunrise, 10: Bokeh]
 
 use <utils.scad>
 use <dishes.scad>
@@ -541,8 +543,8 @@ module sliced_key(slice=[30, 30, 1], offset=[0, 0, 0], dir=[0, 0, 1],
     }
 }
 
-module choc_switch_v1() {
-    color("gray") render(convexity = 4) difference() {
+module choc_switch_v1(bottom_color, top_color, stem_color) {
+    color(bottom_color) render(convexity = 4) difference() {
         union() {
             linear_extrude(height = 0.701, scale = 1.05) {
                 offset(r = 1.0/1.05) square(11.8/1.05, center = true);
@@ -573,7 +575,7 @@ module choc_switch_v1() {
     linear_extrude(height = 0.2, center = true) {
         offset(r = 0.5) square([0.01, 3], center = true);
     }
-    color("red") translate([0, 0, 5+1.01-travel]) render(convexity = 4) difference() {
+    color(stem_color) translate([0, 0, 5+1.01-travel]) render(convexity = 4) difference() {
         union() {
             cube([10.2, 4.5, 4], center = true);
             translate([0, -2.74, 0]) cube([3, 1.02, 4], center = true);
@@ -582,7 +584,7 @@ module choc_switch_v1() {
         translate([ 2.85, 0, 0.51]) cube([1.2, 3, 3], center = true);
         translate([0, -2.76, -0.5]) cube([2, 1.02, 4], center = true);
     }
-    color("white", 0.2) render(convexity = 4) difference() {
+    color(top_color, 0.3) render(convexity = 4) difference() {
         union() {
             translate([0, 0, 2.99])
             linear_extrude(height = 0.51) {
@@ -609,8 +611,8 @@ module choc_switch_v1() {
     }
 }
 
-module choc_switch_v2() {
-    color("gray") render(convexity = 4) difference() {
+module choc_switch_v2(bottom_color, top_color, stem_color) {
+    color(bottom_color) render(convexity = 4) difference() {
         union() {
             linear_extrude(height = 0.701, scale = 1.05) {
                 offset(r = 1.0/1.05) square(11.95/1.05, center = true);
@@ -641,7 +643,7 @@ module choc_switch_v2() {
     linear_extrude(height = 0.2, center = true) {
         offset(r = 0.5) square([0.01, 3], center = true);
     }
-    color("red") translate([0, 0, 5.3+3.3-2-travel]) render(convexity = 4)
+    color(stem_color) translate([0, 0, 5.3+3.3-2-travel]) render(convexity = 4)
     union() {
         difference() {
             cylinder(h=4, d=6.5, center=true);
@@ -650,7 +652,7 @@ module choc_switch_v2() {
         cube([4, 1.1, 4], center=true);
         cube([1.3, 4, 4], center=true);
     }
-    color("white", 0.2) render(convexity = 4) difference() {
+    color(top_color, 0.3) render(convexity = 4) difference() {
         union() {
             translate([0, 0, 2.99])
             linear_extrude(height = 0.81) {
@@ -670,10 +672,47 @@ module choc_switch_v2() {
 }
 
 module choc_switch() {
+    bottom_color =
+        $color_scheme == 1 ? "mediumblue" :
+        $color_scheme == 2 ? "dimgrey" :
+        $color_scheme == 3 ? "red" :
+        $color_scheme == 4 ? "lightgrey" :
+        $color_scheme == 5 ? "#9ef" :
+        $color_scheme == 6 ? "#444" :
+        $color_scheme == 7 ? "#333" :
+        $color_scheme == 8 ? "#333" :
+        $color_scheme == 9 ? "#333" :
+        $color_scheme ==10 ? "darkblue" :
+                             "dimgrey";
+    top_color =
+        $color_scheme == 1 ? "white" :
+        $color_scheme == 2 ? "white" :
+        $color_scheme == 3 ? "white" :
+        $color_scheme == 4 ? "white" :
+        $color_scheme == 5 ? "white" :
+        $color_scheme == 6 ? "darkorange" :
+        $color_scheme == 7 ? "#383034" :
+        $color_scheme == 8 ? "#383034" :
+        $color_scheme == 9 ? "#412" :
+        $color_scheme ==10 ? "deepskyblue" :
+                             "white";
+    stem_color =
+        $color_scheme == 1 ? "deepskyblue" :
+        $color_scheme == 2 ? "sienna" :
+        $color_scheme == 3 ? "white" :
+        $color_scheme == 4 ? "lightpink" :
+        $color_scheme == 5 ? "#9ff" :
+        $color_scheme == 6 ? "darkorange" :
+        $color_scheme == 7 ? "lightgreen" :
+        $color_scheme == 8 ? "#222" :
+        $color_scheme == 9 ? "lightsalmon" :
+        $color_scheme ==10 ? "red" :
+                             "red";
+
     if ($choc_version == 2)
-        choc_switch_v2();
+        choc_switch_v2(bottom_color, top_color, stem_color);
     else
-        choc_switch_v1();
+        choc_switch_v1(bottom_color, top_color, stem_color);
 }
 
 // Expanded switch-top for cutting away from key-cap bottom
