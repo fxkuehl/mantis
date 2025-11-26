@@ -17,9 +17,11 @@ fi
 
 if [ -n "$1" ]; then
 	params="$params -p$cust -P$1"
-	if [ -n "$2" ]; then
-		colors="$2"
-	fi
+	shift 1
+fi
+if [ -n "$1" ]; then
+	colors="$1"
+	shift 1
 fi
 
 # Supersampling
@@ -44,44 +46,44 @@ bottom_cam=15,30,10,225,0,225,450
 
 echo "Perspective view ..."
 $osc $params --camera=$persp_cam --imgsize=$sizeW \
-	-o "$dir/mantis.png" $scad &
+	-o "$dir/mantis.png" "$@" $scad &
 jobs="$jobs $!"
 
 echo "Rear view ..."
 $osc $params --camera=$rear_cam --imgsize=$sizeW \
-	-o "$dir/mantis_rear.png" $scad &
+	-o "$dir/mantis_rear.png" "$@" $scad &
 jobs="$jobs $!"
 
 echo "Bare-bones view ..."
 $osc $params --camera=$persp_cam --imgsize=$sizeW \
 	-D show_trackball=false -D show_key=false \
-	-o "$dir/mantis_bare.png" $scad &
+	-o "$dir/mantis_bare.png" "$@" $scad &
 jobs="$jobs $!"
 
 echo "Naked view ..."
 $osc $params --camera=$persp_cam --imgsize=$sizeW \
 	-D show_trackball=false -D show_key=false -D show_switch=false \
-	-D case_alpha=0.4 -o "$dir/mantis_naked.png" $scad &
+	-D case_alpha=0.4 -o "$dir/mantis_naked.png" "$@" $scad &
 jobs="$jobs $!"
 
 echo "Top-down view ..."
 $osc $params --camera=5,25,0,0,0,30,500 --imgsize=$sizeL \
-	--projection=ortho -o "$dir/mantis_top.png" $scad &
+	--projection=ortho -o "$dir/mantis_top.png" "$@" $scad &
 jobs="$jobs $!"
 
 echo "Bottom-up view ..."
 #$osc $params --camera=0,8,0,180,0,180,400 --imgsize=$sizeW \
 #	-D case_alpha=0.2 -D show_desk=false --projection=ortho \
-#	-o "$dir/mantis_bottom.png" $scad &
+#	-o "$dir/mantis_bottom.png" "$@" $scad &
 $osc $params --camera=$bottom_cam --imgsize=$sizeL \
 	-D case_alpha=0.4 -D show_desk=false \
-	-o "$dir/mantis_bottom.png" $scad &
+	-o "$dir/mantis_bottom.png" "$@" $scad &
 jobs="$jobs $!"
 
 echo "Exploded view ..."
 $osc $params --camera=5,30,270,65,0,15,1300 --imgsize=$sizeP \
 	-D \$explode=40 --projection=ortho \
-	-o "$dir/mantis_exploded.png" $scad &
+	-o "$dir/mantis_exploded.png" "$@" $scad &
 jobs="$jobs $!"
 
 wait || {
