@@ -1345,38 +1345,37 @@ module keyboard() {
     }
 }
 
+module desk() color(desk_color) rotate([0, 0, $explode ? 0 : -5])
+    translate([-300, $explode ? -175 : -100, -20])
+    cube([600, 350, 20]);
+
 if (show_desk) {
-    elevation = max(0, bump_height - bump_recess);
-    color(desk_color) rotate([0, 0, -5]) translate([-300, -100, -20 - elevation])
-        cube([600, 350, 20]);
-    // Approximate shadow to give a sense of the distance from the desk surface:
-    // 1. Core shadow slightly smaller than the outline
-    o = (show_case ? s_pcb + wall_thickness_main : -main_pcb_z) - elevation;
-    f = (show_case ? f_key + s_key + wall_thickness_main :
-                     f_key + s_pcb + main_pcb_z) + elevation;
-    if (show_case || show_pcb || show_plate) {
-        color("black", alpha=show_case ? 0.5 : 0.3)
-            translate([0, 0, -elevation])
-            linear_extrude(h=0.02, center=true) main_offset_fillet(o, f, f);
+    elevation = max(0, $explode + bump_height - bump_recess);
+    desk();
+
+    // Core shadow slightly smaller than the outline
+    if (show_base || show_pcb || show_plate || show_mezzanine) {
+        o = show_base  ? elevation :
+            show_pcb   ? elevation + main_pcb_z :
+            show_plate ? elevation + main_plate_z :
+                         elevation + main_height-deck_thickness;
+        a = min(0.35/sqrt(o), 1);
+        color("black", alpha=a)
+            linear_extrude(h=0.02, center=true)
+            offset(r = 3*o) // expand to slightly below original size
+            offset(r = -6*o) // shrink
+            offset(r = 2*o) // fuse small holes
+            projection(cut=false) keyboard($fs=2);
     }
-    // 2. Partial shadow of the main body, raised part and trackball
-    shadow_width = 2.5 + elevation/4;
-    color("black", alpha=0.2) translate([0, 0, -elevation])
-            render(convexity=10) linear_extrude(h=0.04, center=true) union() {
-        o = (show_case ? s_pcb + wall_thickness_main : 0) + shadow_width;
-        f = (show_case ? f_key + s_key + wall_thickness_main : f_key + s_pcb) + shadow_width;
-        if (show_case || show_pcb || show_plate) {
-            translate([shadow_width, -shadow_width, 0])
-                main_offset_fillet(o, f, f);
-            translate([shadow_width * 1.67, -shadow_width * 1.67, 0])
-                raised_offset_fillet(o, f, f);
-        }
-        if (show_trackball) {
-            translate([shadow_width*3, -shadow_width*3, 0])
-                translate(trackball_position)
-                circle(trackball_radius + shadow_width);
-        }
-    }
+
+    // Slanted shadow angled away from an imaginary sun
+    sun = [0.3, -0.5, 1 + $explode/10];
+    color("black", alpha=0.2)
+    linear_extrude(h=0.04, center=true) projection(cut=false)
+        multmatrix([[1, 0, sun.x/sun.z, 0],
+                    [0, 1, sun.y/sun.z, 0],
+                    [0, 0,           1, 0]])
+        keyboard($fs=2);
 }
 
-translate([0, 0, $explode]) keyboard();
+translate([0, 0, $explode + bump_height - bump_recess]) keyboard();
