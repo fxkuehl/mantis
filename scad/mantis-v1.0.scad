@@ -819,22 +819,22 @@ module bump() union() {
 module main_pcb() scale([-1, 1, 1]) color(pcb_color)
     flat_extrusion("outlines/main_pcb.dxf", pcb_thickness);
 module main_pcb_foam() color(foam_color)
-    translate([0, 0, -foam_thickness - vfit])
+    translate([0, 0, -foam_thickness + vfit])
     flat_extrusion("outlines/main_pcb_foam.dxf", foam_thickness - 2*vfit);
 module raised_pcb() scale([-1, 1, 1]) color(pcb_color)
     flat_extrusion("outlines/raised_pcb.dxf", plate_thickness);
 module raised_pcb_foam() color(foam_color)
-    translate([0, 0, -foam_thickness - vfit])
+    translate([0, 0, -foam_thickness + vfit])
     flat_extrusion("outlines/raised_pcb_foam.dxf", foam_thickness - 2*vfit);
 module main_plate() color(plate_color)
     flat_extrusion("outlines/main_plate.dxf", pcb_thickness);
 module main_plate_foam() color(foam_color)
-    translate([0, 0, -foam_thickness - vfit])
+    translate([0, 0, -foam_thickness + vfit])
     flat_extrusion("outlines/main_plate_foam.dxf", foam_thickness - 2*vfit);
 module raised_plate() color(plate_color)
     flat_extrusion("outlines/raised_plate.dxf", plate_thickness);
 module raised_plate_foam() color(foam_color)
-    translate([0, 0, -foam_thickness - vfit])
+    translate([0, 0, -foam_thickness + vfit])
     flat_extrusion("outlines/raised_plate_foam.dxf", foam_thickness - 2*vfit);
 
 module female_header(height, pin_l, n) {
