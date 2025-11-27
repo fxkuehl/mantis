@@ -248,7 +248,7 @@ function min_rise() = let (
     exc = min($max_exc, $tilt/7.5),
     dish_radius = $dish_diam/2 * sqrt(1 + 1/tan($slope)^2),
     dish_depth = (1.0-cos($slope))*dish_radius,
-    front_offset = 0.5,
+    front_offset = $choc_version == 2 ? 0 : 0.5,
     mid_offset = rotate_x_around(
         [0, -3, -dish_depth], $tilt,
         [0, -exc - $dish_diam/2, 0]).z)
@@ -312,9 +312,9 @@ module choc_stem_v2() {
             translate([0, 0, 0.4]) cylinder(h = 3.21, d = 5.5, $fn = 360/10);
             translate([0, 0, 3.6])
                 multmatrix([[1, 0, 0, 0],
-                            [0, 1, -sin($tilt), 0],
+                            [0, 1, -sin($tilt)/2, 0],
                             [0, 0, 1, 0]])
-                cylinder(h = 10, d = 6.5, $fn = 360/10);
+                cylinder(h = 10, d1 = 6.5, d2 = 6.5 + 10*sin($tilt), $fn = 360/10);
         }
         translate([0, 0, -0.1]) rotate([0, 0, $rot])
             linear_extrude(height=3.7) offset(r = -0.3)
@@ -724,11 +724,11 @@ module switch_top(margin = 0.1) {
 
     translate([0, 0, insertion - 10])
         linear_extrude(height = 8.5) {
-            offset(r = 1.0 + 2*margin) square(size, center = true);
+            offset(r = 1.0 + margin) square(size, center = true);
         }
     translate([0, 0, insertion - 1.501])
         linear_extrude(height = 1.501, scale = 0.9) {
-            offset(r = 1.0 + 2*margin) square(size, center = true);
+            offset(r = 1.0 + margin) square(size, center = true);
         }
 }
 
