@@ -126,10 +126,13 @@ function offset_fillet_poly(points, offset, fi, fo, corner_points) = let (
  * point_list - Template polygon, ordered counter-clockwise
  * offset - How much to grow or shrink the polygon
  * fi - inside fillet radius (for concave corners)
- * di - inside fillet offset
+ * di - inside apex offset
  * fo - outside fillet radius (for convex corners)
- * do - outside fillet offset
+ * do - outside apex offset
  * corner_points - Number of points in each fillet
+ *
+ * di and do modify the fillet radii in order to offset the apex by the
+ * specified amount.
  *
  * All fillets have the same number of points. This allows easy construction
  * of polyhedron faces when stacking many polygons with varying fillet radii.
@@ -185,12 +188,15 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
     ae = fillet_style == 1 ? tan(60)^2 / (4*f_edge) :
          fillet_style == 3 ? tan(60)   / (2*f_edge) : 0;
                                         // parabolic coefficient for edges
-    z1 = fillet_style == 1 ? sqrt(f_corner/ac) :
-         fillet_style == 3 ? ac * f_corner^2 : f_corner;
+    zc1 = fillet_style == 1 ? sqrt(f_corner/ac) :
+          fillet_style == 3 ? ac * f_corner^2 : f_corner;
                                         // z-height of corner fillets
-    q = round(z1 * 1.5708 / $fs);       // # corner fillet layers one side
+    ze1 = fillet_style == 1 ? sqrt(f_edge/ae) :
+          fillet_style == 3 ? ae * f_edge^2 : f_edge;
+                                        // z-height of edge fillets
+    q = round(zc1 * 1.5708 / $fs);      // # corner fillet layers one side
     Q = round_bottom ? 2*q : q;         // # corner fillet layers top+bottom
-    //echo(ac, z1, q);
+    //echo(ac, zc1, q);
 
     bottom = at_z(round_bottom ?
         offset_fillet_poly2(points, o-f_edge, fxy+f_edge, 0,
@@ -200,37 +206,37 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
                                    fxy-f_edge, f_corner-f_edge, m), h);
 
     bottom_fillet = round_bottom ? [for (i = [1 : q]) each let (
-        z = fillet_style == 2 ? cos(90*i/q) * z1 :
-            fillet_style == 3 ? z1 - ac * (i/q*f_corner)^2 :
-                                (1 - i/q) * z1,
-        _r = max(0, f_edge - (z1-z)),
-        r = fillet_style == 0 ? _r :
-            fillet_style == 1 ? ae * _r^2 :
-            fillet_style == 2 ? f_edge - sqrt(f_edge^2 - _r^2) :
-                                ae * _r^2,
-        dr = ((fillet_style == 0 ? z :
-               fillet_style == 1 ? ac * z^2 :
-               fillet_style == 2 ? z1-sqrt(f_corner^2 - z^2) :
-                                   (1 - i/q) * f_corner)
-              - r),
-    ) at_z(offset_fillet_poly2(points, o - r, fxy + r, 0,
-                               fxy - r, dr, m), z1 - z)] : [];
+        z = fillet_style == 2 ? cos(90*i/q) * zc1 :
+            fillet_style == 3 ? zc1 - ac * (i/q*f_corner)^2 :
+                                (1 - i/q) * zc1,
+        ze = max(0, z - zc1 + ze1),
+        zc = z,
+        re = fillet_style == 0 ? ze :
+             fillet_style == 1 ? ae * ze^2 :
+             fillet_style == 2 ? ze1 - sqrt(f_edge^2 - ze^2) :
+                                 ae * ze^2,
+        rc = (fillet_style == 0 ? zc :
+              fillet_style == 1 ? ac * zc^2 :
+              fillet_style == 2 ? zc1 - sqrt(f_corner^2 - zc^2) :
+                                  (1 - i/q) * f_corner),
+    ) at_z(offset_fillet_poly2(points, o - re, fxy + re, 0,
+                               fxy - re, rc - re, m), zc1 - z)] : [];
     top_fillet = [for (i = [q : -1 : 1]) each let (
-        z = fillet_style == 2 ? cos(90*i/q) * z1 :
-            fillet_style == 3 ? z1 - ac * (i/q*f_corner)^2:
-                                (1 - i/q) * z1,
-        _r = max(0, f_edge - (z1-z)),
-        r = fillet_style == 0 ? _r :
-            fillet_style == 1 ? ae * _r^2 :
-            fillet_style == 2 ? f_edge - sqrt(f_edge^2 - _r^2) :
-                                ae * _r^2,
-        dr = ((fillet_style == 0 ? z :
-               fillet_style == 1 ? ac * z^2 :
-               fillet_style == 2 ? z1-sqrt(f_corner^2 - z^2) :
-                                   (1 - i/q) * f_corner)
-              - r)
-    ) at_z(offset_fillet_poly2(points, o - r, fxy + r, 0,
-                              fxy - r, dr, m), h - z1 + z)];
+        z = fillet_style == 2 ? cos(90*i/q) * zc1 :
+            fillet_style == 3 ? zc1 - ac * (i/q*f_corner)^2:
+                                (1 - i/q) * zc1,
+        ze = max(0, z - zc1 + ze1),
+        zc = z,
+        re = fillet_style == 0 ? ze :
+             fillet_style == 1 ? ae * ze^2 :
+             fillet_style == 2 ? ze1 - sqrt(f_edge^2 - ze^2) :
+                                 ae * ze^2,
+        rc = (fillet_style == 0 ? zc :
+              fillet_style == 1 ? ac * zc^2 :
+              fillet_style == 2 ? zc1 - sqrt(f_corner^2 - zc^2) :
+                                  (1 - i/q) * f_corner)
+    ) at_z(offset_fillet_poly2(points, o - re, fxy + re, 0,
+                              fxy - re, rc - re, m), h - zc1 + z)];
     points = concat(bottom, bottom_fillet, top_fillet, top);
     bottom_face = [for (i = [p-1 : -1 : 0]) i];
     top_face = [for (i = [p * (1 + Q) : p * (2 + Q) - 1]) i];
