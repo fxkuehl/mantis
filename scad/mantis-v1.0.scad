@@ -20,13 +20,14 @@ show_foam = true;
 show_display = true;
 // Trackball sensor
 show_sensor = true;
-show_bearing = true;
 show_mezzanine = true;
 show_case = true;
 show_base = true;
 // Pre-render the case
 render_case = true;
 case_alpha = 1.0; // [0.1:0.1:1.0]
+// Show miscelaneous hardware (screws, bearings, gaskets)
+show_misc = true;
 show_desk = true;
 
 /* [Design dimensions in mm] */
@@ -1222,11 +1223,15 @@ module keyboard() {
     if (show_plate) {
         translate([0, 0, main_plate_z + 4*ex]) {
             main_plate();
-            main_gaskets();
+            if (show_misc) {
+                main_gaskets();
+            }
         }
         translate([0, 0, raised_plate_z + 9*ex]) {
             raised_plate();
-            raised_gaskets();
+            if (show_misc) {
+                raised_gaskets();
+            }
         }
         if (show_foam) {
             translate([0, 0, main_plate_z + 3*ex]) main_plate_foam();
@@ -1235,12 +1240,13 @@ module keyboard() {
     }
 
     if (show_sensor) {
-        translate(trackball_position + [0, 0, 3*ex]) rotate([60, 0, 0])
-            for (p = mounting_points_sensor)
-                translate([p.x, p.y,
-                           -trackball_radius - 9.05+1.65 - ex/3])
-                    flat_head_screw(bolt_length);
-
+        if (show_misc) {
+            translate(trackball_position + [0, 0, 3*ex]) rotate([60, 0, 0])
+                for (p = mounting_points_sensor)
+                    translate([p.x, p.y,
+                               -trackball_radius - 9.05+1.65 - ex/3])
+                        flat_head_screw(bolt_length);
+        }
         translate(trackball_position + [0, 0, 3*ex]) rotate([60, 0, 0])
             translate([0, 0, -trackball_radius]) sensor();
     }
@@ -1300,15 +1306,16 @@ module keyboard() {
         }
     }
 
-    if (show_bearing) translate([0, 0,  5.5*ex]) bearings(bearing_size, 0);
+    if (show_misc) translate([0, 0,  5.5*ex]) bearings(bearing_size, 0);
 
     if (show_mezzanine) {
-        for(p = mounting_points_raised)
-            translate([p.x, p.y, main_height - deck_thickness +
-                       mezzanine_thickness - base_thickness + hfit +
-                       4.5*ex])
-                countersunk_screw(bolt_length, 0);
-
+        if (show_misc) {
+            for(p = mounting_points_raised)
+                translate([p.x, p.y, main_height - deck_thickness +
+                           mezzanine_thickness - base_thickness + hfit +
+                           4.5*ex])
+                    countersunk_screw(bolt_length, 0);
+        }
         pivot = [0, mcu_top - post_diameter, main_height - deck_thickness];
         angle = [12 - abs($t-0.5)*24, 0, 0];
         translate([0, 0, 5*ex] + pivot) rotate(angle) translate(-pivot) {
@@ -1321,19 +1328,22 @@ module keyboard() {
     }
 
     if (show_base) {
-        for (p = mounting_points_main)
-            translate([p.x, p.y, hfit - 0.5*ex])
-                countersunk_screw(bolt_length, 0);
-
+        if (show_misc) {
+            for (p = mounting_points_main)
+                translate([p.x, p.y, hfit - 0.5*ex])
+                    countersunk_screw(bolt_length, 0);
+        }
         if (render_case)
             color(base_color, alpha=case_alpha) render(convexity=8)
                 base_plate();
         else
             color(alpha=case_alpha) base_plate();
 
-        for (p = bump_positions)
-            color("white", alpha=0.2)
-                translate([p.x, p.y, bump_recess - 0.5*ex]) bump();
+        if (show_misc) {
+            for (p = bump_positions)
+                color("white", alpha=0.2)
+                    translate([p.x, p.y, bump_recess - 0.5*ex]) bump();
+        }
     }
 
     if (show_case) {
