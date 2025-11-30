@@ -36,7 +36,7 @@ sizes="1920 1440 1152"
 
 images="mantis.png mantis_rear.png mantis_bare.png mantis_naked.png mantis_top.png mantis_bottom.png mantis_exploded.png"
 
-params="$params --colorscheme=$colors -D \$fs=0.5 -D \$fa=1 -D render_pcbs=true -D bottom_color=\"purple\" -D top_color=\"white\""
+params="$params --colorscheme=$colors -D \$fs=0.5 -D \$fa=1 -D render_pcbs=true -D bottom_color=\"purple\" -D top_color=\"white\" -D shadow_softness=6"
 
 trap 'echo "Killing background processes ..."; kill $jobs' INT
 

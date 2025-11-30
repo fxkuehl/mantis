@@ -29,6 +29,8 @@ case_alpha = 1.0; // [0.1:0.1:1.0]
 // Show miscelaneous hardware (screws, bearings, gaskets)
 show_misc = true;
 show_desk = true;
+shadow_softness = 0; // [0:6]
+shadow_spread = 0.1; // [0.05:0.05:0.5]
 
 /* [Design dimensions in mm] */
 // Whether to include a display
@@ -1356,34 +1358,42 @@ module keyboard() {
 module desk() color(desk_color) rotate([0, 0, $explode ? 0 : -5])
     translate([-300, $explode ? -175 : -100, -20])
     cube([600, 350, 20]);
+module shadow(sun) projection(cut=false)
+    multmatrix([[1, 0, sun.x/sun.z, 0],
+                [0, 1, sun.y/sun.z, 0],
+                [0, 0,           1, 0]])
+    keyboard($fs=2);
 
 if (show_desk) {
     elevation = max(0, $explode + bump_height - bump_recess);
     desk();
 
+    // Slanted shadow angled away from an imaginary sun
+    sun = [0.30, -0.50, 1 + $explode/10];
+    color("black", alpha=0.2/(shadow_softness+1))
+        linear_extrude(h=0.02, center=true) shadow(sun);
+    for (i = [1:shadow_softness]) {
+        a = i * 360/shadow_softness-30;
+        d = shadow_softness > 1 ? shadow_spread/2 : 0;
+        s = [sun.x + d*sin(a), sun.y + d*cos(a), sun.z];
+        color("black", alpha=0.2/(shadow_softness+1))
+            linear_extrude(h=0.02*(i+1), center=true) shadow(s);
+    }
+
     // Core shadow slightly smaller than the outline
     if (show_base || show_pcb || show_plate || show_mezzanine) {
-        o = show_base  ? elevation :
-            show_pcb   ? elevation + main_pcb_z :
-            show_plate ? elevation + main_plate_z :
-                         elevation + main_height-deck_thickness;
-        a = min(0.35/sqrt(o), 1);
+        o = (show_base  ? elevation :
+             show_pcb   ? elevation + main_pcb_z :
+             show_plate ? elevation + main_plate_z :
+                          elevation + main_height-deck_thickness)/2;
+        a = min(0.15/o, 0.5);
         color("black", alpha=a)
-            linear_extrude(h=0.02, center=true)
-            offset(r = 3*o) // expand to slightly below original size
-            offset(r = -6*o) // shrink
+            linear_extrude(h=0.02*(shadow_softness+2), center=true)
+            offset(r = 10 + 8*o - o*o) // expand to slightly below original size
+            offset(r = -10 - 10*o) // shrink
             offset(r = 2*o) // fuse small holes
             projection(cut=false) keyboard($fs=2);
     }
-
-    // Slanted shadow angled away from an imaginary sun
-    sun = [0.3, -0.5, 1 + $explode/10];
-    color("black", alpha=0.2)
-    linear_extrude(h=0.04, center=true) projection(cut=false)
-        multmatrix([[1, 0, sun.x/sun.z, 0],
-                    [0, 1, sun.y/sun.z, 0],
-                    [0, 0,           1, 0]])
-        keyboard($fs=2);
 }
 
 translate([0, 0, $explode + bump_height - bump_recess]) keyboard();
