@@ -207,7 +207,7 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
     top = at_z(offset_fillet_poly2(points, o-f_edge, fxy+f_edge, 0,
                                    fxy-f_edge, f_corner-f_edge, m), h);
 
-    bottom_fillet = round_bottom ? [for (i = [1 : q]) each let (
+    fillet = [for (i = [1 : q]) let (
         z = f_style == 2 ? cos(90*i/q) * zc1 :
             f_style == 6 ? (1 - sin(90*i/q)) * zc1 :
             f_style == 3 ? zc1 - ac * (i/q*f_corner)^2 :
@@ -227,29 +227,14 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
         re = invert ? f_edge - _re : _re,
         rc = invert ? f_corner - _rc : _rc
     ) at_z(offset_fillet_poly2(points, o - re, fxy + re, 0,
-                               fxy - re, rc - re, m), zc1 - z)] : [];
-    top_fillet = [for (i = [q : -1 : 1]) each let (
-        z = f_style == 2 ? cos(90*i/q) * zc1 :
-            f_style == 6 ? (1 - sin(90*i/q)) * zc1 :
-            f_style == 3 ? zc1 - ac * (i/q*f_corner)^2 :
-            f_style == 7 ? ac * ((1-i/q)*f_corner)^2 :
-                           (1 - i/q) * zc1,
-        _ze = max(0, z - zc1 + ze1),
-        ze = invert ? ze1 - _ze : _ze,
-        zc = invert ? zc1 - z : z,
-        _re = fillet_style == 0 ? ze :
-              fillet_style == 1 ? ae * ze^2 :
-              fillet_style == 2 ? ze1 - sqrt(f_edge^2 - ze^2) :
-                                  f_edge - sqrt((ze1 - ze)/ae),
-        _rc = fillet_style == 0 ? zc :
-              fillet_style == 1 ? ac * zc^2 :
-              fillet_style == 2 ? zc1 - sqrt(f_corner^2 - zc^2) :
-                                  f_corner - sqrt((zc1 - zc)/ac),
-        re = invert ? f_edge - _re : _re,
-        rc = invert ? f_corner - _rc : _rc
-    ) at_z(offset_fillet_poly2(points, o - re, fxy + re, 0,
-                              fxy - re, rc - re, m), h - zc1 + z)];
+                               fxy - re, rc - re, m), z)];
+
+    bottom_fillet = round_bottom ? [for (i = [0 : q-1])
+        for(p = fillet[i]) [p.x, p.y, zc1 - p.z]] : [];
+    top_fillet = [for (i = [q-1 : -1  : 0])
+        for(p = fillet[i]) [p.x, p.y, h - zc1 + p.z]];
     points = concat(bottom, bottom_fillet, top_fillet, top);
+
     bottom_face = [for (i = [p-1 : -1 : 0]) i];
     top_face = [for (i = [p * (1 + Q) : p * (2 + Q) - 1]) i];
     side_faces = [for (i = [0 : Q]) each
