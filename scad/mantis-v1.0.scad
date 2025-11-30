@@ -594,15 +594,13 @@ module case_outside() {
                 cube([2*hx+dx, hy, raised_height + 2*r_corner_main + 2*vfit]);
         }
 
-        if (has_display) {
-            r = 2*display_bump_height/tan(60);
+        if (has_display)
             translate([0, 0, main_height+raised_height-r_corner_raised-vfit])
                 fillet_polyhedron(display_bump_points,
                                   display_bump_height+r_corner_raised+vfit,
                                   -s_key/2, f_key+s_key/2,
-                                  r/2, r, 3,
+                                  0.75, display_bump_height, 3,
                                   false);
-        }
     }
 }
 //translate([0, 0, 50]) case_outside();

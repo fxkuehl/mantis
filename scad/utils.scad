@@ -184,18 +184,10 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
     n = len(points);                    // # corners
     m = round(3.1416 / 3 * fxy / $fs);  // points per corner
     p = n * (m + 1);                    // points per polygon
-    ac = fillet_style == 1 ? tan(60)^2 / (4*f_corner) :
-         fillet_style == 3 ? tan(60)   / (2*f_corner) : 0;
-                                        // parabolic coefficient for corners
-    ae = fillet_style == 1 ? tan(60)^2 / (4*f_edge) :
-         fillet_style == 3 ? tan(60)   / (2*f_edge) : 0;
-                                        // parabolic coefficient for edges
-    zc1 = fillet_style == 1 ? sqrt(f_corner/ac) :
-          fillet_style == 3 ? ac * f_corner^2 : f_corner;
-                                        // z-height of corner fillets
-    ze1 = fillet_style == 1 ? sqrt(f_edge/ae) :
-          fillet_style == 3 ? ae * f_edge^2 : f_edge;
-                                        // z-height of edge fillets
+    ac = 1 / f_corner;                  // parabolic coefficient for corners
+    ae = 1 / f_edge;                    // parabolic coefficient for edges
+    zc1 = f_corner;                     // z-height of corner fillets
+    ze1 = f_edge;                       // z-height of edge fillets
     q = round(zc1 * 1.5708 / $fs);      // # corner fillet layers one side
     Q = round_bottom ? 2*q : q;         // # corner fillet layers top+bottom
     //echo(ac, zc1, q);
