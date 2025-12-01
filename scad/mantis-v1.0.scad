@@ -933,10 +933,14 @@ module niceview_cutout() union() {
     translate([0, 13.7, 0.5]) rotate([0, 90, 0])
         linear_extrude(height=10.5, center=true)
         offset(r=0.75) square([0.5, 8], center=true);
+
     // Opening for visible area with 0.5mm margin and 1mm fillet
-    translate([0, -0.75, 1.9+5])
-        linear_extrude(height=10.01, center=true) offset(r=1)
-            square([10.8-1, 25.3-1], center=true);
+    wh = main_height + raised_height + display_bump_height -
+         (display_position.z + 1.9);
+    points = [[-10.8/2,  25.3/2], [ 10.8/2,  25.3/2],
+              [ 10.8/2, -25.3/2], [-10.8/2, -25.3/2]];
+    translate([0, -0.75, wh+1+1.9]) rotate([180, 0, 0])
+        fillet_polyhedron(points, wh+1, wh, wh+1, wh, wh, 5, false);
     //cube([10.8, 25.3, 10.01], center=true);
 
     h = display_position.z - // latch height
