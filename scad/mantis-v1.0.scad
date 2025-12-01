@@ -33,6 +33,8 @@ shadow_softness = 0; // [0:6]
 shadow_spread = 0.1; // [0.05:0.05:0.5]
 
 /* [Design dimensions in mm] */
+// Skirts around raised keys
+has_skirts = true;
 // Whether to include a display
 has_display = true;
 display_bump_height = 2; // [0:0.5:5]
@@ -359,46 +361,56 @@ display_bump_points = [
 //translate([0, 0, 30]) polygon(display_bump_points);
 
 module main_key_slots(h) {
+    z = 7;
     o = s_key/2 - 0.01;
+    fxy = s_key/2+f_key-0.01;
+    fe = wall_thickness_raised + s_key/2;
+    fc = fe+0.5;
 
-    module left() translate([-dx/2, 0]) union() {
-        for(i = [-4.5 : 1: -1.5])
-            translate([i*hx, 3*hy]) offset(delta = o) hex_outline();
-        for(i = [-5.0 : 1: -2.0])
-            translate([i*hx, 2*hy]) offset(delta = o) hex_outline();
-        for(i = [-4.5 : 1: -2.5])
-            translate([i*hx,   hy]) offset(delta = o) hex_outline();
-        translate([-3*hx,          0]) offset(delta = o) hex_outline();
-        translate([  -hx, -2*hy - dy]) offset(delta = o) hex_outline();
+    points1 = [
+        [ 2*hx/2 + dx/2, 10*hy/3], [ 3*hx/2 + dx/2, 11*hy/3],
+        [ 4*hx/2 + dx/2, 10*hy/3], [ 5*hx/2 + dx/2, 11*hy/3],
+        [ 6*hx/2 + dx/2, 10*hy/3], [ 7*hx/2 + dx/2, 11*hy/3],
+        [ 8*hx/2 + dx/2, 10*hy/3], [ 9*hx/2 + dx/2, 11*hy/3],
+        [10*hx/2 + dx/2, 10*hy/3], [10*hx/2 + dx/2,  8*hy/3],
+        [11*hx/2 + dx/2,  7*hy/3], [11*hx/2 + dx/2,  5*hy/3],
+        [10*hx/2 + dx/2,  4*hy/3], [10*hx/2 + dx/2,  2*hy/3],
+        [ 9*hx/2 + dx/2,  1*hy/3], [ 8*hx/2 + dx/2,  2*hy/3],
+        [ 7*hx/2 + dx/2,  1*hy/3], [ 7*hx/2 + dx/2, -1*hy/3],
+        [ 6*hx/2 + dx/2, -2*hy/3], [ 5*hx/2 + dx/2, -1*hy/3],
+        [ 5*hx/2 + dx/2,  1*hy/3], [ 4*hx/2 + dx/2,  2*hy/3],
+        [ 4*hx/2 + dx/2,  4*hy/3], [ 3*hx/2 + dx/2,  5*hy/3],
+        [ 3*hx/2 + dx/2,  7*hy/3], [ 2*hx/2 + dx/2,  8*hy/3]
+    ];
+    points2 = [
+        [ 1*hx/2 + dx/2, -5*hy/3 - dy], [ 2*hx/2 + dx/2, -4*hy/3 - dy],
+        [ 3*hx/2 + dx/2, -5*hy/3 - dy], [ 3*hx/2 + dx/2, -7*hy/3 - dy],
+        [ 2*hx/2 + dx/2, -8*hy/3 - dy], [ 1*hx/2 + dx/2, -7*hy/3 - dy]
+    ];
+    module right() {
+        fillet_polyhedron(points1, h+z, o, fxy, fe, fc, 7, false);
+        fillet_polyhedron(points2, h+z, o, fxy, fe, fc, 7, false);
     }
-
-    linear_extrude(h, convexity=10) {
-        f = f_key + s_key;
-        offset(r =    f, $fa = fa_from_fs(f))
-        offset(r = -2*f, $fa = fa_from_fs(f)) offset(delta = f) {
-            left();
-            scale([-1, 1]) left();
-        }
-    }
+    right();
+    scale([-1, 1]) right();
 }
 module raised_key_slots(h) {
     o = s_key/2 - 0.01;
-    skirts = false;
 
     module left_fingers() translate([-dx/2, 0]) union() {
-        if (!skirts)
+        if (!has_skirts)
             translate([-1.5*hx, 3*hy]) offset(delta = o) hex_outline();
-        for(i = [(skirts ? -1.0 : -2.0) : 1: -1.0])
+        for(i = [(has_skirts ? -1.0 : -2.0) : 1: -1.0])
             translate([i*hx, 2*hy]) offset(delta = o) hex_outline();
-        for(i = [(skirts ? -1.5 : -2.5) : 1: -0.5])
+        for(i = [(has_skirts ? -1.5 : -2.5) : 1: -0.5])
             translate([i*hx,   hy]) offset(delta = o) hex_outline();
-        for(i = [(skirts ? -2.0 : -3.0) : 1: -1.0])
+        for(i = [(has_skirts ? -2.0 : -3.0) : 1: -1.0])
             translate([i*hx,    0]) offset(delta = o) hex_outline();
     }
     module left_thumb() translate([-dx/2, -dy]) union() {
         for(i = [-2.5 : 1: -1.5])
             translate([i*hx,  -hy]) offset(delta = o) hex_outline();
-        if (!skirts)
+        if (!has_skirts)
             translate([  -hx, -2*hy]) offset(delta = o) hex_outline();
     }
 
@@ -735,10 +747,10 @@ module case() union() {
         render(convexity=10) union() {
             base_plate_base(hfit, vfit);
             case_inside(0, 0);
-            translate([0, 0, main_height - deck_thickness - vfit - 0.01])
-                main_key_slots(deck_thickness + vfit + 0.02);
-            translate([0, 0, main_height - deck_thickness - vfit - 0.01])
-                raised_key_slots(raised_height + deck_thickness + vfit + 0.02);
+            translate([0, 0, main_height - deck_thickness - 0.01])
+                main_key_slots(deck_thickness + 0.02);
+            translate([0, 0, main_height - deck_thickness - 0.01])
+                raised_key_slots(raised_height + deck_thickness + 0.02);
 
             /* Position of the bottom right thumb key. The edge of that key
              * marks the plane that cuts the sphere of the trackball. Rotate
