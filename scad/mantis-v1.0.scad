@@ -1306,10 +1306,10 @@ module keyboard() {
         }
     }
 
-    if (show_misc) translate([0, 0,  5.5*ex]) bearings(bearing_size, 0);
-
     if (show_mezzanine) {
         if (show_misc) {
+            if (show_misc) translate([0, 0,  5.5*ex]) bearings(bearing_size, 0);
+
             for(p = mounting_points_raised)
                 translate([p.x, p.y, main_height - deck_thickness +
                            mezzanine_thickness - base_thickness + hfit +
