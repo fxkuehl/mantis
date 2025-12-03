@@ -1390,13 +1390,13 @@ if (show_desk) {
     // Slanted shadow angled away from an imaginary sun
     sun = [0.30, -0.50, 1 + $explode/10];
     color("black", alpha=0.2/(shadow_softness+1))
-        linear_extrude(h=0.02, center=true) shadow(sun);
-    for (i = [1:shadow_softness]) {
+        linear_extrude(height=0.02, center=true) shadow(sun);
+    if (shadow_softness > 0) for (i = [1:shadow_softness]) {
         a = i * 360/shadow_softness-30;
         d = shadow_softness > 1 ? shadow_spread/2 : 0;
         s = [sun.x + d*sin(a), sun.y + d*cos(a), sun.z];
         color("black", alpha=0.2/(shadow_softness+1))
-            linear_extrude(h=0.02*(i+1), center=true) shadow(s);
+            linear_extrude(height=0.02*(i+1), center=true) shadow(s);
     }
 
     // Core shadow slightly smaller than the outline
@@ -1407,7 +1407,7 @@ if (show_desk) {
                           elevation + main_height-deck_thickness)/2;
         a = min(0.15/o, 0.5);
         color("black", alpha=a)
-            linear_extrude(h=0.02*(shadow_softness+2), center=true)
+            linear_extrude(height=0.02*(shadow_softness+2), center=true)
             offset(r = 10 + 8*o - o*o) // expand to slightly below original size
             offset(r = -10 - 10*o) // shrink
             offset(r = 2*o) // fuse small holes
