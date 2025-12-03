@@ -88,39 +88,6 @@ function fa_from_fs(radius) = 360 / max(3, ceil(6.2832 * radius / $fs));
 
 function wrap(vec, i) = let (n = len(vec)) vec[(i + n) % n];
 
-/* Create a point list of an offset, filleted polygon
- *
- * point_list - Template polygon, ordered counter-clockwise
- * offset - How much to grow or shrink the polygon
- * fi - inside fillet radius (for concave corners)
- * fo - outside fillet radius (for convex corners)
- * corner_points - Number of points in each fillet
- *
- * All fillets have the same number of points. This allows easy construction
- * of polyhedron faces when stacking many polygons with varying fillet radii.
- *
- * Limitations:
- * - corner angles must be > 0°
- * - Doesn't support  merging of neighboring fillet arcs if the vertices
- *   are too close together
- */
-function offset_fillet_poly(points, offset, fi, fo, corner_points) = let (
-    n = len(points),
-    corners = [for (i = [0:n-1]) let (
-        p0 = points[i],
-        d1 = wrap(points, i-1) - p0, d2 = wrap(points, i+1) - p0,
-        u1 = d1 / norm(d1), u2 = d2 / norm(d2),
-        v0 = -u1 - u2, u0 = v0 / norm(v0), w0 = [u0.y, -u0.x],
-        r1 = [-u1.y, u1.x], s = r1 * u2 < 0 ? -1 : 1,
-        beta = acos(u1 * u2) / 2, gamma = 90 - beta,
-        c = s * offset / sin(beta),
-        f = s < 0 ? fi : fo
-    )  [p0 + u0 * (c - f/cos(gamma)), u0, w0, f, s*gamma]]
-) /*echo(corners)*/ [for (c = corners) each let (
-        pc = c[0], u0 = c[1], w0 = c[2], f = c[3], gamma = c[4]
-    ) [for (t = [-gamma : 2*gamma/corner_points : gamma])
-        pc + f*u0 * cos(t) + f*w0 * sin(t)]];
-
 /* Create a point list of an offset, filleted polygon v2
  *
  * point_list - Template polygon, ordered counter-clockwise
@@ -144,7 +111,7 @@ function offset_fillet_poly(points, offset, fi, fo, corner_points) = let (
  * - Doesn't support  merging of neighboring fillet arcs if the vertices
  *   are too close together
  */
-function offset_fillet_poly2(points, offset, fi, di, fo, do, corner_points)
+function offset_fillet_poly(points, offset, fi, di, fo, do, corner_points)
 = let (
     n = len(points),
     corners = [for (i = [0:n-1]) let (
@@ -194,13 +161,13 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
     //echo(ac, zc1, q);
 
     bottom = at_z(round_bottom ?
-        offset_fillet_poly2(points, o-f_edge, fxy+f_edge, 0,
+        offset_fillet_poly(points, o-f_edge, fxy+f_edge, 0,
                             fxy-f_edge, f_corner-f_edge, m) :
-        offset_fillet_poly(points, o, fxy, fxy, m), 0);
+        offset_fillet_poly(points, o, fxy, 0, fxy, 0, m), 0);
     top = at_z(round_top ?
-        offset_fillet_poly2(points, o-f_edge, fxy+f_edge, 0,
+        offset_fillet_poly(points, o-f_edge, fxy+f_edge, 0,
                             fxy-f_edge, f_corner-f_edge, m) :
-        offset_fillet_poly(points, o, fxy, fxy, m), h);
+        offset_fillet_poly(points, o, fxy, 0, fxy, 0, m), h);
 
     fillet = [for (i = [1 : q]) let (
         z = f_style == 2 ? cos(90*i/q) * zc1 :
@@ -221,7 +188,7 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
                                   f_corner - sqrt((zc1 - zc)/ac),
         re = invert ? f_edge - _re : _re,
         rc = invert ? f_corner - _rc : _rc
-    ) at_z(offset_fillet_poly2(points, o - re, fxy + re, 0,
+    ) at_z(offset_fillet_poly(points, o - re, fxy + re, 0,
                                fxy - re, rc - re, m), z)];
 
     bottom_fillet = round_bottom ? [for (i = [0 : q-1])
