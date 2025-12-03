@@ -176,7 +176,7 @@ function at_z(points, z) = [for (p = points) [p.x, p.y, z]];
 // f_style: edge/corner fillet style (0: chamfer, 1: root, 2: circle, 3: parabola)
 // round_bottom: true if bottom side is fillet, false if bottom is flat
 module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
-                         f_style, round_bottom=true) {
+                         f_style, round_bottom=true, round_top=true) {
     assert(f_edge <= f_corner);
     fillet_style = f_style % 4;
     invert = (f_style >= 4);
@@ -189,15 +189,18 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
     zc1 = f_corner;                     // z-height of corner fillets
     ze1 = f_edge;                       // z-height of edge fillets
     q = round(zc1 * 1.5708 / $fs);      // # corner fillet layers one side
-    Q = round_bottom ? 2*q : q;         // # corner fillet layers top+bottom
+    Q = (round_bottom ? q : 0) + (round_top ? q : 0);
+                                        // # corner fillet layers top+bottom
     //echo(ac, zc1, q);
 
     bottom = at_z(round_bottom ?
         offset_fillet_poly2(points, o-f_edge, fxy+f_edge, 0,
-                           fxy-f_edge, f_corner-f_edge, m) :
+                            fxy-f_edge, f_corner-f_edge, m) :
         offset_fillet_poly(points, o, fxy, fxy, m), 0);
-    top = at_z(offset_fillet_poly2(points, o-f_edge, fxy+f_edge, 0,
-                                   fxy-f_edge, f_corner-f_edge, m), h);
+    top = at_z(round_top ?
+        offset_fillet_poly2(points, o-f_edge, fxy+f_edge, 0,
+                            fxy-f_edge, f_corner-f_edge, m) :
+        offset_fillet_poly(points, o, fxy, fxy, m), h);
 
     fillet = [for (i = [1 : q]) let (
         z = f_style == 2 ? cos(90*i/q) * zc1 :
@@ -223,8 +226,8 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
 
     bottom_fillet = round_bottom ? [for (i = [0 : q-1])
         for(p = fillet[i]) [p.x, p.y, zc1 - p.z]] : [];
-    top_fillet = [for (i = [q-1 : -1  : 0])
-        for(p = fillet[i]) [p.x, p.y, h - zc1 + p.z]];
+    top_fillet = round_top ? [for (i = [q-1 : -1  : 0])
+        for(p = fillet[i]) [p.x, p.y, h - zc1 + p.z]] : [];
     points = concat(bottom, bottom_fillet, top_fillet, top);
 
     bottom_face = [for (i = [p-1 : -1 : 0]) i];

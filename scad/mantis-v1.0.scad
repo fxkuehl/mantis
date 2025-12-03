@@ -360,8 +360,9 @@ display_bump_points = [
 ];
 //translate([0, 0, 30]) polygon(display_bump_points);
 
-module main_key_slots(h) {
+module main_key_slots(height) {
     z = 7;
+    h = has_skirts ? height+z : height;
     o = s_key/2 - 0.01;
     fxy = s_key/2+f_key-0.01;
     fe = wall_thickness_raised + s_key/2;
@@ -388,12 +389,14 @@ module main_key_slots(h) {
         [ 2*hx/2 + dx/2, -8*hy/3 - dy], [ 1*hx/2 + dx/2, -7*hy/3 - dy]
     ];
     module right() {
-        fillet_polyhedron(points1, h+z, o, fxy, fe, fc, 7, false);
-        fillet_polyhedron(points2, h+z, o, fxy, fe, fc, 7, false);
+        fillet_polyhedron(points1, h, o, fxy, fe, fc, 7, false, has_skirts);
+        fillet_polyhedron(points2, h, o, fxy, fe, fc, 7, false, has_skirts);
     }
     right();
     scale([-1, 1]) right();
 }
+//translate([0, 0, main_height - deck_thickness]) main_key_slots(5);
+
 module raised_key_slots(h) {
     o = s_key/2 - 0.01;
 
