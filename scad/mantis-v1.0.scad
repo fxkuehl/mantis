@@ -599,12 +599,17 @@ module case_main()
                       r_edge_main, r_corner_main, fillet_style);
 module case_outside() {
     union() {
+        // work around CGAL quirks: make the raised part slightly smaller
+        // than the main part, otherwise CGAL throws various errors or
+        // assertion failures, sometimes with different ones depending on
+        // arbitrary changes of parameters.
+        x = 0.0001;
         case_main();
         translate([0, 0, main_height - 2*r_corner_main]) difference() {
             fillet_polyhedron(raised_outline_points,
                               raised_height + 2*r_corner_main,
-                              s_pcb + wall_thickness_raised,
-                              f_key + s_key + wall_thickness_raised,
+                              s_pcb + wall_thickness_raised-x,
+                              f_key + s_key + wall_thickness_raised-x,
                               r_edge_raised, r_corner_raised, fillet_style,
                     round_bottom=(wall_thickness_main < wall_thickness_raised));
             translate([hx+dx/2, -5*hy/3 - dy, -vfit]) rotate([0, 0, 180])
@@ -1381,7 +1386,7 @@ module shadow(sun) projection(cut=false)
     multmatrix([[1, 0, sun.x/sun.z, 0],
                 [0, 1, sun.y/sun.z, 0],
                 [0, 0,           1, 0]])
-    keyboard($fs=2);
+    render(convexity=10) keyboard($fs=2);
 
 if (show_desk) {
     elevation = max(0, $explode + bump_height - bump_recess);

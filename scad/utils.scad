@@ -233,8 +233,11 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
     bottom_face = [for (i = [p-1 : -1 : 0]) i];
     top_face = [for (i = [p * (1 + Q) : p * (2 + Q) - 1]) i];
     side_faces = [for (i = [0 : Q]) each
-        [for (j = [0 : p-1])
-            [i*p + j, i*p + (j+1)%p, (i+1)*p + (j+1)%p, (i+1)*p + j]]];
+        [for (j = [0 : p-1]) each
+            [[i*p + j, i*p + (j+1)%p, (i+1)*p + (j+1)%p],
+             [i*p + j, (i+1)*p + (j+1)%p, (i+1)*p + j]]
+        ]
+    ];
     faces = concat([bottom_face, top_face], side_faces);
     polyhedron(points, faces, convexity=10);
 }
