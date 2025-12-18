@@ -366,7 +366,7 @@ module main_key_slots(height) {
     o = s_key/2 - 0.01;
     fxy = s_key/2+f_key-0.01;
     fe = wall_thickness_raised + s_key/2;
-    fc = fe+0.5;
+    fc = fe+0.85;
 
     points1 = [
         [ 2*hx/2 + dx/2, 10*hy/3], [ 3*hx/2 + dx/2, 11*hy/3],

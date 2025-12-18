@@ -106,14 +106,21 @@ function wrap(vec, i) = let (n = len(vec)) vec[(i + n) % n];
  * di and do offset the fillet radius to move the apex of the fillet in or
  * out by the specified amount.
  *
+ * Supports truncation or merging of adjacent fillets in case they intersect.
+ * The strategy depends on whether the direction of adjacent corners is the
+ * same or different. Same direction truncates the fillets at their
+ * intersection point (TODO: support adjacent fillets of different radius).
+ * Different direction truncates the fillets to create a common tangent
+ * (already supports different radii). This does not change the number of
+ * points. Instead the position along the arc is compressed gradually.
+ *
  * Limitations:
- * - corner angles must be > 0°
- * - Doesn't support  merging of neighboring fillet arcs if the vertices
- *   are too close together
+ * - corner angles must be != 0°
  */
 function offset_fillet_poly(points, offset, fi, di, fo, do, corner_points)
 = let (
     n = len(points),
+    // Calculate center, coordinate vectors, radius, angle per corner
     corners = [for (i = [0:n-1]) let (
         p0 = points[i],
         d1 = wrap(points, i-1) - p0, d2 = wrap(points, i+1) - p0,
@@ -124,11 +131,48 @@ function offset_fillet_poly(points, offset, fi, di, fo, do, corner_points)
         c = s * offset / sin(beta),
         df = 1 / (1 / sin(beta) - 1),
         f = s < 0 ? fi + di*df : fo + do*df
-    )  [p0 + u0 * (c - f/cos(gamma)), u0, w0, f, s*gamma]]
-) /*echo(corners)*/ [for (c = corners) each let (
-        pc = c[0], u0 = c[1], w0 = c[2], f = c[3], gamma = c[4]
-    ) [for (t = [-gamma : 2*gamma/corner_points : gamma])
-        pc + f*u0 * cos(t) + f*w0 * sin(t)]];
+    )  [p0 + u0 * (c - f/cos(gamma)), u0, w0, f, s*gamma,
+        norm(d1)]],
+    // Check for truncated fillets
+    t_corners = [for (j = [0:n-1]) let (
+        i = (j-1+n) % n,
+        k = (j+1) % n,
+        s = sign(corners[j][4]),
+        s1 = sign(corners[i][4]), s2 = sign(corners[k][4]),
+        r0 = corners[j][3]-s*offset,
+        r1 = corners[i][3]-s1*offset, r2 = corners[k][3]-s2*offset,
+        a = r1*tan(abs(corners[i][4])), // f_i*tan(gamma_i)
+        b = r0*tan(abs(corners[j][4])), // f_j*tan(gamma_j)
+        c = r2*tan(abs(corners[k][4])), // f_k*tan(gamma_k)
+        d1 = corners[j][5], d2 = corners[k][5],
+        min1 = a+b, // min distance between prev and cur point
+        min2 = b+c, // min distance between cur and next point
+        x1 = min1 - d1, x2 = min2 - d2, // overlap (if positive)
+        gamma1 = corners[j][4] - (x1 <= 0 ? 0 : // Don't truncate
+            corners[j][4] * corners[i][4] > 0 ?
+            s*asin(x1 / (2 * r0)) :        // Same side
+            2.0*s*atan(x1 / (r0 + r1))),   // Opposite side
+        gamma2 = corners[j][4] - (x2 <= 0 ? 0 : // Don't truncate
+            corners[j][4] * corners[k][4] > 0 ?
+            s*asin(x2 / (2 * r0)) :        // Same side
+            2.0*s*atan(x2 / (r0 + r2)))    // Opposite side
+    )  [corners[j][0], corners[j][1], corners[j][2], corners[j][3],
+        corners[j][4], gamma1, gamma2]]
+) [for (c = t_corners) each let (
+        pc = c[0], u0 = c[1], w0 = c[2], f = c[3], gamma = c[4],
+        gamma1 = c[5], gamma2 = c[6],
+        // f(x) = a*x^2 + b*x + c   ,   f'(x) = 2ax + b
+        // f(0) = 0  <==> c = 0
+        // f'(0) = 1 <==> b = 1
+        // f(-/+gamma) = -/+gammaX <==>
+        //    a*l^2 + l = c <==> a = (gammaX - gamma) / l^2
+        a1 = gamma > 0 ? (gamma - gamma1) / gamma^2 :
+                         (gamma2 - gamma) / gamma^2,
+        a2 = gamma > 0 ? (gamma2 - gamma) / gamma^2 :
+                         (gamma - gamma1) / gamma^2
+    )  [for (t = [-gamma : 2*gamma/corner_points : gamma]) let (
+            ct = t < 0 ? a1 * t^2 + t : a2 * t^2 + t
+        ) pc + f*u0 * cos(ct) + f*w0 * sin(ct)]];
 
 // Helper to add a z-coordinate to 2D points
 function at_z(points, z) = [for (p = points) [p.x, p.y, z]];
@@ -276,11 +320,9 @@ color("white", alpha=0.5) corr_sphere(2.5/2, $fs=0.1);
 
 translate([0, 0, -1.5]) color("red") half_sphere(2.5/2, $fa=360/20);
 */
-
 /*
 poly = [[-10, 0], [0, 5], [10, 0], [10, -10], [0, -5], [-10, -10]];
-x = offset_fillet_poly(poly, 1, 2, 2, 5);
-
+x = offset_fillet_poly(poly, 1, 6, 0, 6, 0, 20);
 color("grey") polygon(poly);
 color("red") translate([0, 0, -1.1]) polygon(x);
 color("red") translate([0, -12.5, -1.1]) polygon(x);
