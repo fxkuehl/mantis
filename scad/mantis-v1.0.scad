@@ -876,7 +876,7 @@ module female_header(height, pin_l, n) {
     pin_w = 0.4;
     w = 2.5;
     pad = 0.25;
-    color("#303030") difference() {
+    color("#303030") render(convexity=10) difference() {
         translate([-w/2, -pitch/2 - pad, 0])
             cube([w, pitch*n + 2*pad, height]);
         for (i = [0:n-1])
@@ -890,7 +890,7 @@ module male_header(height, pin_l1, pin_l2, n) {
     pitch = 2.54;
     pin_w = 0.64;
     w = 2.5;
-    color("#303030") difference() {
+    color("#303030") render(convexity=10) difference() {
         translate([-w/2, -pitch/2, 0]) cube([w, pitch*n, height]);
         for (i = [0:n]) {
             translate([-w, (i-0.5)*pitch, 0])
@@ -906,8 +906,8 @@ module male_header(height, pin_l1, pin_l2, n) {
             cube([pin_w, pin_w, pin_l1 + height + pin_l2]);
 }
 module usb_port(depth) union() {
-    difference() {
-        color("lightgrey") usb_port_template(1.255, 10.5);
+    color("lightgrey") render(convexity=10) difference() {
+        usb_port_template(1.255, 10.5);
         translate([0, 0.1, 0]) usb_port_template(1.155, 10.5);
     }
     color("#303030") translate([0, 0.05, 0]) usb_port_template(0, 10.4);
