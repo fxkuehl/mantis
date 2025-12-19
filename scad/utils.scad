@@ -181,19 +181,20 @@ function at_z(points, z) = [for (p = points) [p.x, p.y, z]];
 // points: points of a polygon describing the outline in x-y plane
 // h: height
 // o: offset in x-y plane
-// fxy: fillet in x-y plane of the bulk
+// fi: inside fillet in x-y plane of the bulk
+// fo: outside fillet in x-y plane of the bulk
 // f_edge: fillet of the top/bottom edge
 // f_corner: fillet of the corners
 // f_style: edge/corner fillet style (0: chamfer, 1: root, 2: circle, 3: parabola)
 // round_bottom: true if bottom side is fillet, false if bottom is flat
-module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
+module fillet_polyhedron(points, h, o, fi, fo, f_edge, f_corner,
                          f_style, round_bottom=true, round_top=true) {
     assert(f_edge <= f_corner);
     fillet_style = f_style % 4;
     invert = (f_style >= 4);
 
     n = len(points);                    // # corners
-    m = round(3.1416 / 3 * fxy / $fs);  // points per corner
+    m = round(3.1416 / 3 * fo / $fs);  // points per corner
     p = n * (m + 1);                    // points per polygon
     ac = 1 / f_corner;                  // parabolic coefficient for corners
     ae = 1 / f_edge;                    // parabolic coefficient for edges
@@ -205,13 +206,13 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
     //echo(ac, zc1, q);
 
     bottom = at_z(round_bottom ?
-        offset_fillet_poly(points, o-f_edge, fxy+f_edge, 0,
-                            fxy-f_edge, f_corner-f_edge, m) :
-        offset_fillet_poly(points, o, fxy, 0, fxy, 0, m), 0);
+        offset_fillet_poly(points, o-f_edge, fi+f_edge, 0,
+                            fo-f_edge, f_corner-f_edge, m) :
+        offset_fillet_poly(points, o, fi, 0, fo, 0, m), 0);
     top = at_z(round_top ?
-        offset_fillet_poly(points, o-f_edge, fxy+f_edge, 0,
-                            fxy-f_edge, f_corner-f_edge, m) :
-        offset_fillet_poly(points, o, fxy, 0, fxy, 0, m), h);
+        offset_fillet_poly(points, o-f_edge, fi+f_edge, 0,
+                            fo-f_edge, f_corner-f_edge, m) :
+        offset_fillet_poly(points, o, fi, 0, fo, 0, m), h);
 
     fillet = [for (i = [1 : q]) let (
         z = f_style == 2 ? cos(90*i/q) * zc1 :
@@ -232,8 +233,8 @@ module fillet_polyhedron(points, h, o, fxy, f_edge, f_corner,
                                   f_corner - sqrt((zc1 - zc)/ac),
         re = invert ? f_edge - _re : _re,
         rc = invert ? f_corner - _rc : _rc
-    ) at_z(offset_fillet_poly(points, o - re, fxy + re, 0,
-                               fxy - re, rc - re, m), z)];
+    ) at_z(offset_fillet_poly(points, o - re, fi + re, 0,
+                               fo - re, rc - re, m), z)];
 
     bottom_fillet = round_bottom ? [for (i = [0 : q-1])
         for(p = fillet[i]) [p.x, p.y, zc1 - p.z]] : [];

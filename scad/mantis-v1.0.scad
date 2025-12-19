@@ -360,13 +360,19 @@ display_bump_points = [
 ];
 //translate([0, 0, 30]) polygon(display_bump_points);
 
-module main_key_slots(height) {
+module main_key_slots(height, skirt=false) {
     z = 7;
-    h = has_skirts ? height+z : height;
     o = s_key/2 - 0.01;
-    fxy = s_key/2+f_key-0.01;
+    fi = s_key/2+f_key - 0.01;
     fe = wall_thickness_raised + s_key/2;
-    fc = fe+0.85;
+    fo = fi + fe;
+    // Use corner fillet to increase outside radius at the top to match
+    // inside fillet radius of the top deck's edge. Calculate the difference
+    // how much the radius needs to move inward.
+    x1 = (o + fo)*(1/cos(30) - 1);
+    x2 = (o + fi)*(1/cos(30) - 1);
+    fc = fe + x1-x2;
+    h = has_skirts && skirt ? height+z-fc : height;
 
     points1 = [
         [ 2*hx/2 + dx/2, 10*hy/3], [ 3*hx/2 + dx/2, 11*hy/3],
@@ -389,13 +395,17 @@ module main_key_slots(height) {
         [ 2*hx/2 + dx/2, -8*hy/3 - dy], [ 1*hx/2 + dx/2, -7*hy/3 - dy]
     ];
     module right() {
-        fillet_polyhedron(points1, h, o, fxy, fe, fc, 7, false, has_skirts);
-        fillet_polyhedron(points2, h, o, fxy, fe, fc, 7, false, has_skirts);
+        fillet_polyhedron(points1, h, o, fi, fi, fe, fc, 7, false, false);
+        fillet_polyhedron(points2, h, o, fi, fi, fe, fc, 7, false, false);
+        if (has_skirts && skirt) translate([0, 0, h-0.01]) {
+            fillet_polyhedron(points1, fc+0.01, o, fi, fo, fe, fc, 7, false, true);
+            fillet_polyhedron(points2, fc+0.01, o, fi, fo, fe, fc, 7, false, true);
+        }
     }
     right();
     scale([-1, 1]) right();
 }
-//translate([0, 0, main_height - deck_thickness]) main_key_slots(5);
+//translate([0, 0, main_height - deck_thickness]) main_key_slots(deck_thickness, true);
 
 module raised_key_slots(h) {
     o = s_key/2 - 0.01;
@@ -596,6 +606,7 @@ module case_main()
     fillet_polyhedron(main_outline_points, main_height,
                       s_pcb + wall_thickness_main,
                       f_key + s_key + wall_thickness_main,
+                      f_key + s_key + wall_thickness_main,
                       r_edge_main, r_corner_main, fillet_style);
 module case_outside() {
     union() {
@@ -610,6 +621,7 @@ module case_outside() {
                               raised_height + 2*r_corner_main,
                               s_pcb + wall_thickness_raised-x,
                               f_key + s_key + wall_thickness_raised-x,
+                              f_key + s_key + wall_thickness_raised-x,
                               r_edge_raised, r_corner_raised, fillet_style,
                     round_bottom=(wall_thickness_main < wall_thickness_raised));
             translate([hx+dx/2, -5*hy/3 - dy, -vfit]) rotate([0, 0, 180])
@@ -620,7 +632,8 @@ module case_outside() {
             translate([0, 0, main_height+raised_height-r_corner_raised-vfit])
                 fillet_polyhedron(display_bump_points,
                                   display_bump_height+r_corner_raised+vfit,
-                                  -s_key/2, f_key+s_key/2,
+                                  -s_key/2,
+                                  f_key+s_key/2, f_key+s_key/2,
                                   0.75, display_bump_height, 3,
                                   false);
     }
@@ -756,7 +769,7 @@ module case() union() {
             base_plate_base(hfit, vfit);
             case_inside(0, 0);
             translate([0, 0, main_height - deck_thickness - 0.01])
-                main_key_slots(deck_thickness + 0.02);
+                main_key_slots(deck_thickness + 0.02, true);
             translate([0, 0, main_height - deck_thickness - 0.01])
                 raised_key_slots(raised_height + deck_thickness + 0.02);
 
@@ -960,7 +973,7 @@ module niceview_cutout() union() {
     points = [[-10.8/2,  25.3/2], [ 10.8/2,  25.3/2],
               [ 10.8/2, -25.3/2], [-10.8/2, -25.3/2]];
     translate([0, -0.75, wh+1+1.9]) rotate([180, 0, 0])
-        fillet_polyhedron(points, wh+1, wh, wh+1, wh, wh, 5, false);
+        fillet_polyhedron(points, wh+1, wh, wh+1, wh+1, wh, wh, 5, false);
     //cube([10.8, 25.3, 10.01], center=true);
 
     h = display_position.z - // latch height
