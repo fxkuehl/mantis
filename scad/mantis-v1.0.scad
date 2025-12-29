@@ -361,16 +361,16 @@ display_bump_points = [
 //translate([0, 0, 30]) polygon(display_bump_points);
 
 module main_key_slots(height, skirt=false) {
-    z = 7;
+    z = 2.5 + 2*wall_thickness_raised;
     o = s_key/2 - 0.01;
-    fi = s_key/2+f_key - 0.01;
-    fe = wall_thickness_raised + s_key/2;
-    fo = fi + fe;
+    fi = f_key + s_key;
+    fe = wall_thickness_raised + s_key/2 + 0.01;
+    fo = fi + fe - s_key/2;
     // Use corner fillet to increase outside radius at the top to match
     // inside fillet radius of the top deck's edge. Calculate the difference
     // how much the radius needs to move inward.
-    x1 = (o + fo)*(1/cos(30) - 1);
-    x2 = (o + fi)*(1/cos(30) - 1);
+    x1 = fo*(1/cos(30) - 1);
+    x2 = fi*(1/cos(30) - 1);
     fc = fe + x1-x2;
     h = has_skirts && skirt ? height+z-fc : height;
 
@@ -395,12 +395,11 @@ module main_key_slots(height, skirt=false) {
         [ 2*hx/2 + dx/2, -8*hy/3 - dy], [ 1*hx/2 + dx/2, -7*hy/3 - dy]
     ];
     module right() {
-        fillet_polyhedron(points1, h-0.01, o, fi, fi, fe, fc, 7, false, false);
-        fillet_polyhedron(points2, h-0.01, o, fi, fi, fe, fc, 7, false, false);
-        if (has_skirts && skirt) translate([0, 0, h-0.02]) {
-            x = 0.0001;
-            fillet_polyhedron(points1, fc+0.02, o-x, fi, fo, fe, fc, 7, false, true);
-            fillet_polyhedron(points2, fc+0.02, o-x, fi, fo, fe, fc, 7, false, true);
+        fillet_polyhedron(points1, h-0.001, o, fi, fi, fe, fc, 7, false, false);
+        fillet_polyhedron(points2, h-0.001, o, fi, fi, fe, fc, 7, false, false);
+        if (has_skirts && skirt) translate([0, 0, h-0.011]) {
+            fillet_polyhedron(points1, fc+0.011, 0.01, fi, fo, fe, fc, 7, false, true);
+            fillet_polyhedron(points2, fc+0.011, 0.01, fi, fo, fe, fc, 7, false, true);
         }
     }
     right();
@@ -771,8 +770,13 @@ module case() union() {
             case_inside(0, 0);
             translate([0, 0, main_height - deck_thickness - 0.01])
                 main_key_slots(deck_thickness + 0.02, true);
-            translate([0, 0, main_height - deck_thickness - 0.01])
-                raised_key_slots(raised_height + deck_thickness + 0.02);
+            // Cut through the top deck and deep enough through the skirts to
+            // accommodate 3.3mm key travel.
+            raised_slot_depth = has_skirts ? max(deck_thickness+0.02, 3.3) :
+                raised_height + deck_thickness + 0.02;
+            translate([0, 0, main_height + raised_height -
+                             raised_slot_depth - 0.01])
+                raised_key_slots(raised_slot_depth + 0.02);
 
             /* Position of the bottom right thumb key. The edge of that key
              * marks the plane that cuts the sphere of the trackball. Rotate
