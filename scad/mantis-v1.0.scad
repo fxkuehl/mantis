@@ -395,11 +395,12 @@ module main_key_slots(height, skirt=false) {
         [ 2*hx/2 + dx/2, -8*hy/3 - dy], [ 1*hx/2 + dx/2, -7*hy/3 - dy]
     ];
     module right() {
-        fillet_polyhedron(points1, h, o, fi, fi, fe, fc, 7, false, false);
-        fillet_polyhedron(points2, h, o, fi, fi, fe, fc, 7, false, false);
-        if (has_skirts && skirt) translate([0, 0, h-0.01]) {
-            fillet_polyhedron(points1, fc+0.01, o, fi, fo, fe, fc, 7, false, true);
-            fillet_polyhedron(points2, fc+0.01, o, fi, fo, fe, fc, 7, false, true);
+        fillet_polyhedron(points1, h-0.01, o, fi, fi, fe, fc, 7, false, false);
+        fillet_polyhedron(points2, h-0.01, o, fi, fi, fe, fc, 7, false, false);
+        if (has_skirts && skirt) translate([0, 0, h-0.02]) {
+            x = 0.0001;
+            fillet_polyhedron(points1, fc+0.02, o-x, fi, fo, fe, fc, 7, false, true);
+            fillet_polyhedron(points2, fc+0.02, o-x, fi, fo, fe, fc, 7, false, true);
         }
     }
     right();

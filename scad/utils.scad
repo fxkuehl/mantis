@@ -150,11 +150,11 @@ function offset_fillet_poly(points, offset, fi, di, fo, do, corner_points)
         x1 = min1 - d1, x2 = min2 - d2, // overlap (if positive)
         gamma1 = corners[j][4] - (x1 <= 0 ? 0 : // Don't truncate
             corners[j][4] * corners[i][4] > 0 ?
-            s*asin(x1 / (2 * r0)) :        // Same side
+            s*asin(x1 / (2 * r0))+0.1 :        // Same side
             2.0*s*atan(x1 / (r0 + r1))),   // Opposite side
         gamma2 = corners[j][4] - (x2 <= 0 ? 0 : // Don't truncate
             corners[j][4] * corners[k][4] > 0 ?
-            s*asin(x2 / (2 * r0)) :        // Same side
+            s*asin(x2 / (2 * r0))+0.1 :        // Same side
             2.0*s*atan(x2 / (r0 + r2)))    // Opposite side
     )  [corners[j][0], corners[j][1], corners[j][2], corners[j][3],
         corners[j][4], gamma1, gamma2]]
