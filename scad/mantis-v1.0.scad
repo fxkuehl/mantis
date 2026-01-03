@@ -994,10 +994,10 @@ module niceview_cutout() union() {
     translate([0, -0.5, -1.5]) difference() {
         cube([14.2, 35.2, 3.01], center=true);
         multmatrix([[1, 0, 0,   (l - w)/2 - g],
-                    [0, 1, d/h, -35.2/2-1],
+                    [0, 1, d/h, -35.2/2-1.01],
                     [0, 0, 1,   1.5-h],
                     [0, 0, 0,   1]])
-            cube([3, 2, 6], center=true);
+            cube([w, 2, 6], center=true);
     }
     // Space around the latch
     translate([0, -36.2/2 - r/2, -0.55]) difference() {
