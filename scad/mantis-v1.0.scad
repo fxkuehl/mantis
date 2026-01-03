@@ -375,7 +375,14 @@ module main_key_slots(height, skirt=false) {
     h = has_skirts && skirt ? height+z-fc : height;
 
     points1 = [
+                                   [ 7*hx/2 + dx/2, -1*hy/3],
+        // Inner zig-zag edge
+        [ 6*hx/2 + dx/2, -2*hy/3], [ 5*hx/2 + dx/2, -1*hy/3],
+        [ 5*hx/2 + dx/2,  1*hy/3], [ 4*hx/2 + dx/2,  2*hy/3],
+        [ 4*hx/2 + dx/2,  4*hy/3], [ 3*hx/2 + dx/2,  5*hy/3],
+        [ 3*hx/2 + dx/2,  7*hy/3], [ 2*hx/2 + dx/2,  8*hy/3],
         [ 2*hx/2 + dx/2, 10*hy/3], [ 3*hx/2 + dx/2, 11*hy/3],
+        // Rest of the body
         [ 4*hx/2 + dx/2, 10*hy/3], [ 5*hx/2 + dx/2, 11*hy/3],
         [ 6*hx/2 + dx/2, 10*hy/3], [ 7*hx/2 + dx/2, 11*hy/3],
         [ 8*hx/2 + dx/2, 10*hy/3], [ 9*hx/2 + dx/2, 11*hy/3],
@@ -383,11 +390,7 @@ module main_key_slots(height, skirt=false) {
         [11*hx/2 + dx/2,  7*hy/3], [11*hx/2 + dx/2,  5*hy/3],
         [10*hx/2 + dx/2,  4*hy/3], [10*hx/2 + dx/2,  2*hy/3],
         [ 9*hx/2 + dx/2,  1*hy/3], [ 8*hx/2 + dx/2,  2*hy/3],
-        [ 7*hx/2 + dx/2,  1*hy/3], [ 7*hx/2 + dx/2, -1*hy/3],
-        [ 6*hx/2 + dx/2, -2*hy/3], [ 5*hx/2 + dx/2, -1*hy/3],
-        [ 5*hx/2 + dx/2,  1*hy/3], [ 4*hx/2 + dx/2,  2*hy/3],
-        [ 4*hx/2 + dx/2,  4*hy/3], [ 3*hx/2 + dx/2,  5*hy/3],
-        [ 3*hx/2 + dx/2,  7*hy/3], [ 2*hx/2 + dx/2,  8*hy/3]
+        [ 7*hx/2 + dx/2,  1*hy/3]
     ];
     points2 = [
         [ 1*hx/2 + dx/2, -5*hy/3 - dy], [ 2*hx/2 + dx/2, -4*hy/3 - dy],
@@ -398,8 +401,10 @@ module main_key_slots(height, skirt=false) {
         fillet_polyhedron(points1, h-0.001, o, fi, fi, fe, fc, 7, false, false);
         fillet_polyhedron(points2, h-0.001, o, fi, fi, fe, fc, 7, false, false);
         if (has_skirts && skirt) translate([0, 0, h-0.011]) {
-            fillet_polyhedron(points1, fc+0.011, 0.01, fi, fo, fe, fc, 7, false, true);
-            fillet_polyhedron(points2, fc+0.011, 0.01, fi, fo, fe, fc, 7, false, true);
+            fillet_polyhedron(slice(points1, [0:10]), fc+0.011, 0.01,
+                              fi, fo, fe, fc, 7, false, true);
+            fillet_polyhedron(points2, fc+0.011, 0.01,
+                              fi, fo, fe, fc, 7, false, true);
         }
     }
     right();

@@ -1,3 +1,5 @@
+function slice(vec, range) = [for (i = range) vec[i]];
+
 function rotate_x(point, angle) = let (sin_a = sin(angle), cos_a = cos(angle)) [
     point.x,
     point.y*cos_a - point.z*sin_a,
