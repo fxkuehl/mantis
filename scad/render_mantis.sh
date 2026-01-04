@@ -81,8 +81,11 @@ $osc $params --camera=$bottom_cam --imgsize=$sizeL \
 jobs="$jobs $!"
 
 echo "Exploded view ..."
-$osc $params --camera=5,30,270,65,0,15,1300 --imgsize=$sizeP \
-	-D \$explode=40 -D fast_shadow=false --projection=ortho \
+#$osc $params --camera=5,30,270,65,0,15,1300 --imgsize=$sizeP \
+#	-D \$explode=40 -D fast_shadow=false --projection=ortho \
+#	-o "$dir/mantis_exploded.png" "$@" $scad &
+$osc $params --camera=10,30,180,65,0,15,1150 --imgsize=$sizeP \
+	-D \$explode=30 -D show_desk=false \
 	-o "$dir/mantis_exploded.png" "$@" $scad &
 jobs="$jobs $!"
 

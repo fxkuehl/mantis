@@ -1252,7 +1252,7 @@ module key_profile(x, key_color="") {
     $rgb = rgb;
     $slope = slope;
     $dish_diam = dish_diam;
-    $explode=$explode/3;
+    $explode=$explode/2;
     $key_color=key_color;
     $color_scheme=switch_colors;
     z_off = switch_type == 2 ? 0.5 : 0;
@@ -1298,16 +1298,14 @@ module keyboard(fast_shadow=false) {
         }
     }
 
-    if (show_sensor && !case_shadow) {
+    if (show_sensor && !case_shadow)
+        translate(trackball_position + [0, 0, 3*ex]) {
         if (show_misc) {
-            translate(trackball_position + [0, 0, 3*ex]) rotate([60, 0, 0])
-                for (p = mounting_points_sensor)
-                    translate([p.x, p.y,
-                               -trackball_radius - 9.05+1.65 - ex/3])
-                        flat_head_screw(bolt_length);
+            rotate([60, 0, 0]) for (p = mounting_points_sensor)
+                translate([p.x, p.y, -trackball_radius - 9.05+1.65])
+                    flat_head_screw(bolt_length);
         }
-        translate(trackball_position + [0, 0, 3*ex]) rotate([60, 0, 0])
-            translate([0, 0, -trackball_radius]) sensor();
+        rotate([60, 0, 0]) translate([0, 0, -trackball_radius]) sensor();
     }
 
     if (has_display && show_display && !case_shadow)
@@ -1334,7 +1332,7 @@ module keyboard(fast_shadow=false) {
         raised_thumbs =   [[2.5,-1,60,0,0],[3.5,-1,0,0,1]];
         main_thumbs =     [[4.0,-2, 0,1,0]];
         union() {
-            main_z = main_switch_z + 7*ex;
+            main_z = main_switch_z + 5*ex;
             raised_z = raised_switch_z + 11*ex;
             hx = hx + ex/3;
             hy = hy + ex/3;
@@ -1367,12 +1365,12 @@ module keyboard(fast_shadow=false) {
 
     if (show_mezzanine && !case_shadow) {
         if (show_misc) {
-            if (show_misc) translate([0, 0,  5.5*ex]) bearings(bearing_size, 0);
+            if (show_misc) translate([0, 0,  5*ex]) bearings(bearing_size, 0);
 
             for(p = mounting_points_raised)
                 translate([p.x, p.y, main_height - deck_thickness +
                            mezzanine_thickness - base_thickness + hfit +
-                           4.5*ex])
+                           5*ex])
                     countersunk_screw(bolt_length, 0);
         }
         pivot = [0, mcu_top - post_diameter, main_height - deck_thickness];
@@ -1389,7 +1387,7 @@ module keyboard(fast_shadow=false) {
     if (show_base && !case_shadow) {
         if (show_misc) {
             for (p = mounting_points_main)
-                translate([p.x, p.y, hfit - 0.5*ex])
+                translate([p.x, p.y, hfit])
                     countersunk_screw(bolt_length, 0);
         }
         if (render_case)
@@ -1401,7 +1399,7 @@ module keyboard(fast_shadow=false) {
         if (show_misc) {
             for (p = bump_positions)
                 color("white", alpha=0.2)
-                    translate([p.x, p.y, bump_recess - 0.5*ex]) bump();
+                    translate([p.x, p.y, bump_recess]) bump();
         }
     }
 
@@ -1425,7 +1423,7 @@ module shadow(sun) projection(cut=false)
     keyboard(fast_shadow, $fs=2);
 
 if (show_desk) {
-    elevation = max(0, $explode + bump_height - bump_recess);
+    elevation = max(0, bump_height - bump_recess);
     desk();
 
     // Slanted shadow angled away from an imaginary sun
@@ -1452,8 +1450,11 @@ if (show_desk) {
             offset(r = 10 + 8*o - o*o) // expand to slightly below original size
             offset(r = -10 - 10*o) // shrink
             offset(r = 2*o) // fuse small holes
-            shadow([0, 0, 1]);
+            projection(cut=false) if (!$explode)
+                keyboard(true, $fs=2);
+            else
+                base_plate(true);
     }
 }
 
-translate([0, 0, $explode + bump_height - bump_recess]) keyboard();
+translate([0, 0, bump_height - bump_recess]) keyboard();
