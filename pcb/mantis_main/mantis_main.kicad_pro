@@ -461,7 +461,7 @@
       },
       {
         "netclass": "Power",
-        "pattern": "GND"
+        "pattern": "GND*"
       },
       {
         "netclass": "Default",
@@ -620,7 +620,7 @@
         "pattern": "BOT_LED"
       },
       {
-        "netclass": "Default",
+        "netclass": "Power",
         "pattern": "VCC"
       },
       {
@@ -773,190 +773,6 @@
       },
       {
         "netclass": "Default",
-        "pattern": "DI_C2_R1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C2_R1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C3_R1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C3_R1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C4_R1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C4_R1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C1_R2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C1_R2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C2_R2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C2_R2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C3_R2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C3_R2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C4_R2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C4_R2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C1_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C1_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C2_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C2_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C3_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C3_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C4_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C4_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C5_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C5_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C7_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C7_R3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C2_L1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C2_L1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C3_L1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C3_L1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C4_L1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C4_L1"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C1_L2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C1_L2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C2_L2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C2_L2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C3_L2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C3_L2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C4_L2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C4_L2"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C1_L3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C1_L3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C2_L3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C2_L3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DI_C3_L3"
-      },
-      {
-        "netclass": "Default",
-        "pattern": "DO_C3_L3"
-      },
-      {
-        "netclass": "Default",
         "pattern": "DI_C4_L3"
       },
       {
@@ -978,6 +794,14 @@
       {
         "netclass": "Default",
         "pattern": "DO_C7_L3"
+      },
+      {
+        "netclass": "Default",
+        "pattern": ""
+      },
+      {
+        "netclass": "Power",
+        "pattern": "BAT"
       }
     ]
   },
