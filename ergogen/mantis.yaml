@@ -607,6 +607,30 @@ outlines:
     - what: rectangle
       size: [14 + 4kx, 40 + 4kx]
       fillet: 2kx
+  _battery_connector:
+    - what: rectangle
+      size: [6+0.5, 7.6 + 5 + 0.25]
+      where.shift: [1, -2.2 - 5/2 + 0.25/2]
+  _battery_connector_cutout:
+    - what: outline
+      name: _battery_connector
+      where:
+        ref: f_c5_r2
+        rotate: -30
+        shift: [hx + dx/2 + 14, 13]
+  _battery_pins:
+    - what: circle
+      radius: 1.25
+    - what: circle
+      radius: 1.25
+      where.shift: [2, 0]
+  _battery_pin_relief:
+    - what: outline
+      name: _battery_pins
+      where:
+        ref: f_c5_r2
+        rotate: -30
+        shift: [hx + dx/2 + 14, 13]
   _display_main_cutout:
     - what: rectangle
       size: [13.7, 20]
@@ -656,6 +680,8 @@ outlines:
         rotate: -30
       adjust.shift: [5, 0]
       asym: clone
+    - what: outline
+      name: _battery_connector_cutout
   _trackball:
     - what: circle
       where:
@@ -782,6 +808,8 @@ outlines:
         shift: [hx/2+dx/2 - 17, hy/3]
       expand: 0.25
     - what: outline
+      name: _battery_pin_relief
+    - what: outline
       name: _base_relief_switch
       where: [          zn1_c2_r, zn1_c3_r, zn1_c4_r,
               zn2_c1_r, zn2_c2_r, zn2_c3_r, zn2_c4_r,
@@ -847,6 +875,9 @@ outlines:
       adjust.shift: [5, 0]
       asym: clone
       operation: subtract
+    - what: outline
+      name: _battery_connector_cutout
+      operation: subtract
   _main_pcb_flipped:
     - what: outline
       name: __main_pcb
@@ -889,11 +920,11 @@ outlines:
   main_pcb_foam:
     - what: outline
       name: _main_pcb
-    - what: rectangle
-      size: [15, 2]
+    - what: rectangle # Battery cable groove
+      size: [15, 6]
       where:
-        ref: mirror_f_c5_r3
-        shift: [0, 2hy/3+2]
+        ref: mirror_f_c5_r2
+        shift: [-3, -2]
       operation: subtract
     - what: outline
       name: _main_pcb_foam_switches
@@ -1045,10 +1076,11 @@ outlines:
   _raised_pcb:
     - what: outline
       name: _raised
+      fillet: fk+kx
     - what: outline
       name: _trackball_raised_cutout
       operation: subtract
-      fillet: fk
+      fillet: fk+2kx
     - what: rectangle
       size: [3hx, 4hy/3+kx]
       where:
@@ -1129,6 +1161,9 @@ outlines:
         ref: f_c5_r3
         shift: [hx/2+dx/2, -9]
         rotate: 180
+      operation: subtract
+    - what: outline
+      name: _battery_connector_cutout
       operation: subtract
   _raised_key_slots:
     - what: outline
@@ -1379,6 +1414,17 @@ pcbs:
           RAW: SDA
           GND: SCL
           RST: GPIO2
+      # Placeholder for battery connector
+      battery_connector:
+        what: diode
+        where:
+          ref: mirror_f_c5_r2
+          rotate: -30
+          shift: [hx + dx/2 + 14, 13]
+        params:
+          designator: J
+          from: GND
+          to: BAT
       # Placeholder for nice!view header
       nv_header:
         what: promicro
