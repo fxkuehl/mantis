@@ -10,10 +10,10 @@ $explode = 0;
 show_trackball = true;
 show_switch = true;
 show_key = true;
-// Switch plates
-show_plate = true;
-// Switch PCBs
-show_pcb = true;
+show_main_plate = true;
+show_main_pcb = true;
+show_raised_plate = true;
+show_raised_pcb = true;
 // Foam or cork
 show_foam = true;
 // nice!view display
@@ -930,16 +930,111 @@ module usb_port(depth) union() {
     color("#303030") translate([0, 0.05, 0]) usb_port_template(0, 10.4);
 }
 
+module ffc_connector_hirose() {
+    color("beige") translate([-4, 0, 0]) cube([8, 2.2, 1.19]);
+    color("dimgrey") translate([-6.57/2, -0.5, 0.6]) cube([6.57, 1.5, 0.6]);
+    for (i = [0:11])
+        color("gold") translate([i*0.5 - 2.75, 0.1, 0]) cube([0.15, 2.4, 0.35]);
+}
+
+module ffc_connector_molex() {
+    color("beige") translate([-10.7/2, -1.8, 0]) cube([10.7, 4, 1.8]);
+    color("dimgrey") translate([-9.1/2, -2.6, 1]) cube([9.1, 4, 0.9]);
+    for (i = [0:11])
+        color("gold") translate([i*0.5 - 2.75, -1.4, 0]) cube([0.15, 4, 0.35]);
+}
+
+module ffc_connector() ffc_connector_molex();
+
+module jst_ph(n) translate([-(n-1), 0, 0]) {
+    color("beige") render() difference() {
+        w = n * 2 + 1.9;
+        translate([0, 7.6/2-1.6, 2.4]) cube([w, 7.6, 4.8], center=true);
+        translate([0, 7.6/2+0.5, 2.4]) cube([w-1, 7.6, 4.8-1], center=true);
+        translate([0, -2, 2.4]) cube([w-1, 3.5, 5], center=true);
+        translate([-w/2 + 1, 0, 4.8]) cube([1, 8, 1.1], center=true);
+        translate([ w/2 - 1, 0, 4.8]) cube([1, 8, 1.1], center=true);
+        translate([0, 6, 3]) cube([w+1, 4, 1], center=true);
+
+        g = (n-2) * 2 + 1;
+        translate([0, 6, 4.8]) cube([g, 8, 1.1], center=true);
+
+        multmatrix([
+            [1, 0, 0, 0],
+            [0, 1, 0, -1.3],
+            [0, 1, 1,  4.9],
+            [0, 0, 0, 1]]) cube([w+1, 2, 4], center=true);
+        for(i = [0:(n-1)]) {
+            x = (i - (n-1)/2) * 2;
+            translate([x, -1, 2.4]) cube([0.6, 2, 5], center=true);
+        }
+    }
+    for(i = [0:(n-1)]) {
+        x = (i - (n-1)/2) * 2;
+        color("silver") union() {
+            translate([x, 0, -0.15]) cube([0.5, 0.5, 6.5], center=true);
+            translate([x, 2.75, 3.1]) cube([0.5, 6, 0.5], center=true);
+        }
+    }
+}
+
+module pcm12_switch() {
+    color("silver") translate([-6.7/2, -2.6/2, 0]) cube([6.7, 2.6, 1.4]);
+    color("dimgrey") translate([-1.3, 2.58/2, 0.4]) cube([1.3, 1.5, 0.8]);
+    color("silver") translate([-7.7/2, -2.6/2, 0]) cube([7.7, 0.66, 0.15]);
+    color("silver") translate([-7.7/2, 2.6/2-0.66, 0]) cube([7.7, 0.66, 0.15]);
+    color("gold") translate([-0.75-0.2, -2.6/2-0.9, 0]) cube([0.4, 1, 0.15]);
+    color("gold") translate([-2.25-0.2, -2.6/2-0.9, 0]) cube([0.4, 1, 0.15]);
+    color("gold") translate([2.25-0.2, -2.6/2-0.9, 0]) cube([0.4, 1, 0.15]);
+}
+
+module reset_button() {
+    color("silver") linear_extrude(height=0.8, center=false)
+        polygon([
+            [-2.55, 1.35], [-1.35, 2.55], [ 1.35, 2.55], [ 2.55, 1.35],
+            [ 2.55,-1.35], [ 1.35,-2.55], [-1.35,-2.55], [-2.55,-1.35]
+        ]);
+    color("silver") translate([0, 0, 0.79])
+        cylinder(h=0.41, r1=2.2, r2=2.0, center=false);
+    color("palegoldenrod") translate([0, 0, 1.19])
+        cylinder(h=0.31, r=1.0, center=true);
+    color("silver") translate([0, 1.85, 0.05])
+        cube([6.6, 0.5, 0.1], center=true);
+    color("silver") translate([0, -1.85, 0.05])
+        cube([6.6, 0.5, 0.1], center=true);
+}
+
 module controller() {
     ex = $explode;
     y0 = -2.54*6;
-    translate([-7.62, y0, 0]) female_header(8.39, 3.2, 12);
-    translate([ 7.62, y0, 0]) female_header(8.39, 3.2, 12);
     translate([-7.62, y0, 8.4 + 1*ex]) male_header(2.49, 6, 3, 12);
     translate([ 7.62, y0, 8.4 + 1*ex]) male_header(2.49, 6, 3, 12);
     color(pcb_color) translate([-mcu_size.x/2, -mcu_size.y/2, 10.9 + ex])
         cube([mcu_size.x, mcu_size.y, 1.6]);
     translate([0, mcu_size.y/2, 10.9 + ex - 1.6]) usb_port(10.5);
+}
+
+module main_pcb_assembly(show_mcu=true) {
+    main_pcb();
+    translate([0, hy, 0]) rotate([0, 180, 0]) ffc_connector();
+    translate([-17, 4*hy/3, 0]) rotate([0, 180, 0]) ffc_connector();
+    translate([0, mcu_top - 2.6/2, 0]) rotate([0, 180, 0])
+        pcm12_switch();
+    translate([-17, mcu_top - 8.89 - 1.85, 0]) rotate([0, 180, 0])
+        reset_button();
+    translate([0, mcu_y, pcb_thickness]) {
+        y0 = -2.54*6;
+        translate([-7.62, y0, 0]) female_header(8.39, 3.2, 12);
+        translate([ 7.62, y0, 0]) female_header(8.39, 3.2, 12);
+        if (show_mcu) controller();
+    }
+    translate([-4, mcu_y-12, pcb_thickness]) rotate([0, 0, 180]) jst_ph(5);
+    translate([14, 13, pcb_thickness]) rotate([0, 0, 150]) jst_ph(2);
+}
+
+module raised_pcb_assembly() {
+    raised_pcb();
+    translate([0, hy-9, 0]) rotate([0, 180, 180]) ffc_connector();
 }
 
 module niceview() {
@@ -1017,64 +1112,6 @@ module niceview_cutout() union() {
             square([l-2*g, r], center=true);
         translate([-g, g, -g]) cube([l, 2*g+r, 4.91], center=true);
     }
-}
-
-module ffc_connector_hirose() {
-    color("beige") translate([-4, 0, 0]) cube([8, 2.2, 1.19]);
-    color("dimgrey") translate([-6.57/2, -0.5, 0.6]) cube([6.57, 1.5, 0.6]);
-    for (i = [0:11])
-        color("gold") translate([i*0.5 - 2.75, 0.1, 0]) cube([0.15, 2.4, 0.35]);
-}
-
-module ffc_connector_molex() {
-    color("beige") translate([-10.7/2, -1.8, 0]) cube([10.7, 4, 1.8]);
-    color("dimgrey") translate([-9.1/2, -2.6, 1]) cube([9.1, 4, 0.9]);
-    for (i = [0:11])
-        color("gold") translate([i*0.5 - 2.75, -1.4, 0]) cube([0.15, 4, 0.35]);
-}
-
-module ffc_connector() ffc_connector_molex();
-
-module pcm12_switch() {
-    color("silver") translate([-6.7/2, -2.6/2, 0]) cube([6.7, 2.6, 1.4]);
-    color("dimgrey") translate([-1.3, 2.58/2, 0.4]) cube([1.3, 1.5, 0.8]);
-    color("silver") translate([-7.7/2, -2.6/2, 0]) cube([7.7, 0.66, 0.15]);
-    color("silver") translate([-7.7/2, 2.6/2-0.66, 0]) cube([7.7, 0.66, 0.15]);
-    color("gold") translate([-0.75-0.2, -2.6/2-0.9, 0]) cube([0.4, 1, 0.15]);
-    color("gold") translate([-2.25-0.2, -2.6/2-0.9, 0]) cube([0.4, 1, 0.15]);
-    color("gold") translate([2.25-0.2, -2.6/2-0.9, 0]) cube([0.4, 1, 0.15]);
-}
-
-module reset_button() {
-    color("silver") linear_extrude(height=0.8, center=false)
-        polygon([
-            [-2.55, 1.35], [-1.35, 2.55], [ 1.35, 2.55], [ 2.55, 1.35],
-            [ 2.55,-1.35], [ 1.35,-2.55], [-1.35,-2.55], [-2.55,-1.35]
-        ]);
-    color("silver") translate([0, 0, 0.79])
-        cylinder(h=0.41, r1=2.2, r2=2.0, center=false);
-    color("palegoldenrod") translate([0, 0, 1.19])
-        cylinder(h=0.31, r=1.0, center=true);
-    color("silver") translate([0, 1.85, 0.05])
-        cube([6.6, 0.5, 0.1], center=true);
-    color("silver") translate([0, -1.85, 0.05])
-        cube([6.6, 0.5, 0.1], center=true);
-}
-
-module main_pcb_assembly() {
-    main_pcb();
-    translate([0, hy, 0]) rotate([0, 180, 0]) ffc_connector();
-    translate([-17, 4*hy/3, 0]) rotate([0, 180, 0]) ffc_connector();
-    translate([0, mcu_top - 2.6/2, 0]) rotate([0, 180, 0])
-        pcm12_switch();
-    translate([-17, mcu_top - 8.89 - 1.85, 0]) rotate([0, 180, 0])
-        reset_button();
-    translate([0, mcu_y, pcb_thickness]) controller();
-}
-
-module raised_pcb_assembly() {
-    raised_pcb();
-    translate([0, hy-9, 0]) rotate([0, 180, 180]) ffc_connector();
 }
 
 module lens(offset) {
@@ -1270,31 +1307,31 @@ module keyboard(fast_shadow=false) {
     ex = $explode;
     case_shadow = (show_case && show_base && fast_shadow);
 
-    if (show_pcb && !case_shadow) {
-        translate([0, 0, main_pcb_z + 2*ex]) main_pcb_assembly();
-        translate([0, 0, raised_pcb_z + 7*ex]) raised_pcb_assembly();
-        if (show_foam && !fast_shadow) {
-            translate([0, 0, main_pcb_z + 1*ex]) main_pcb_foam();
-            translate([0, 0, raised_pcb_z + 6*ex]) raised_pcb_foam();
+    if (!case_shadow) {
+        if (show_main_pcb) translate([0, 0, main_pcb_z + 2*ex]) {
+            main_pcb_assembly(show_misc);
+            if (show_foam && !fast_shadow)
+                translate([0, 0, -ex]) main_pcb_foam();
         }
-    }
+        if (show_raised_pcb) translate([0, 0, raised_pcb_z + 7*ex]) {
+            raised_pcb_assembly();
+            if (show_foam && !fast_shadow)
+                translate([0, 0, -ex]) raised_pcb_foam();
+        }
 
-    if (show_plate && !case_shadow) {
-        translate([0, 0, main_plate_z + 4*ex]) {
+        if (show_main_plate) translate([0, 0, main_plate_z + 4*ex]) {
             main_plate();
-            if (show_misc) {
-                main_gaskets();
+            if (!fast_shadow) {
+                if (show_misc) main_gaskets();
+                if (show_foam) translate([0, 0, -ex]) main_plate_foam();
             }
         }
-        translate([0, 0, raised_plate_z + 9*ex]) {
+        if (show_raised_plate) translate([0, 0, raised_plate_z + 9*ex]) {
             raised_plate();
-            if (show_misc) {
-                raised_gaskets();
+            if (!fast_shadow) {
+                if (show_misc) raised_gaskets();
+                if (show_foam) translate([0, 0, -ex]) raised_plate_foam();
             }
-        }
-        if (show_foam && !fast_shadow) {
-            translate([0, 0, main_plate_z + 3*ex]) main_plate_foam();
-            translate([0, 0, raised_plate_z + 8*ex]) raised_plate_foam();
         }
     }
 
@@ -1439,11 +1476,11 @@ if (show_desk) {
     }
 
     // Core shadow slightly smaller than the outline
-    if (show_base || show_pcb || show_plate || show_mezzanine) {
-        o = (show_base  ? elevation :
-             show_pcb   ? elevation + main_pcb_z :
-             show_plate ? elevation + main_plate_z :
-                          elevation + main_height-deck_thickness)/2;
+    if (show_base || show_main_pcb || show_main_plate || show_mezzanine) {
+        o = (show_base       ? elevation :
+             show_main_pcb   ? elevation + main_pcb_z :
+             show_main_plate ? elevation + main_plate_z :
+                               elevation + main_height-deck_thickness)/2;
         a = min(0.15/o, 0.5);
         color("black", alpha=a)
             linear_extrude(height=0.02*(shadow_softness+2), center=true)

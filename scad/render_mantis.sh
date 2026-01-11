@@ -42,7 +42,7 @@ trap 'echo "Killing background processes ..."; kill $jobs' INT
 
 persp_cam=15,0,10,45,0,22,450
 rear_cam=15,40,10,45,0,150,450
-bottom_cam=15,30,10,225,0,225,450
+bottom_cam=-15,30,10,225,0,135,450
 
 echo "Perspective view ..."
 $osc $params --camera=$persp_cam --imgsize=$sizeW \
