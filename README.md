@@ -8,8 +8,6 @@ This is the development branch of Mantis. It's taking me way longer than expecte
 
 >![photo](assets/v1.0-renders/1152/v1.0-mantis_bare.jpg)
 
-<img align="right" src="./assets/v1.0-renders/1152/v1.0-mantis_exploded.jpg" height="600" style="margin:20px">
-
 The basic recipe is still the same:
 
 * Compact unibody keyboard with 40 sculpted hexagonal keys
@@ -21,7 +19,9 @@ The basic recipe is still the same:
 
 ## What's new in v1.0
 
-These are mostly the features that I wanted v1.0 to have when I started working on it in November 2025:
+>![photo](assets/v1.0-renders/1152/v1.0-mantis_bottom.jpg)
+
+These are mostly the features that I wanted v1.0 to have when I started working on it in November 2024:
 
 * Integrated trackball or trackpad
 * 3D-printed, fully enclosed case hiding switches
@@ -38,7 +38,7 @@ Only the nice!view display option was a later addition as wireless support becam
 
 ## Details and trade-offs
 
->![photo](assets/v1.0-renders/1152/v1.0-mantis_bottom.jpg)
+<img align="right" src="./assets/v1.0-renders/1152/v1.0-mantis_exploded.jpg" width="50%" style="margin:10px">
 
 I figured the trackball would be harder to design for than a cirque trackpad, so I started with the trackball design. Once I got down to the nuts and bolts, these were some of the decisions and trade-offs that emerged:
 
