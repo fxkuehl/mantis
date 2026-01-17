@@ -122,7 +122,7 @@ tilt2 = 28;
 rise2 = 1.5;
 //rise2 = 2.9;
 // Tilt angle for bottom row keys
-tilt3 = 15;
+tilt3 = 28;
 // Rise of the top bottom keys
 rise3 = -0.5;
 
@@ -362,7 +362,7 @@ display_bump_points = [
 //translate([0, 0, 30]) polygon(display_bump_points);
 
 module main_key_slots(height, skirt=false) {
-    z = 2.5 + 2*wall_thickness_raised;
+    z = raised_height/2.5 - 1.2 + 2*wall_thickness_raised;
     o = s_key/2 - 0.01;
     fi = f_key + s_key;
     fe = wall_thickness_raised + s_key/2 + 0.01;
@@ -1459,7 +1459,7 @@ module shadow(sun) projection(cut=false)
                 [0, 0,           1, 0]])
     keyboard(fast_shadow, $fs=2);
 
-if (show_desk) {
+if (show_desk && $preview) {
     elevation = max(0, bump_height - bump_recess);
     desk();
 
