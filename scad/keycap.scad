@@ -265,18 +265,19 @@ function min_rise() = let (
     -min(front_offset, mid_offset);
 
 module choc_peg() {
-    r = 0.1;
+    r = 0.399;
+    s = 1/r;
     module cross_section() {
         offset(r = -2*r) offset(delta = r) polygon([
     [ 0.65,-1.5], [ 0.65,-0.4], [ 0.449,-0.4], [ 0.449,0.4], [ 0.65,0.4], [ 0.65,1.5],
     [-0.65,1.5], [-0.65,0.4], [-0.449,0.4], [-0.449,-0.4], [-0.65,-0.4], [-0.65,-1.5]
         ]);
     }
-    translate([0, 0, r]) minkowski() {
+    translate([0, 0, r*s]) minkowski() {
         linear_extrude(height = 4 - 2*r, convexity = 2) {
             cross_section();
         }
-        half_sphere(r, $fa = 360/$fn);
+        scale([1, 1, s]) half_sphere(r, $fa = 360/$fn);
     }
 }
 
@@ -290,7 +291,7 @@ module choc_stem_v1() {
                 offset(r = 2) offset(delta = -2) square([12, 6.5], center = true);
             }
             linear_extrude(height = 1, center = true) {
-                offset(r = 1) offset(delta = -1) square([10, 4.5], center = true);
+                offset(r = 0.9) offset(delta = -1) square([10, 4.5], center = true);
             }
             translate([0, 0, -0.5]) cube([8.3, 2.8, 0.502], center = true);
         }
@@ -307,7 +308,9 @@ module choc_stem_v1() {
                 translate([4.05, 0, 0]) rotate([90, 0, 0])
                     cylinder(3, r = 0.751, center = true);
             }
-            cube([8.5, 3, 1.502], center = true);
+            linear_extrude(height = 1.502, center = true) {
+                offset(r = 0.25) offset(delta = -0.25) square([8.5, 3], center = true);
+            }
         }
     }
 
@@ -531,7 +534,7 @@ module minkey(detail = 32) {
     }
 }
 
-module key(detail = 16) {
+module key(detail = 24) {
     color($key_color ? $key_color : undef) render(convexity=8) difference () {
         if ($minkowski)
             minkey(detail);
