@@ -59,24 +59,33 @@ use <utils.scad>
 use <dishes.scad>
 
 cos30 = cos(30);
-function fillet_unit_hex_point(r, a) = let (
+function fillet_unit_hex_point(r, a, c) = let (
     circle = [-sin(a), cos(a), 0],
-    a_corner = round(a / 60) * 60,
+    a_corner = c * 60,
     hex = [-sin(a_corner), cos(a_corner), 0],
     r_hex = (1-r) / cos30
 ) r * circle + r_hex * hex;
 
-module fillet_hexagon(R, r, h, da=$fa) {
-    steps = floor(360/da);
-    
-    points_lower = [for (a = [0 : da : (steps-1) * da])
-        fillet_unit_hex_point(r/R, a)*R
-    ];
-    points_upper = [for (a = [0 : da : (steps-1) * da])
-        fillet_unit_hex_point(r/R, a)*R + [0, 0, h]
-    ];
+function fillet_hex_points(R, r, l, da) = let (
+    steps = floor(60/da),
+    _da = 60 / steps,
+) [for (i = [0 : 1 : (steps + l) * 6 - 1]) let (
+    side = floor(i / (steps + l)),
+    k = max(i % (steps + l) - steps, 0),
+    j = i - side*l - k,
+    a = (j - steps/2) * _da,
+    p0 = fillet_unit_hex_point(r/R, a, side)*R,
+    p1 = fillet_unit_hex_point(r/R, a, (side + 1) % 6)*R
+    //dummy = (echo(side, i, j, k, a))
+) l ? (p0 * (l - k) + p1 * k) / l : p0];
+
+module fillet_hexagon(R, r, h, l, da=$fa) {
+    points_lower = fillet_hex_points(R, r, l, da);
+    points_upper = [for (p = fillet_hex_points(R, r, l, da))
+        p + [0, 0, h]];
     points = concat(points_lower, points_upper);
 
+    steps = len(points_lower);
     face_bot = [for (i = [0 : 1 : steps-1]) i];
     face_top = [for (i = [0 : 1 : steps-1]) steps*2 - 1 - i];
     faces_rim = [for (i = [0 : 1 : steps-1])
@@ -154,13 +163,14 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, offset, da=$fa, 
     qfmax = offset > 0 ? 0.8 : 1;
 
     steps_cone = max(3, floor(steps / 15));
-    // Ensure an equal and odd number of points per corner, at least 3
-    round_points = function(x) max(18, (round(x / 12) * 2 + 1) * 6);
+    // Ensure an equal number of points per corner, at least 3
+    l = 2;
+    round_points = function(x) max((l + 2) * 6, (round(x / 6) + l) * 6);
     n_points_cone = [for (i = [0 : steps_cone])
         round_points(interpolate(r1 / r2, 1, i/steps_cone) * steps * sin(slope))];
     points_cone = [for (i = [0 : steps_cone]) each
         let (b = i / steps_cone,
-             steps = n_points_cone[i],
+             steps = n_points_cone[i] - 6*l,
              da = 360 / steps,
              qf = b * qfmax,
              qb = b * qbmax,
@@ -187,10 +197,9 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, offset, da=$fa, 
              R = D/2 * cos30 + ro * (1 - cos30),
              t = atan2(zob - zof, yob - yof),
              shift = yof + D/2)
-        [for (a = [0 : da : (steps-1) * da])
-            scale_x(
-                rotate_x_around(fillet_unit_hex_point(ro/R, a)*R,
-                                t, [0, -D/2, 0]), offset > 0 ? w/D : 1) + [0, shift, zof]
+        [for (p = fillet_hex_points(R, ro, l, da))
+            scale_x(rotate_x_around(p, t, [0, -D/2, 0]),
+                    offset > 0 ? w/D : 1) + [0, shift, zof]
         ]
     ];
 
@@ -202,13 +211,14 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, offset, da=$fa, 
     offset_radius = dish_radius + offset;
 
     steps_dish = max(2, floor(slope / da));
-    steps_rim = n_points_cone[steps_cone];
+    steps_rim = n_points_cone[steps_cone] - 6*l;
+    corr = l/2 * 360 / n_points_cone[steps_cone];
     da_dish = slope / steps_dish;
     n_points_dish = [for (b = [slope-da_dish : -da_dish : 0])
         max(1, ceil(steps_rim * sin(b) / sin(slope)))];
     points_dish = [for (i = [0 : 1 : steps_dish - 1]) each
         let (b = (steps_dish - i - 1) * da_dish, n = n_points_dish[i], da = 360 / n)
-        [for (j = [0 : 1 : n-1]) let (a = j * da)
+        [for (j = [0 : 1 : n-1]) let (a = j * da - 30 + corr)
             rotate_x_around(offset_radius*sin(b)*[-sin(a), cos(a), 0] +
                             [0, 0, offset_radius*(1-cos(b)) - dish_depth - offset],
                             tilt, [0, -R2, 0]) + [0, -exc, h]
@@ -222,7 +232,7 @@ module fillet_hexagon_cone(R1, R2, r1, r2, exc, tilt, slope, h, offset, da=$fa, 
     //points_clamped = clamp_z_exp(points, $clamp_z1 - offset, $clamp_z2 - offset);
 
     face_bot = [for (i = [0 : 1 : n_points_cone[0]-1]) i];
-    face_top = [for (i = [0 : 1 : steps_rim-1]) len(points_cone) - 1 - i];
+    face_top = [for (i = [0 : 1 : n_points_cone[steps_cone]-1]) len(points_cone) - 1 - i];
     faces_caps = dish ? [face_bot] : [face_bot, face_top];
     faces_cone = concentric_faces(steps_cone + (dish ? steps_dish : 0),
                                   n_points);
@@ -430,7 +440,7 @@ module saddlekey(detail = 32) {
         union() {
             difference() {
                 translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
-                shell($thickness, da=5);
+                shell($thickness, da=3);
                 rgb_holes();
                 switch_top();
             }

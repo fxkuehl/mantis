@@ -40,6 +40,9 @@ function clamp_z_exp(points, z1, z2) = let (d = z2 - z1)
          z2 - d * exp((z1 - p.z) / d)]
     ];
 
+function sum(vec, i = 0, s = 0) =
+    i >= len(vec) ? s : sum(vec, i+1, s + vec[i]);
+
 function part_sums(seq) = [for (a = 0, i = 0; i <= len(seq);
                                 a = a + seq[min(i, len(seq)-1)],
                                 i = i + 1) a];
