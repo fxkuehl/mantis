@@ -48,12 +48,14 @@ function __offset_helper(points, n, o) = let (
 // o - offset along the normal vectors
 
 // Parabolic dish
-module parabolic_dish(d, alpha, size, n, o = 0) {
+module parabolic_dish(d, alpha, size, n, o = 0, side_saddle = false) {
     b = tan(alpha) / d;
     a = -b * (d/2)^2;
     points = [for (i = [0 : n]) each let (y = i * size / n - size/2)
         [for (j = [0 : n]) let (x = j * size / n - size/2)
-            [x, y, b * (x^2 + y^2) + a]
+            [x, y, a +
+             (side_saddle && x > 0 ? -b : b) * x^2 +
+             b * y^2]
         ]
     ];
     points_offset = o ? __offset_helper(points, n, o) : points;

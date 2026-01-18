@@ -5,9 +5,11 @@ n_keys = 1;
 $choc_version = 1; // [1: v1, 2: v2]
 // Whether to render RGB LED cutouts in the keycaps
 $rgb = true;
-// Whether to use a minkowski sum for more consistent thickness
+// Slow legacy method to make consistent wall thickness
 $minkowski = false;
-// Whether to use a saddle-shaped dish (not enabled with minkowski)
+// Legacy spherical dish
+$spherical = false;
+// Saddle-shaped dish, makes a parabolic dish if false
 $saddle = true;
 
 // Key parameters:
@@ -31,9 +33,9 @@ $dish_diam = 14;
 $fillet = 3;
 // Maximum dish excentricity (tilt / 7.5)
 $max_exc = 2.5;
-// Start soft-clamping Z at
+// Start soft-clamping Z at (only for legacy dish)
 $clamp_z1 = 8.25;
-// Clamp infinity Z to
+// Clamp infinity Z to (only for legacy dish)
 $clamp_z2 = 10.25;
 
 // How far the keys are pressed down (0-3mm)
@@ -346,7 +348,8 @@ module choc_stem() {
 }
 
 module rgb_holes() {
-    tilt = $saddle ? min($tilt, 15) : $tilt;
+    spherical = $spherical || $minkowski;
+    tilt = !spherical ? min($tilt, 15) : $tilt;
     exc = min($max_exc, tilt/7.5);
     dy_tilt = $dish_diam * (1 - cos(tilt)) + exc;
     y0 = 8.0 - dy_tilt + (dy_tilt > 4 ? 0.1 : 0);
@@ -411,7 +414,7 @@ module offsetkey(detail = 32) {
                                     $print_stats=false);*/
 }
 
-module saddlekey(detail = 32) {
+module dishedkey(detail = 32) {
     R1 = $key_width / 2;
     R2 = $dish_diam / 2;
     r1 = $fillet;
@@ -426,16 +429,20 @@ module saddlekey(detail = 32) {
 
     module shell(offset, da=$fa) {
         dish_size = $key_width * 2 / sqrt(3) + exc;
-        dish_res = ceil(180 / (3.14 * da));
-        double = ($tilt > 15);
+        dish_res = floor(180 / (3.14 * da) / 2) * 2 + 1;
+        double = ($tilt > $slope);
         intersection() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
                                 $tilt, $slope, height, offset, da=da,
                                 dish=false);
             translate([0, -R2 - exc, height]) rotate([$tilt, 0, 0])
                 translate([0, R2, 0]) rotate([0, 0, 90])
-                saddle2_dish($dish_diam, $dish_diam / sqrt(2), $slope, dish_size,
-                            dish_res, -offset, double);
+                if ($saddle)
+                    saddle2_dish($dish_diam, $dish_diam / sqrt(2), $slope,
+                                 dish_size, dish_res, -offset, double);
+                else
+                    parabolic_dish($dish_diam, $slope,
+                                 dish_size, dish_res, -offset, double);
         }
     }
 
@@ -443,7 +450,7 @@ module saddlekey(detail = 32) {
         union() {
             difference() {
                 translate([0, 0, R1*1.5 + 0.01]) cube(R1*3, center=true);
-                shell($thickness, da=3);
+                shell($thickness, da=max($fa, 3));
                 rgb_holes();
                 switch_top();
             }
@@ -538,10 +545,10 @@ module key(detail = 24) {
     color($key_color ? $key_color : undef) render(convexity=8) difference () {
         if ($minkowski)
             minkey(detail);
-        else if ($saddle)
-            saddlekey(detail);
-        else
+        else if ($spherical)
             offsetkey(detail);
+        else
+            dishedkey(detail);
     }
 }
 
