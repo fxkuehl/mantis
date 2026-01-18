@@ -115,16 +115,16 @@ slope = 15;
 // Tilt angle for home keys
 tilt1 = 15;
 // Rise of the home keys
-rise1 = -0.5;
+rise1 = -0.5; // [-0.5:0.1:4]
 // Tilt angle for top row keys
 tilt2 = 28;
 // Rise of the top row keys
-rise2 = 1.5;
+rise2 = 2.0; // [-0.5:0.1:4]
 //rise2 = 2.9;
 // Tilt angle for bottom row keys
 tilt3 = 28;
 // Rise of the top bottom keys
-rise3 = -0.5;
+rise3 = -0.5; // [-0.5:0.1:4]
 
 /* [Colors] */
 key_color = "linen";

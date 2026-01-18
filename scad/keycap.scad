@@ -430,19 +430,30 @@ module dishedkey(detail = 32) {
     module shell(offset, da=$fa) {
         dish_size = $key_width * 2 / sqrt(3) + exc;
         dish_res = floor(180 / (3.14 * da) / 2) * 2 + 1;
-        double = ($tilt > $slope);
+        side_saddle = ($tilt > $slope);
         intersection() {
             fillet_hexagon_cone(R1, R2, r1, r2, exc,
                                 $tilt, $slope, height, offset, da=da,
                                 dish=false);
+            saddle_version = 2;
+            side_slope = $tilt;
+            //side_slope = ($tilt + $slope) / 2;
+            //side_slope = $slope;
             translate([0, -R2 - exc, height]) rotate([$tilt, 0, 0])
-                translate([0, R2, 0]) rotate([0, 0, 90])
-                if ($saddle)
-                    saddle2_dish($dish_diam, $dish_diam / sqrt(2), $slope,
-                                 dish_size, dish_res, -offset, double);
-                else
-                    parabolic_dish($dish_diam, $slope,
-                                 dish_size, dish_res, -offset, double);
+                translate([0, R2, 0]) rotate([0, 0, 90]) if ($saddle) {
+                    if (saddle_version == 1)
+                        saddle_dish($dish_diam, $dish_diam / sqrt(2), $slope,
+                                    dish_size, dish_res, -offset, side_saddle);
+                    else if (saddle_version == 2)
+                        saddle2_dish($dish_diam, $dish_diam / sqrt(2),
+                                     $slope, side_slope,
+                                     dish_size, dish_res, -offset, side_saddle);
+                    else
+                        saddle3_dish($dish_diam, $dish_diam / sqrt(2), $slope,
+                                     dish_size, dish_res, -offset, side_saddle);
+                } else
+                    parabolic_dish($dish_diam, $slope, side_slope,
+                                   dish_size, dish_res, -offset, side_saddle);
         }
     }
 
