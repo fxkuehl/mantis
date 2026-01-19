@@ -172,8 +172,9 @@ trackball_position = [0, -hy - 3*dy/2, trackball_z];
 //trackball_diameter = 24;
 //trackball_position = [0, -hy - 2*dy/2, trackball_diameter/2 + 10];
 
+// Display 1.9mm thick + 0.1mm tolerance, 1mm thick frame around it = 3mm
 display_position = [0, mcu_top-mcu_size.y - 2.6 + 18,
-                    main_height+raised_height-1];
+                    main_height+raised_height+display_bump_height-3];
 
 use <utils.scad>
 
@@ -516,6 +517,15 @@ module flat_head_screw(length) {
 module mcu(height, offset)
     translate([0, mcu_y, 0]) linear_extrude(height) offset(r=offset)
         square(mcu_size, center=true);
+module mcu_pins(height, diam) {
+    y0 = mcu_y - 2.54*6;
+    for (i = [0:11]) {
+        translate([-7.62, y0 + i*2.54, 0])
+            cylinder(h=height, d=diam);
+        translate([ 7.62, y0 + i*2.54, 0])
+            cylinder(h=height, d=diam);
+    }
+}
 module display_cable_cutout(height, offset)
     translate([0, mcu_y - mcu_size.y/2, 0]) linear_extrude(height)
         offset(r=offset) square([12-2*offset, 7-2*offset], center=true);
@@ -824,15 +834,21 @@ module case(fast_shadow=false) union() {
             }
             translate([0, 0,
                        main_height + raised_height - deck_thickness - 1])
-                mcu(2, 0);
+                mcu_pins(2, 3);
 
-            usb_height = 0.6 + 1.5;
+            // allow +/-2mm movement or misalignment for max-size plug
+            usb_height = 0.6 + 4;
+            // allow USB plugs or magnetic adapters with 2.5mm width
+            // surrounding the USB plug itself
             usb_offset = 1.255 + 2.5;
+            // Assume Z position of top-mounted USB port with 8.4mm female +
+            // 2.5mm male headers. Mid-mounted USB will have only 0.4mm to move
+            // up, but down-movement matters more
+            usb_z = main_pcb_z + pcb_thickness + 8.4+2.5 - (1.255*2+0.6)/2;
             w = max(wall_thickness_main, wall_thickness_raised);
             translate([0, mcu_top + s_pcb + w + 0.1,
-                       main_height + raised_height - deck_thickness
-                       - usb_height/2 - usb_offset])
-                usb_port_template(usb_offset, w + 0.2, usb_height);
+                       usb_z])
+                usb_port_template(usb_offset, w + 1.2, usb_height);
 
             power_switch_cutout();
 
@@ -924,10 +940,10 @@ module male_header(height, pin_l1, pin_l2, n) {
 }
 module usb_port(depth) union() {
     color("lightgrey") render(convexity=10) difference() {
-        usb_port_template(1.255, 10.5);
-        translate([0, 0.1, 0]) usb_port_template(1.155, 10.5);
+        usb_port_template(1.255, depth);
+        translate([0, 0.1, 0]) usb_port_template(1.155, depth);
     }
-    color("#303030") translate([0, 0.05, 0]) usb_port_template(0, 10.4);
+    color("#303030") translate([0, 0.05, 0]) usb_port_template(0, depth-0.1);
 }
 
 module ffc_connector_hirose() {
@@ -1007,11 +1023,17 @@ module reset_button() {
 module controller() {
     ex = $explode;
     y0 = -2.54*6;
+    usb_mount_z = 0;
     translate([-7.62, y0, 8.4 + 1*ex]) male_header(2.49, 6, 3, 12);
     translate([ 7.62, y0, 8.4 + 1*ex]) male_header(2.49, 6, 3, 12);
     color(pcb_color) translate([-mcu_size.x/2, -mcu_size.y/2, 10.9 + ex])
-        cube([mcu_size.x, mcu_size.y, 1.6]);
-    translate([0, mcu_size.y/2, 10.9 + ex - 1.6]) usb_port(10.5);
+        difference() {
+            cube([mcu_size.x, mcu_size.y, 1.6]);
+            if (usb_mount_z < 1.6)
+                translate([(mcu_size.x - 9.3)/2, mcu_size.y - 10.6, -0.1])
+                    cube([9.3, 10.7, 1.8]);
+        }
+    translate([0, mcu_size.y/2, 10.9 + ex - usb_mount_z]) usb_port(10.5);
 }
 
 module main_pcb_assembly(show_mcu=true) {
@@ -1075,9 +1097,10 @@ module niceview_cutout() union() {
     // PCB + display
     translate([0, 0, 0.95]) cube([14.2, 36.2, 1.91], center=true);
     // Ribbon cable
-    translate([0, 13.7, 0.5]) rotate([0, 90, 0])
+    below_ribbon = 1;
+    translate([0, 13.7, 0.5-below_ribbon]) rotate([0, 90, 0])
         linear_extrude(height=10.5, center=true)
-        offset(r=0.75) square([0.5, 8], center=true);
+        offset(r=0.75) square([0.5+2*below_ribbon, 8], center=true);
 
     // Opening for visible area with 0.5mm margin and 1mm fillet
     wh = main_height + raised_height + display_bump_height -
