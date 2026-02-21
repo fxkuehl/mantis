@@ -100,10 +100,9 @@ gasket_length = 13; // [1:1:20]
 gasket_width = 4; // [1:1:20]
 
 /* [Keycaps] */
-// Switch type
 switch_type = 1; // [1: Choc v1, 2: Choc v2]
-// Switch color scheme
 switch_colors = 6; // [0: Red, 1: Blue, 2: Brown, 3: Pro Red, 4: Pink, 5: Robin, 6: Sunset, 7: Twilight, 8: Nocturnal, 9: Sunrise, 10: Bokeh]
+show_legends = false;
 // RGB LED cutouts
 rgb = false;
 // Saddle shaped dish
@@ -1306,7 +1305,7 @@ module trackball_holder(fast_shadow=false) intersection() {
     render(convexity=10) case_inside(hfit, vfit);
 }
 
-module key_profile(x, key_color="") {
+module key_profile(x, key_color, angle, l_angle, legend) {
     $fa = $fs*2;
     $choc_version = switch_type;
     $rgb = rgb;
@@ -1317,12 +1316,20 @@ module key_profile(x, key_color="") {
     $color_scheme=switch_colors;
     z_off = switch_type == 2 ? 0.5 : 0;
 
-    if (x == 0) {
-        switch_key($tilt=tilt1, $rise=rise1+z_off, $saddle=saddle);
-    } else if (x == 1) {
-        switch_key($tilt=tilt2, $rise=rise2+z_off, $saddle=saddle);
-    } else if (x == 2) {
-        switch_key($tilt=tilt3, $rise=rise3+z_off, $saddle=saddle);
+    module legend(text, angle) {
+        key_lift = $choc_version == 2 ? 5.3 + 3.3 : 5.5 + 3;
+        translate([0, 0, key_lift - travel - $droop + $explode])
+            color("black") render(convexity=10)
+            dish_legend(text, "", 4, angle);
+    }
+
+    $saddle = saddle;
+    $tilt = (x == 0 ? tilt1 : x == 1 ? tilt2 : tilt3);
+    $rise = (x == 0 ? rise1 : x == 1 ? rise2 : rise3) + z_off;
+    rotate([0, 0, angle]) {
+        switch_key();
+        if (show_legends)
+            legend(legend, -angle+l_angle);
     }
 }
 
@@ -1378,6 +1385,18 @@ module keyboard(fast_shadow=false) {
 
     if ((show_key || show_switch) && !fast_shadow) {
         colors = [key_color, key_color2];
+        main_legends_left = ["- _", "Q", "W", "E",
+                               "J", "A", "S", "D",
+                               "Z", "X", "C", "Win"];
+        main_legends_right = [ "I", "O", "P", "' \"",
+                               "K", "L", "B", "Enter",
+                             ", <", ". >", "/ ?", "Win"];
+        raised_legends_left  = ["R", "F", "T", "V", "G"];
+        raised_legends_right = ["U", "Y", "N", "H", "M"];
+        raised_t_legends_left  = ["Alt", ""];
+        raised_t_legends_right = ["", "AltGr"];
+        main_t_legends_left  = ["Sym"];
+        main_t_legends_right = ["Fun"];
         main_fingers = [
             [0.5,3,  0,0,0],[1.5,3, -60,1,0],[2.5,3, -60,1,0],[3.5,3, -60,1,0],
             [0.0,2,120,0,0],[1.0,2,-120,0,1],[2.0,2,-120,0,1],[3.0,2,-120,0,1],
@@ -1385,9 +1404,9 @@ module keyboard(fast_shadow=false) {
                                                               [2.0,0, 180,1,0]
         ];
         raised_fingers = [
-            [4.0,2, -60,1,0],[4.5,1,-120,1,0],
-            [3.5,1,-120,0,1],[4.0,0,-120,1,0],
-            [3.0,0, 180,2,0]
+            [4.0,2, -60,1,0],
+            [3.5,1,-120,0,1],[4.5,1,-120,1,0],
+            [3.0,0, 180,2,0],[4.0,0,-120,1,0]
         ];
         raised_thumbs =   [[2.5,-1,60,0,0],[3.5,-1,0,0,1]];
         main_thumbs =     [[4.0,-2, 0,1,0]];
@@ -1396,29 +1415,45 @@ module keyboard(fast_shadow=false) {
             raised_z = raised_switch_z + 11*ex;
             hx = hx + ex/3;
             hy = hy + ex/3;
-            for (k = main_fingers) {
+            for (i = [0 : len(main_fingers)-1])
+                let (k = main_fingers[i],
+                     l = main_legends_left[i],
+                     mirror = [3, 2, 1, 0, 7, 6, 5, 4, 10, 9, 8, 11],
+                     r = main_legends_right[mirror[i]]) {
                 translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy, main_z])
-                    rotate([0, 0, k[2]]) key_profile(k[3],colors[k[4]]);
+                    key_profile(k[3],colors[k[4]],k[2],-30,l);
                 translate([5*hx + dx/2 - k[0]*hx, k[1]*hy, main_z])
-                    rotate([0, 0,-k[2]]) key_profile(k[3],colors[k[4]]);
+                    key_profile(k[3],colors[k[4]],-k[2],30,r);
             }
-            for (k = main_thumbs) {
+            for (i = [0 : len(main_thumbs)-1])
+                let (k = main_thumbs[i],
+                     l = main_t_legends_left[i],
+                     mirror = [0],
+                     r = main_t_legends_right[mirror[i]]) {
                 translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy - dy, main_z])
-                    rotate([0, 0, k[2]]) key_profile(k[3],colors[k[4]]);
+                    key_profile(k[3],colors[k[4]],k[2],-30,l);
                 translate([5*hx + dx/2 - k[0]*hx, k[1]*hy - dy, main_z])
-                    rotate([0, 0,-k[2]]) key_profile(k[3],colors[k[4]]);
+                    key_profile(k[3],colors[k[4]],-k[2],30,r);
             }
-            for (k = raised_fingers) {
+            for (i = [0 : len(raised_fingers)-1])
+                let (k = raised_fingers[i],
+                     l = raised_legends_left[i],
+                     mirror = [0, 2, 1, 4, 3],
+                     r = raised_legends_right[mirror[i]]) {
                 translate([-5*hx - dx/2 + k[0]*hx, k[1]*hy, raised_z])
-                    rotate([0, 0, k[2]]) key_profile(k[3],colors[k[4]]);
+                    key_profile(k[3],colors[k[4]],k[2],-30,l);
                 translate([5*hx + dx/2 - k[0]*hx, k[1]*hy, raised_z])
-                    rotate([0, 0,-k[2]]) key_profile(k[3],colors[k[4]]);
+                    key_profile(k[3],colors[k[4]],-k[2],30,r);
             }
-            for (k = raised_thumbs) {
+            for (i = [0 : len(raised_thumbs)-1])
+                let (k = raised_thumbs[i],
+                     l = raised_t_legends_left[i],
+                     mirror = [1, 0],
+                     r = raised_t_legends_right[mirror[i]]) {
                 translate([-5*hx -dx/2 + k[0]*hx, k[1]*hy - dy, raised_z])
-                    rotate([0, 0, k[2]]) key_profile(k[3],colors[k[4]]);
+                    key_profile(k[3],colors[k[4]],k[2],-30,l);
                 translate([5*hx + dx/2 - k[0]*hx, k[1]*hy - dy, raised_z])
-                    rotate([0, 0,-k[2]]) key_profile(k[3],colors[k[4]]);
+                    key_profile(k[3],colors[k[4]],-k[2],30,r);
             }
         }
     }

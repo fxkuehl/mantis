@@ -552,6 +552,44 @@ module minkey(detail = 32) {
     }
 }
 
+module dish_legend(legend, font, size, angle) {
+    R1 = $key_width / 2;
+    R2 = $dish_diam / 2;
+    r1 = $fillet;
+    r2 = R2;
+    exc = min($max_exc, $tilt/7.5);
+    height = $droop + $rise + $thickness;
+
+    module dish(offset=0, da=$fa) {
+        dish_size = $key_width * 2 / sqrt(3) + exc;
+        dish_res = floor(180 / (3.14 * da) / 2) * 2 + 1;
+        side_saddle = ($tilt > $slope);
+        saddle_version = 2;
+        side_slope = $tilt;
+        translate([0, -R2 - exc, height]) rotate([$tilt, 0, 0])
+            translate([0, R2, 0]) rotate([0, 0, 90]) if ($saddle) {
+                if (saddle_version == 1)
+                    saddle_dish($dish_diam, $dish_diam / sqrt(2), $slope,
+                                dish_size, dish_res, -offset, side_saddle);
+                else if (saddle_version == 2)
+                    saddle2_dish($dish_diam, $dish_diam / sqrt(2),
+                                 $slope, side_slope,
+                                 dish_size, dish_res, -offset, side_saddle);
+                else
+                    saddle3_dish($dish_diam, $dish_diam / sqrt(2), $slope,
+                                 dish_size, dish_res, -offset, side_saddle);
+            } else
+                parabolic_dish($dish_diam, $slope, side_slope,
+                               dish_size, dish_res, -offset, side_saddle);
+    }
+
+    if (show_key) translate([0, 0, 0.01]) intersection() {
+        dish();
+        translate([0, -exc, 0]) rotate([0, 0, angle]) linear_extrude(height=20)
+            text(legend, font=font, size=size, halign="center", valign="center");
+    }
+}
+
 module key(detail = 24) {
     color($key_color ? $key_color : undef) render(convexity=8) difference () {
         if ($minkowski)
